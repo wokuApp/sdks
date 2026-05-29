@@ -1,0 +1,60 @@
+{
+  "name": "@wokuapp/woku-widget",
+  "version": "0.1.0",
+  "private": false,
+  "description": "Ambivalent web widget micro-app (woku 1-5 + NPS 0-10), distributed via CDN iframe + lightweight loader script.",
+  "keywords": [
+    "woku",
+    "widget",
+    "nps",
+    "feedback",
+    "embed",
+    "cdn",
+    "iframe"
+  ],
+  "license": "MIT",
+  "author": "Woku",
+  "homepage": "https://github.com/wokuApp/sdks/tree/main/packages/woku-widget#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wokuApp/sdks.git",
+    "directory": "packages/woku-widget"
+  },
+  "bugs": {
+    "url": "https://github.com/wokuApp/sdks/issues"
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "vite --config vite.app.config.ts",
+    "build": "pnpm build:app && pnpm build:loader",
+    "build:app": "tsc --noEmit && vite build --config vite.app.config.ts",
+    "build:loader": "vite build --config vite.loader.config.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "lint": "eslint .",
+    "preview": "vite preview --config vite.app.config.ts"
+  },
+  "dependencies": {
+    "@base-ui/react": "^1.1.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.562.0",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "tailwind-merge": "^3.4.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@testing-library/react": "^16.3.1",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^4.3.4",
+    "jsdom": "^26.1.0",
+    "tailwindcss": "^4",
+    "typescript": "^5.7.2",
+    "vite": "^7.0.0",
+    "vitest": "^3.2.4"
+  }
+}

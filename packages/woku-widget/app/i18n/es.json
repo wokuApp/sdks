@@ -1,0 +1,41 @@
+{
+  "qualifier": {
+    "rateBad": "Malo",
+    "rateGood": "Muy Bueno",
+    "tooltip": "Califica del 1 al 5",
+    "rateUs": "Califica y deja un comentario sobre:",
+    "npsQuestion": "¿Con qué probabilidad recomendarías nuestros servicios a un amigo o colega?",
+    "npsDetractor": "Nada probable",
+    "npsPromoter": "Muy probable",
+    "npsTooltip": "Selecciona un puntaje del 0 al 10"
+  },
+  "feedback": {
+    "title": "Profundiza tu calificación dejando un texto o audio.",
+    "placeholder": "Escribe aquí tu opinión...",
+    "send": "Enviar Feedback",
+    "pending": "Escribe o Graba tu Opinión",
+    "recordAudio": "Presiona para grabar audio",
+    "stop": "Parar",
+    "delete": "Borrar",
+    "emailRequired": "Ingresa un email válido",
+    "skip": "Saltar"
+  },
+  "identity": {
+    "emailPlaceholder": "Email...",
+    "anonymous": "Anónimo"
+  },
+  "thank": {
+    "title": "¡Gracias por tu Opinión!",
+    "subtitle": "Estamos comprometidos a escuchar y adaptarnos a tus necesidades para brindarte el máximo valor.",
+    "rateAgain": "Volver a Calificar"
+  },
+  "branding": {
+    "poweredBy": "Powered by"
+  },
+  "aria": {
+    "closeWidget": "Cerrar widget",
+    "openFeedback": "Abrir feedback",
+    "starRating": "Calificación en estrellas",
+    "npsRating": "Puntuación NPS del 0 al 10"
+  }
+}
