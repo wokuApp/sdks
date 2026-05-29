@@ -1,0 +1,73 @@
+{
+  "name": "@wokuapp/react-native",
+  "version": "0.1.0",
+  "description": "React Native SDK to capture Woku ratings and NPS (text + audio) with offline buffering and configurable intercepts.",
+  "keywords": [
+    "woku",
+    "react-native",
+    "feedback",
+    "nps",
+    "sdk",
+    "customer-feedback",
+    "voice-of-customer"
+  ],
+  "license": "MIT",
+  "author": "Woku",
+  "homepage": "https://github.com/wokuApp/sdks/tree/main/packages/react-native#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wokuApp/sdks.git",
+    "directory": "packages/react-native"
+  },
+  "bugs": {
+    "url": "https://github.com/wokuApp/sdks/issues"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": false
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "prepublishOnly": "pnpm build",
+    "clean": "rm -rf dist",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src"
+  },
+  "peerDependencies": {
+    "react": ">=17",
+    "react-native": ">=0.68"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-native": {
+      "optional": true
+    }
+  }
+}

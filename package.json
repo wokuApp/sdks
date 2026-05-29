@@ -1,0 +1,46 @@
+{
+  "name": "@wokuapp/sdks",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Monorepo for Woku's official SDKs.",
+  "license": "MIT",
+  "homepage": "https://github.com/wokuApp/sdks#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wokuApp/sdks.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wokuApp/sdks/issues"
+  },
+  "packageManager": "pnpm@10.20.0",
+  "engines": {
+    "node": ">=18"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  },
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "test:run": "pnpm -r test:run",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "format": "prettier --write \"**/*.{ts,tsx,json,md,yml,yaml}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,json,md,yml,yaml}\"",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "release": "pnpm build && changeset publish"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.27.10",
+    "@eslint/js": "^9.17.0",
+    "eslint": "^9.17.0",
+    "prettier": "^3.4.2",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.18.0",
+    "vitest": "^2.1.8"
+  }
+}
