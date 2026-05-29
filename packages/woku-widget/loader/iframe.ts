@@ -25,7 +25,7 @@ export function createIframeManager(
   behavior: string,
   onMessage: (msg: PostMessageFromApp) => void,
 ): IframeManager {
-  const widgetBaseUrl = config.widgetBaseUrl ?? `${CDN_ORIGIN}/woku-widget/v1`;
+  const widgetBaseUrl = config.widgetBaseUrl ?? `${CDN_ORIGIN}/sdks/woku-widget/v1`;
   const appOrigin = extractOrigin(widgetBaseUrl);
   const zIndex = config.theme?.zIndex ?? 999999;
 

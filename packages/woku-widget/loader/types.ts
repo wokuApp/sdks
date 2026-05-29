@@ -33,7 +33,7 @@ export interface WokuWidgetConfig {
   npsToolId?: string;
   /** Default: https://clientapi.woku.app */
   apiBaseUrl?: string;
-  /** Default: https://cdn.woku.app/woku-widget/v1 */
+  /** Default: https://cdn.woku.app/sdks/woku-widget/v1 */
   widgetBaseUrl?: string;
   /** Force locale ('es' | 'en'); if omitted, auto-detect from navigator */
   lang?: string;

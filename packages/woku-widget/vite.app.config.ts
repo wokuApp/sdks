@@ -8,6 +8,10 @@ import { resolve } from 'path';
  */
 export default defineConfig({
   root: 'app',
+  // Relative base so index.html references its assets as ./assets/... — this
+  // makes the build portable under any CDN path prefix
+  // (e.g. cdn.woku.app/sdks/woku-widget/v1/ and /v0.1.0/) without rebuilding.
+  base: './',
   plugins: [react()],
   resolve: {
     alias: {

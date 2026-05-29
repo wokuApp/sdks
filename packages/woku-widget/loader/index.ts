@@ -5,7 +5,7 @@
  * Target size: ≤ ~5 KB gzipped. No React, no framework — pure vanilla TS.
  *
  * Usage in the host page:
- *   <script src="https://cdn.woku.app/woku-widget/v1/loader.js"></script>
+ *   <script src="https://cdn.woku.app/sdks/woku-widget/v1/loader.js"></script>
  *   <script>
  *     WokuWidget.init({
  *       companyId: 'COMPANY_ID',

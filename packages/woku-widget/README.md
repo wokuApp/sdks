@@ -9,7 +9,7 @@ website via a lightweight loader `<script>` (~2.5 KB gzipped) that injects an `<
 
 ```html
 <!-- 1. Load the loader (the only script your page needs) -->
-<script src="https://cdn.woku.app/woku-widget/v1/loader.js"></script>
+<script src="https://cdn.woku.app/sdks/woku-widget/v1/loader.js"></script>
 
 <!-- 2. Initialize the widget -->
 <script>
@@ -48,7 +48,7 @@ interface WokuWidgetConfig {
   wokuId?: string;                  // required when captureType === 'woku'
   npsToolId?: string;               // optional for NPS — omit for company-level
   apiBaseUrl?: string;              // default: https://clientapi.woku.app
-  widgetBaseUrl?: string;           // default: https://cdn.woku.app/woku-widget/v1
+  widgetBaseUrl?: string;           // default: https://cdn.woku.app/sdks/woku-widget/v1
   lang?: string;                    // 'es' | 'en'; auto-detect if omitted
   branding?: boolean;               // show "Powered by Woku"; default: true
 
@@ -124,11 +124,11 @@ Build outputs:
 ## CDN paths (S3 + CloudFront)
 
 ```
-cdn.woku.app/woku-widget/v1/loader.js          ← major-alias (cache 5 min)
-cdn.woku.app/woku-widget/v1/index.html         ← major-alias (cache 5 min)
-cdn.woku.app/woku-widget/v0.1.0/loader.js      ← semver-pinned (cache immutable)
-cdn.woku.app/woku-widget/v0.1.0/index.html
-cdn.woku.app/woku-widget/v0.1.0/assets/*
+cdn.woku.app/sdks/woku-widget/v1/loader.js          ← major-alias (cache 5 min)
+cdn.woku.app/sdks/woku-widget/v1/index.html         ← major-alias (cache 5 min)
+cdn.woku.app/sdks/woku-widget/v0.1.0/loader.js      ← semver-pinned (cache immutable)
+cdn.woku.app/sdks/woku-widget/v0.1.0/index.html
+cdn.woku.app/sdks/woku-widget/v0.1.0/assets/*
 ```
 
 CDN publish is handled by `scripts/release-widget.sh` (infra task — not part of this package).
