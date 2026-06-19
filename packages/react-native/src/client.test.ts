@@ -48,7 +48,7 @@ describe('WokuClient', () => {
     const result = await mkClient({ request }).send(submission);
     const req = request.mock.calls[0][0];
     expect(req.method).toBe('POST');
-    expect(req.url).toBe('https://api.woku.app/sdk/v1/captures');
+    expect(req.url).toBe('https://api.woku.app/v1/captures');
     expect(req.headers.Authorization).toBe('Bearer pk_test');
     expect(req.headers['X-Woku-Company']).toBe('c1');
     expect(req.headers['X-Woku-Idempotency-Key']).toBe('cap_1');

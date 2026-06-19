@@ -131,6 +131,7 @@ export async function createWokuTextnote(params: CreateWokuTextnoteParams): Prom
   const body: Record<string, unknown> = {
     qualification,
     description,
+    responseChannel: 'widget-web',
     ...(anonymous || !clientEmail ? { anonymous: true } : { clientEmail }),
   };
 
@@ -155,6 +156,7 @@ export async function createWokuVoicemail(params: CreateWokuVoicemailParams): Pr
   formData.append('type', 'audio');
   formData.append('size', file.size.toString());
   formData.append('qualification', qualification.toString());
+  formData.append('responseChannel', 'widget-web');
   if (clientEmail && !anonymous) formData.append('clientEmail', clientEmail);
   if (anonymous) formData.append('anonymous', 'true');
 
@@ -190,6 +192,7 @@ export async function createNps(params: CreateNpsParams): Promise<NpsSubmitResul
 
   const body: Record<string, unknown> = {
     score,
+    responseChannel: 'widget-web',
     ...(npsToolId ? { npsToolId } : {}),
     ...(anonymous || !clientEmail ? { anonymous: true } : { clientEmail }),
   };

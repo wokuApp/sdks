@@ -30,6 +30,10 @@ your own ingestion, retry, or offline logic. The SDK:
 > core plus the adapter interfaces. Pre-built React Native adapters
 > (MMKV storage, audio recorder) ship in a follow-up minor; until then you
 > wire your app's libraries to the small interfaces below (a few lines).
+> Captures post to the resource-oriented `/v1/captures` endpoint and are
+> tagged server-side with the `mobile-sdk` response channel. Text + rating /
+> score are supported today; **audio capture ingestion lands with the audio
+> adapter follow-up** (sending `audio` is rejected by the endpoint for now).
 
 ## Install
 
@@ -61,11 +65,11 @@ await woku.captureNps({
   comment: 'Fast checkout, loved it.',
 });
 
-// Woku rating (1–5) with an audio comment
+// Woku rating (1–5) with a text comment
 await woku.captureWoku({
   wokuId: 'woku_store_centro',
   rating: 5,
-  audio: { uri: fileUri, mimeType: 'audio/m4a', durationMs: 4200 },
+  comment: 'Great staff, quick service.',
   respondent: { email: 'ana@example.com' },
 });
 

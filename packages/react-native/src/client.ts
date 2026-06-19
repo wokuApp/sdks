@@ -21,11 +21,13 @@ export interface WokuClientConfig {
   /** HTTP transport. Defaults to the global `fetch`. */
   http?: HttpClient;
   logger?: Logger;
-  /** Ingest path appended to `apiUrl`. Defaults to `/sdk/v1/captures`. */
+  /** Ingest path appended to `apiUrl`. Defaults to `/v1/captures`. */
   capturePath?: string;
 }
 
-const DEFAULT_CAPTURE_PATH = '/sdk/v1/captures';
+// Resource-oriented v1 capture endpoint (woku-server clientapi). The channel
+// ('mobile-sdk') is sealed server-side from this endpoint.
+const DEFAULT_CAPTURE_PATH = '/v1/captures';
 
 /**
  * Thin, typed transport to the Woku capture ingest endpoint. Stateless:
