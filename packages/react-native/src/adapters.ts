@@ -16,7 +16,12 @@ export interface HttpRequest {
   method: string;
   url: string;
   headers: Record<string, string>;
-  body?: string;
+  /**
+   * JSON string for text/rating captures, or a `FormData` for audio captures
+   * (multipart). For `FormData` the host's `fetch` sets the
+   * `multipart/form-data` Content-Type (with boundary) itself.
+   */
+  body?: string | FormData;
 }
 
 /** HTTP transport. Defaults to global `fetch`. */

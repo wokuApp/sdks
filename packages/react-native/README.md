@@ -31,9 +31,11 @@ your own ingestion, retry, or offline logic. The SDK:
 > (MMKV storage, audio recorder) ship in a follow-up minor; until then you
 > wire your app's libraries to the small interfaces below (a few lines).
 > Captures post to the resource-oriented `/v1/captures` endpoint and are
-> tagged server-side with the `mobile-sdk` response channel. Text + rating /
-> score are supported today; **audio capture ingestion lands with the audio
-> adapter follow-up** (sending `audio` is rejected by the endpoint for now).
+> tagged server-side with the `mobile-sdk` response channel. Text/rating and
+> score captures are sent as JSON; **audio captures are sent as multipart**
+> (the `audio.uri` file plus a `payload` field) and become a voicemail review
+> server-side. Submissions are idempotent by their client-generated `id`, so
+> the offline queue can retry safely.
 
 ## Install
 

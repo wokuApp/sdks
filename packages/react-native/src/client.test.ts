@@ -52,12 +52,36 @@ describe('WokuClient', () => {
     expect(req.headers.Authorization).toBe('Bearer pk_test');
     expect(req.headers['X-Woku-Company']).toBe('c1');
     expect(req.headers['X-Woku-Idempotency-Key']).toBe('cap_1');
+    expect(req.headers['Content-Type']).toBe('application/json');
     expect(JSON.parse(req.body as string).score).toBe(9);
     expect(result).toEqual({
       id: 'cap_1',
       status: 'sent',
       remoteId: 'remote_1',
     });
+  });
+
+  it('sends multipart (FormData) without Content-Type when the submission has audio', async () => {
+    const request = vi.fn(async () =>
+      mkResponse({ json: async () => ({ id: 'remote_2' }) }),
+    );
+    const audioSubmission: CaptureSubmission = {
+      ...submission,
+      kind: 'woku',
+      targetId: 'woku1',
+      rating: 5,
+      audio: { uri: 'file:///tmp/a.m4a', mimeType: 'audio/m4a' },
+    };
+
+    await mkClient({ request }).send(audioSubmission);
+    const req = request.mock.calls[0][0];
+
+    expect(req.body).toBeInstanceOf(FormData);
+    // The platform sets the multipart Content-Type (with boundary), not us.
+    expect(req.headers['Content-Type']).toBeUndefined();
+    expect(req.headers['X-Woku-Idempotency-Key']).toBe('cap_1');
+    const payload = (req.body as FormData).get('payload');
+    expect(JSON.parse(payload as string).audio.uri).toBe('file:///tmp/a.m4a');
   });
 
   it('throws WokuQuarantineError on 429 with Retry-After', async () => {

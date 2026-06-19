@@ -57,18 +57,37 @@ export class WokuClient {
    * non-2xx responses (so the caller can decide to re-queue).
    */
   async send(submission: CaptureSubmission): Promise<SubmissionResult> {
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${this.config.publicKey}`,
+      'X-Woku-Company': this.config.companyId,
+      'X-Woku-Idempotency-Key': submission.id,
+    };
+
+    let requestBody: string | FormData;
+    if (submission.audio) {
+      // Audio capture: send multipart so the server can store the voicemail.
+      // The platform `fetch` reads the local `uri` and sets the multipart
+      // Content-Type (with boundary), so we must NOT set it ourselves.
+      const form = new FormData();
+      form.append('file', {
+        uri: submission.audio.uri,
+        type: submission.audio.mimeType,
+        name: 'capture-audio',
+      } as unknown as Blob);
+      form.append('payload', JSON.stringify(submission));
+      requestBody = form;
+    } else {
+      headers['Content-Type'] = 'application/json';
+      requestBody = JSON.stringify(submission);
+    }
+
     let response;
     try {
       response = await this.http.request({
         method: 'POST',
         url: this.endpoint,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.config.publicKey}`,
-          'X-Woku-Company': this.config.companyId,
-          'X-Woku-Idempotency-Key': submission.id,
-        },
-        body: JSON.stringify(submission),
+        headers,
+        body: requestBody,
       });
     } catch (err) {
       throw new WokuNetworkError((err as Error).message);
