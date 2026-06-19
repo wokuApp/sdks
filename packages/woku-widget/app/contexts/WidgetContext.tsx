@@ -136,7 +136,7 @@ export function WidgetProvider({ config, initialEmail, children }: WidgetProvide
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [config.captureType, config.wokuId, config.apiBaseUrl, config.publishableKey]);
 
   const reset = () => {
