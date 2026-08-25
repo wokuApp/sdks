@@ -12,8 +12,8 @@ import type {
 import type {
   DeletedResult,
   InvitationsResult,
-  Woku,
   WokuRecord,
+  WokuResource,
 } from '../models';
 
 /** Manage wokus (feedback collection tools) — `/v1/wokus`. */
@@ -23,12 +23,12 @@ export class Wokus {
   list(
     params?: { page?: number; limit?: number },
     opts?: RequestOptions,
-  ): Promise<Page<Woku>> {
-    return this.client.getPage<Woku>('/v1/wokus', params, opts);
+  ): Promise<Page<WokuResource>> {
+    return this.client.getPage<WokuResource>('/v1/wokus', params, opts);
   }
 
-  create(body: CreateWokuParams, opts?: RequestOptions): Promise<Woku> {
-    return this.client.request<Woku>('post', '/v1/wokus', {
+  create(body: CreateWokuParams, opts?: RequestOptions): Promise<WokuResource> {
+    return this.client.request<WokuResource>('post', '/v1/wokus', {
       ...opts,
       body,
       idempotent: true,
@@ -36,16 +36,16 @@ export class Wokus {
   }
 
   /** Get one woku with aggregated review stats. */
-  get(id: string, opts?: RequestOptions): Promise<Woku> {
-    return this.client.request<Woku>('get', `/v1/wokus/${id}`, opts);
+  get(id: string, opts?: RequestOptions): Promise<WokuResource> {
+    return this.client.request<WokuResource>('get', `/v1/wokus/${id}`, opts);
   }
 
   update(
     id: string,
     body: UpdateWokuParams,
     opts?: RequestOptions,
-  ): Promise<Woku> {
-    return this.client.request<Woku>('patch', `/v1/wokus/${id}`, {
+  ): Promise<WokuResource> {
+    return this.client.request<WokuResource>('patch', `/v1/wokus/${id}`, {
       ...opts,
       body,
     });
@@ -64,16 +64,16 @@ export class Wokus {
     id: string,
     body: UpdateWokuSettingsParams,
     opts?: RequestOptions,
-  ): Promise<Woku> {
-    return this.client.request<Woku>('patch', `/v1/wokus/${id}/settings`, {
+  ): Promise<WokuResource> {
+    return this.client.request<WokuResource>('patch', `/v1/wokus/${id}/settings`, {
       ...opts,
       body,
     });
   }
 
   /** Move the woku into a folder, or to the root with `{ folderId: null }`. */
-  move(id: string, body: MoveWokuParams, opts?: RequestOptions): Promise<Woku> {
-    return this.client.request<Woku>('patch', `/v1/wokus/${id}/move`, {
+  move(id: string, body: MoveWokuParams, opts?: RequestOptions): Promise<WokuResource> {
+    return this.client.request<WokuResource>('patch', `/v1/wokus/${id}/move`, {
       ...opts,
       body,
     });

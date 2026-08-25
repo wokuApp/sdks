@@ -37,6 +37,39 @@ describe('Woku facade — request shaping', () => {
     expect(key).toBeTruthy();
   });
 
+  it('trackers.assignToWoku upserts a tracker value with an idempotency key', async () => {
+    let key: string | null = null;
+    let body: unknown;
+    server.use(
+      http.post(
+        `${BASE}/v1/external-trackers/wokus/w1`,
+        async ({ request }) => {
+          key = request.headers.get('x-woku-idempotency-key');
+          body = await request.json();
+          return HttpResponse.json({ name: 'crm', value: 'TX-1' });
+        },
+      ),
+    );
+    await woku().trackers.assignToWoku('w1', { name: 'crm', value: 'TX-1' });
+    expect(body).toEqual({ name: 'crm', value: 'TX-1' });
+    expect(key).toBeTruthy();
+  });
+
+  it('trackers.removeFromWoku URL-encodes the tracker name in the DELETE path', async () => {
+    let seenPath: string | null = null;
+    server.use(
+      http.delete(
+        `${BASE}/v1/external-trackers/wokus/w1/:name`,
+        ({ request }) => {
+          seenPath = new URL(request.url).pathname;
+          return HttpResponse.json({ deleted: true });
+        },
+      ),
+    );
+    await woku().trackers.removeFromWoku('w1', 'crm id');
+    expect(seenPath).toBe('/v1/external-trackers/wokus/w1/crm%20id');
+  });
+
   it('npsTools.create -> POST /v1/nps-tools ; get -> GET /v1/nps-tool/:id (singular)', async () => {
     server.use(
       http.post(`${BASE}/v1/nps-tools`, () =>
@@ -63,18 +96,28 @@ describe('Woku facade — request shaping', () => {
     expect(fetched.name).toBe('Survey');
   });
 
-  it('nps.sendInvitations posts to /v1/nps/invitations with an idempotency key', async () => {
+  it('nps.sendInvitations posts the exact wire body to /v1/nps/invitations with an idempotency key', async () => {
     let key: string | null = null;
+    let body: unknown;
     server.use(
-      http.post(`${BASE}/v1/nps/invitations`, ({ request }) => {
+      http.post(`${BASE}/v1/nps/invitations`, async ({ request }) => {
         key = request.headers.get('x-woku-idempotency-key');
+        body = await request.json();
         return HttpResponse.json({ accepted: 2, rejected: 0 }, { status: 202 });
       }),
     );
     const result = await woku().nps.sendInvitations({
+      channel: 'email',
       npsToolId: 'nt1',
-      recipients: [{ email: 'a@b.c' }, { email: 'd@e.f' }],
-    } as never);
+      recipients: ['a@b.c', 'd@e.f'],
+    });
+    // The server DTO requires channel + string[] recipients; assert the exact
+    // shape so a wrong example can never silently reach the wire again.
+    expect(body).toEqual({
+      channel: 'email',
+      npsToolId: 'nt1',
+      recipients: ['a@b.c', 'd@e.f'],
+    });
     expect(result.accepted).toBe(2);
     expect(key).toBeTruthy();
   });

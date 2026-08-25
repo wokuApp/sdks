@@ -73,4 +73,15 @@ describe('Page', () => {
     for await (const item of page) ids.push(item.id);
     expect(ids).toEqual(['e1', 'e2']);
   });
+
+  it('getNextPage throws on the last page (guard with hasNextPage)', async () => {
+    server.use(
+      http.get(`${BASE}/v1/events`, () =>
+        HttpResponse.json({ data: [{ id: 'a' }], total: 1, page: 1, limit: 20 }),
+      ),
+    );
+    const page = await client().getPage<{ id: string }>('/v1/events');
+    expect(page.hasNextPage()).toBe(false);
+    expect(() => page.getNextPage()).toThrow(RangeError);
+  });
 });

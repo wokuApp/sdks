@@ -4,9 +4,14 @@ import { setupServer } from 'msw/node';
 
 import { WokuClient } from './client';
 import {
+  AuthenticationError,
   BadRequestError,
+  ConflictError,
+  InternalServerError,
   NotFoundError,
+  PermissionDeniedError,
   RateLimitError,
+  UnprocessableEntityError,
   WokuConnectionError,
   WokuError,
   WokuTimeoutError,
@@ -89,17 +94,49 @@ describe('WokuClient.request', () => {
     expect(err.message).toContain('a is bad, b is bad');
   });
 
-  it('maps 429 to RateLimitError with retryAfterSeconds', async () => {
+  it('maps 429 to RateLimitError, reading retryAfterSeconds from the Retry-After header', async () => {
     server.use(
       http.get(`${BASE}/v1/thing`, () =>
-        HttpResponse.json({ retryAfter: 1 }, { status: 429 }),
+        HttpResponse.json({}, { status: 429, headers: { 'retry-after': '2' } }),
       ),
     );
     const err = await makeClient({ maxRetries: 0 })
       .request('get', '/v1/thing')
       .catch((e) => e);
     expect(err).toBeInstanceOf(RateLimitError);
-    expect(err.retryAfterSeconds).toBe(1);
+    expect(err.retryAfterSeconds).toBe(2);
+  });
+
+  it('falls back to a retryAfter body field when there is no Retry-After header', async () => {
+    server.use(
+      http.get(`${BASE}/v1/thing`, () =>
+        HttpResponse.json({ retryAfter: 5 }, { status: 429 }),
+      ),
+    );
+    const err = await makeClient({ maxRetries: 0 })
+      .request('get', '/v1/thing')
+      .catch((e) => e);
+    expect(err.retryAfterSeconds).toBe(5);
+  });
+
+  it('maps every documented status to its typed error subclass', async () => {
+    const cases: Array<[number, unknown]> = [
+      [401, AuthenticationError],
+      [403, PermissionDeniedError],
+      [409, ConflictError],
+      [422, UnprocessableEntityError],
+      [503, InternalServerError],
+    ];
+    for (const [status, ctor] of cases) {
+      server.use(
+        http.get(`${BASE}/v1/thing`, () => new HttpResponse(null, { status })),
+      );
+      const err = await makeClient({ maxRetries: 0 })
+        .request('get', '/v1/thing')
+        .catch((e) => e);
+      expect(err, `status ${status}`).toBeInstanceOf(ctor as never);
+      expect(err.status).toBe(status);
+    }
   });
 });
 
@@ -166,6 +203,36 @@ describe('retries', () => {
     expect(out).toEqual({ ok: true });
     expect(calls).toBe(2);
   });
+
+  it('exhausts retries then throws the mapped error (attempts = maxRetries + 1)', async () => {
+    let calls = 0;
+    server.use(
+      http.get(`${BASE}/v1/thing`, () => {
+        calls += 1;
+        return new HttpResponse(null, { status: 503 });
+      }),
+    );
+    await expect(
+      makeClient({ maxRetries: 2 }).request('get', '/v1/thing'),
+    ).rejects.toBeInstanceOf(InternalServerError);
+    expect(calls).toBe(3);
+  });
+});
+
+describe('headers', () => {
+  it('does not let caller headers unset the Authorization bearer', async () => {
+    let auth: string | null = null;
+    server.use(
+      http.get(`${BASE}/v1/thing`, ({ request }) => {
+        auth = request.headers.get('authorization');
+        return HttpResponse.json({ ok: true });
+      }),
+    );
+    await makeClient().request('get', '/v1/thing', {
+      headers: { Authorization: 'Bearer HIJACK', 'X-Extra': '1' },
+    });
+    expect(auth).toBe('Bearer sk_test');
+  });
 });
 
 describe('timeout and abort', () => {
@@ -194,5 +261,23 @@ describe('timeout and abort', () => {
     });
     controller.abort();
     await expect(p).rejects.toBeInstanceOf(WokuConnectionError);
+  });
+
+  it('does not retry a caller-aborted GET even with retries enabled', async () => {
+    let calls = 0;
+    server.use(
+      http.get(`${BASE}/v1/slow`, async () => {
+        calls += 1;
+        await delay('infinite');
+        return HttpResponse.json({});
+      }),
+    );
+    const controller = new AbortController();
+    const p = makeClient({ maxRetries: 3 }).request('get', '/v1/slow', {
+      signal: controller.signal,
+    });
+    controller.abort();
+    await expect(p).rejects.toBeInstanceOf(WokuConnectionError);
+    expect(calls).toBe(1);
   });
 });

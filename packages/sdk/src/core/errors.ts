@@ -60,6 +60,11 @@ export class WokuAPIError extends WokuError {
   readonly requestId?: string;
   /** Parsed response body (or the raw text when it was not JSON). */
   readonly body: WokuErrorBody | string | undefined;
+  /**
+   * Seconds to wait before retrying, from the `Retry-After` response header
+   * (or a `retryAfter` body field as a fallback), when the server sent one.
+   */
+  readonly retryAfterSeconds?: number;
 
   constructor(
     status: number,
@@ -67,12 +72,14 @@ export class WokuAPIError extends WokuError {
     message: string,
     requestId?: string,
     code?: string,
+    retryAfterSeconds?: number,
   ) {
     super(message, { code: code ?? codeForStatus(status) });
     this.name = 'WokuAPIError';
     this.status = status;
     this.body = body;
     this.requestId = requestId;
+    this.retryAfterSeconds = retryAfterSeconds ?? retryAfterFromBody(body);
   }
 
   /** Build the most specific error subclass for a status + body. */
@@ -80,27 +87,29 @@ export class WokuAPIError extends WokuError {
     status: number,
     body: WokuErrorBody | string | undefined,
     requestId?: string,
+    retryAfterSeconds?: number,
   ): WokuAPIError {
     const message = messageFrom(status, body, requestId);
+    const ra = retryAfterSeconds;
     switch (true) {
       case status === 400:
-        return new BadRequestError(status, body, message, requestId);
+        return new BadRequestError(status, body, message, requestId, undefined, ra);
       case status === 401:
-        return new AuthenticationError(status, body, message, requestId);
+        return new AuthenticationError(status, body, message, requestId, undefined, ra);
       case status === 403:
-        return new PermissionDeniedError(status, body, message, requestId);
+        return new PermissionDeniedError(status, body, message, requestId, undefined, ra);
       case status === 404:
-        return new NotFoundError(status, body, message, requestId);
+        return new NotFoundError(status, body, message, requestId, undefined, ra);
       case status === 409:
-        return new ConflictError(status, body, message, requestId);
+        return new ConflictError(status, body, message, requestId, undefined, ra);
       case status === 422:
-        return new UnprocessableEntityError(status, body, message, requestId);
+        return new UnprocessableEntityError(status, body, message, requestId, undefined, ra);
       case status === 429:
-        return new RateLimitError(status, body, message, requestId);
+        return new RateLimitError(status, body, message, requestId, undefined, ra);
       case status >= 500:
-        return new InternalServerError(status, body, message, requestId);
+        return new InternalServerError(status, body, message, requestId, undefined, ra);
       default:
-        return new WokuAPIError(status, body, message, requestId);
+        return new WokuAPIError(status, body, message, requestId, undefined, ra);
     }
   }
 }
@@ -155,19 +164,9 @@ export class UnprocessableEntityError extends WokuAPIError {
 
 /** 429 — rate limited. `retryAfterSeconds` mirrors the `Retry-After` header. */
 export class RateLimitError extends WokuAPIError {
-  readonly retryAfterSeconds?: number;
-
   constructor(...args: ConstructorParameters<typeof WokuAPIError>) {
     super(...args);
     this.name = 'RateLimitError';
-    const body = this.body;
-    if (
-      body &&
-      typeof body === 'object' &&
-      typeof body.retryAfter === 'number'
-    ) {
-      this.retryAfterSeconds = body.retryAfter;
-    }
   }
 }
 
@@ -178,6 +177,13 @@ export class InternalServerError extends WokuAPIError {
     this.name = 'InternalServerError';
   }
 }
+
+const retryAfterFromBody = (
+  body: WokuErrorBody | string | undefined,
+): number | undefined =>
+  body && typeof body === 'object' && typeof body.retryAfter === 'number'
+    ? body.retryAfter
+    : undefined;
 
 const codeForStatus = (status: number): string => {
   const map: Record<number, string> = {

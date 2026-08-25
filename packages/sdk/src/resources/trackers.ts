@@ -2,15 +2,26 @@ import type { WokuClient } from '../core/client';
 import type { Page } from '../core/pagination';
 import type { RequestOptions } from '../core/options';
 import type {
+  AssignTrackerByNameParams,
   CreateTrackerParams,
   SearchEntitiesByTrackersParams,
   UpdateTrackerParams,
 } from '../types';
-import type { EntitiesByTrackers, Tracker } from '../models';
+import type { EntitiesByTrackers, Tracker, WokuRecord } from '../models';
+
+/** A VoC entity type that can carry tracker values. */
+export type TrackerEntityType = 'nps' | 'csat' | 'ces' | 'form' | 'flow';
 
 export interface ListTrackersParams {
   includeInactive?: boolean;
   includeUsage?: boolean;
+  page?: number;
+  limit?: number;
+}
+
+export interface SearchWokusByTrackerParams {
+  name: string;
+  value: string;
   page?: number;
   limit?: number;
 }
@@ -85,6 +96,97 @@ export class Trackers {
       'post',
       '/v1/external-trackers/search-entities',
       { ...opts, body },
+    );
+  }
+
+  /** List the tracker values assigned to a woku. */
+  listWokuValues(
+    wokuId: string,
+    opts?: RequestOptions,
+  ): Promise<WokuRecord[]> {
+    return this.client.request<WokuRecord[]>(
+      'get',
+      `/v1/external-trackers/wokus/${wokuId}`,
+      opts,
+    );
+  }
+
+  /** Assign (upsert) a tracker value to a woku by tracker name. */
+  assignToWoku(
+    wokuId: string,
+    body: AssignTrackerByNameParams,
+    opts?: RequestOptions,
+  ): Promise<WokuRecord> {
+    return this.client.request<WokuRecord>(
+      'post',
+      `/v1/external-trackers/wokus/${wokuId}`,
+      { ...opts, body, idempotent: true },
+    );
+  }
+
+  /** Remove a tracker value from a woku by tracker name. */
+  removeFromWoku(
+    wokuId: string,
+    trackerName: string,
+    opts?: RequestOptions,
+  ): Promise<WokuRecord> {
+    return this.client.request<WokuRecord>(
+      'delete',
+      `/v1/external-trackers/wokus/${wokuId}/${encodeURIComponent(trackerName)}`,
+      opts,
+    );
+  }
+
+  /** Search wokus by an exact `(tracker name, value)` pair (paginated). */
+  searchWokus(
+    params: SearchWokusByTrackerParams,
+    opts?: RequestOptions,
+  ): Promise<Page<WokuRecord>> {
+    return this.client.getPage<WokuRecord>(
+      '/v1/external-trackers/search',
+      params,
+      opts,
+    );
+  }
+
+  /** List the tracker values assigned to a VoC entity (nps/csat/ces/form/flow). */
+  listEntityValues(
+    entityType: TrackerEntityType,
+    id: string,
+    opts?: RequestOptions,
+  ): Promise<WokuRecord[]> {
+    return this.client.request<WokuRecord[]>(
+      'get',
+      `/v1/external-trackers/${entityType}/${id}`,
+      opts,
+    );
+  }
+
+  /** Assign (upsert) a tracker value to a VoC entity by tracker name. */
+  assignToEntity(
+    entityType: TrackerEntityType,
+    id: string,
+    body: AssignTrackerByNameParams,
+    opts?: RequestOptions,
+  ): Promise<WokuRecord> {
+    return this.client.request<WokuRecord>(
+      'post',
+      `/v1/external-trackers/${entityType}/${id}`,
+      { ...opts, body, idempotent: true },
+    );
+  }
+
+  /** Remove a tracker value from a VoC entity by tracker name. */
+  removeFromEntity(
+    entityType: TrackerEntityType,
+    id: string,
+    trackerName: string,
+    opts?: RequestOptions,
+  ): Promise<WokuRecord> {
+    return this.client.request<WokuRecord>(
+      'delete',
+      `/v1/external-trackers/${entityType}/${id}/${encodeURIComponent(trackerName)}`,
+      opts,
     );
   }
 }

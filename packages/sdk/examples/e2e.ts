@@ -35,13 +35,14 @@ async function main(): Promise<void> {
   });
   console.log('npsTool:', tool._id);
 
-  // 4. Optionally send (real invitation — off by default).
+  // 4. Optionally send (real invitation, off by default).
   const recipient = process.env.WOKU_E2E_RECIPIENT;
   if (process.env.WOKU_E2E_ALLOW_SEND === 'true' && recipient) {
     const result = await woku.nps.sendInvitations({
+      channel: 'email',
       npsToolId: tool._id,
-      recipients: [{ email: recipient }],
-    } as never);
+      recipients: [recipient],
+    });
     console.log('sent:', result);
   } else {
     console.log(

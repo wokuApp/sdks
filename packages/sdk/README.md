@@ -56,8 +56,9 @@ const tool = await woku.npsTools.create({
   npsMessage: 'How likely are you to recommend us?',
 });
 await woku.nps.sendInvitations({
+  channel: 'email',
   npsToolId: tool._id,
-  recipients: [{ email: 'ana@example.com' }],
+  recipients: ['ana@example.com'],
 });
 
 // Read delivery + response rate.

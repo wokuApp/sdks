@@ -147,7 +147,7 @@ export class WokuClient {
     let attempt = 0;
     for (;;) {
       try {
-        const { status, body, requestId } = await this.send(
+        const { status, body, requestId, retryAfterSeconds } = await this.send(
           url,
           method,
           headers,
@@ -158,7 +158,12 @@ export class WokuClient {
         if (status >= 200 && status < 300) {
           return body as T;
         }
-        const apiError = WokuAPIError.from(status, body, requestId);
+        const apiError = WokuAPIError.from(
+          status,
+          body,
+          requestId,
+          retryAfterSeconds,
+        );
         if (retryable && attempt < maxRetries && RETRYABLE_STATUS.has(status)) {
           await sleep(this.backoff(attempt, apiError));
           attempt += 1;
@@ -168,6 +173,9 @@ export class WokuClient {
       } catch (error) {
         if (error instanceof WokuAPIError) throw error;
         const connError = toConnectionError(error);
+        // A caller-initiated abort rejects promptly; it is never retried (only
+        // a timeout, which carries a different code, stays retryable).
+        if (connError.code === 'aborted') throw connError;
         if (retryable && attempt < maxRetries) {
           await sleep(this.backoff(attempt));
           attempt += 1;
@@ -230,12 +238,14 @@ export class WokuClient {
     args: RequestArgs,
   ): Record<string, string> {
     const headers: Record<string, string> = {
-      Authorization: `Bearer ${this.apiKey}`,
       Accept: 'application/json',
       'User-Agent': `woku-sdk-js/${SDK_VERSION}`,
       ...this.defaultHeaders,
       ...args.headers,
     };
+    // Authorization is applied last so caller/default headers can never unset
+    // the secret key (the documented guarantee on RequestOptions.headers).
+    headers['Authorization'] = `Bearer ${this.apiKey}`;
     if (args.body !== undefined) {
       headers['Content-Type'] = 'application/json';
     }
@@ -256,6 +266,7 @@ export class WokuClient {
     status: number;
     body: WokuErrorBody | string | undefined;
     requestId?: string;
+    retryAfterSeconds?: number;
   }> {
     const controller = new AbortController();
     let timedOut = false;
@@ -281,6 +292,7 @@ export class WokuClient {
         status: response.status,
         body: parseBody(text),
         requestId: requestIdFrom(response.headers),
+        retryAfterSeconds: retryAfterFromHeaders(response.headers),
       };
     } catch (error) {
       if (timedOut) throw new WokuTimeoutError();
@@ -297,11 +309,8 @@ export class WokuClient {
   private backoff(attempt: number, apiError?: WokuAPIError): number {
     // Honor Retry-After (seconds) when the server sends it, else full jitter.
     const retryAfter =
-      apiError &&
-      apiError.body &&
-      typeof apiError.body === 'object' &&
-      typeof apiError.body.retryAfter === 'number'
-        ? apiError.body.retryAfter * 1000
+      apiError && typeof apiError.retryAfterSeconds === 'number'
+        ? apiError.retryAfterSeconds * 1000
         : undefined;
     if (retryAfter !== undefined) return Math.min(retryAfter, RETRY_CAP_MS);
     const ceiling = Math.min(RETRY_CAP_MS, RETRY_BASE_MS * 2 ** attempt);
@@ -328,6 +337,20 @@ const requestIdFrom = (headers: {
   headers.get('request-id') ??
   headers.get('x-woku-request-id') ??
   undefined;
+
+// Parse the `Retry-After` header, which is either a number of seconds or an
+// HTTP date. Returns seconds to wait, or undefined when absent/unparseable.
+const retryAfterFromHeaders = (headers: {
+  get(name: string): string | null;
+}): number | undefined => {
+  const raw = headers.get('retry-after');
+  if (!raw) return undefined;
+  const seconds = Number(raw);
+  if (Number.isFinite(seconds)) return Math.max(0, seconds);
+  const when = Date.parse(raw);
+  if (!Number.isNaN(when)) return Math.max(0, (when - Date.now()) / 1000);
+  return undefined;
+};
 
 const toConnectionError = (error: unknown): WokuConnectionError => {
   if (error instanceof WokuConnectionError) return error;

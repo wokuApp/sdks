@@ -151,8 +151,11 @@ export interface DispatchStats {
   responseRate: number | null;
 }
 
-/** A woku (feedback collection tool), curated. */
-export interface Woku {
+/**
+ * A woku (feedback collection tool), curated. Named `WokuResource` so it does
+ * not collide with the `Woku` client class at the package root.
+ */
+export interface WokuResource {
   _id: string;
   description: string;
   folderId?: string | null;
