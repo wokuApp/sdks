@@ -1,0 +1,76 @@
+{
+  "name": "@wokuapp/sdk",
+  "version": "0.1.0",
+  "description": "Official server-side SDK for the Woku management API (trackers, VoC tools, action plans, tickets, delivery and capture over /v1).",
+  "keywords": [
+    "woku",
+    "sdk",
+    "api",
+    "customer-feedback",
+    "nps",
+    "csat",
+    "ces",
+    "voice-of-customer"
+  ],
+  "license": "MIT",
+  "author": "Woku",
+  "homepage": "https://github.com/wokuApp/sdks/tree/main/packages/sdk#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wokuApp/sdks.git",
+    "directory": "packages/sdk"
+  },
+  "bugs": {
+    "url": "https://github.com/wokuApp/sdks/issues"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": false
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "prepublishOnly": "pnpm build",
+    "clean": "rm -rf dist",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src",
+    "generate": "openapi-typescript ../../../woku-server/openapi/openapi-v1.json -o src/_generated/openapi.ts",
+    "check:publint": "publint --strict",
+    "check:exports": "attw --pack ."
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
+    "msw": "^2.7.0",
+    "openapi-typescript": "^7.5.0",
+    "publint": "^0.3.2"
+  }
+}
