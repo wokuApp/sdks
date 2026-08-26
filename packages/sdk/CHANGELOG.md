@@ -1,5 +1,11 @@
 # @wokuapp/sdk
 
+## 0.2.2
+
+### Patch Changes
+
+- ce24e1b: Docs: the Quickstart now assigns the created tracker to the NPS tool (it was created but never used), and the monorepo README lists all three packages (`@wokuapp/sdk`, `@wokuapp/react-native`, `@wokuapp/woku-widget`).
+
 ## 0.2.1
 
 ### Patch Changes
