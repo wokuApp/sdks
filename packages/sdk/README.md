@@ -50,18 +50,25 @@ const tracker = await woku.trackers.create({
   system: 'retail',
 });
 
-// Create an NPS tool and send it.
+// Create an NPS tool.
 const tool = await woku.npsTools.create({
   name: 'Post-purchase',
   npsMessage: 'How likely are you to recommend us?',
 });
+
+// Tag the NPS tool with the tracker, so every response is grouped by store.
+await woku.trackers.assignToEntity('nps', tool._id, {
+  name: tracker.name,
+  value: 'TX-42',
+});
+
+// Send it, then read delivery + response rate.
 await woku.nps.sendInvitations({
   channel: 'email',
   npsToolId: tool._id,
   recipients: ['ana@example.com'],
 });
 
-// Read delivery + response rate.
 const stats = await woku.dispatches.stats({ channel: 'email' });
 console.log(stats.responseRate);
 ```
