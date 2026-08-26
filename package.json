@@ -27,6 +27,8 @@
     "test:run": "pnpm -r test:run",
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r typecheck",
+    "check:publint": "pnpm -r --if-present check:publint",
+    "check:exports": "pnpm -r --if-present check:exports",
     "format": "prettier --write \"**/*.{ts,tsx,json,md,yml,yaml}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,json,md,yml,yaml}\"",
     "changeset": "changeset",

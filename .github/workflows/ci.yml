@@ -33,3 +33,6 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      - name: Package checks (publint + are-the-types-wrong)
+        run: pnpm check:publint && pnpm check:exports
