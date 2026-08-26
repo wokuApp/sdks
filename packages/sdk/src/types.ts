@@ -40,7 +40,6 @@ export type UpdateTicketDestinationParams =
 
 export type CreateActionPlanGroupParams = Schemas['CreateActionPlanGroupDto'];
 export type UpdateActionPlanGroupParams = Schemas['UpdateActionPlanGroupDto'];
-export type SendActionPlanParams = Schemas['SendActionPlanDto'];
 export type CreateActionPlanTaskParams = Schemas['CreateActionPlanTaskDto'];
 export type UpdateActionPlanTaskParams = Schemas['UpdateActionPlanTaskDto'];
 export type ReorderActionPlanTasksParams = Schemas['ReorderActionPlanTasksDto'];

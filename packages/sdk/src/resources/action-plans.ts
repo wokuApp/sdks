@@ -5,7 +5,6 @@ import type {
   CreateActionPlanGroupParams,
   CreateActionPlanTaskParams,
   ReorderActionPlanTasksParams,
-  SendActionPlanParams,
   UpdateActionPlanGroupParams,
   UpdateActionPlanTaskParams,
 } from '../types';
@@ -70,19 +69,6 @@ export class ActionPlans {
       'post',
       `/v1/action-plans/${id}/conversation`,
       { ...opts, body: { text, confirm: true } },
-    );
-  }
-
-  /** Send an approved plan to a destination (jira/monday/clickup/notion/internal). */
-  send(
-    id: string,
-    body: SendActionPlanParams,
-    opts?: RequestOptions,
-  ): Promise<WokuRecord> {
-    return this.client.request<WokuRecord>(
-      'post',
-      `/v1/action-plans/${id}/send`,
-      { ...opts, body },
     );
   }
 
