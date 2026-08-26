@@ -2,8 +2,8 @@
 
 # Woku SDKs
 
-Official SDKs for integrating [Woku](https://woku.app) feedback capture into
-your own products.
+Official SDKs for [Woku](https://woku.app): manage your account from a backend
+with the management SDK, and capture customer feedback inside your own products.
 
 </div>
 
@@ -12,18 +12,23 @@ under the [`@wokuapp`](https://www.npmjs.com/org/wokuapp) npm scope.
 
 ## Packages
 
-| Package                                            | Description                                                                                                                                      | Version                                                    |
-| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------- |
-| [`@wokuapp/react-native`](./packages/react-native) | React Native SDK to capture Woku ratings and NPS (text + audio) inside iOS and Android apps, with offline buffering and configurable intercepts. | ![npm](https://img.shields.io/npm/v/@wokuapp/react-native) |
+| Package                                            | Description                                                                                                                                                      | Version                                                    |
+| -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| [`@wokuapp/sdk`](./packages/sdk)                   | **Server-side** SDK for the Woku management API (`/v1`): trackers, VoC tools (NPS/CSAT/CES), wokus, forms, flows, action plans, tickets, dispatches and sends. Typed, retrying, auto-paginated. | ![npm](https://img.shields.io/npm/v/@wokuapp/sdk)          |
+| [`@wokuapp/react-native`](./packages/react-native) | React Native SDK to capture Woku ratings and NPS (text + audio) inside iOS and Android apps, with offline buffering and configurable intercepts.                 | ![npm](https://img.shields.io/npm/v/@wokuapp/react-native) |
+| [`@wokuapp/woku-widget`](./packages/woku-widget)   | Embeddable web widget to capture Woku and NPS feedback on a website.                                                                                             | ![npm](https://img.shields.io/npm/v/@wokuapp/woku-widget)  |
 
-More SDKs (web widget, Node) will live here as additional packages.
+There is also an official Python management SDK, [`woku`](https://pypi.org/project/woku/),
+in the separate [`woku-python`](https://github.com/wokuApp/woku-python) repository.
 
 ## Repository layout
 
 ```
 sdks/
 ├── packages/
-│   └── react-native/      @wokuapp/react-native
+│   ├── sdk/               @wokuapp/sdk (management, server-side)
+│   ├── react-native/      @wokuapp/react-native (capture, mobile)
+│   └── woku-widget/       @wokuapp/woku-widget (capture, web)
 ├── .changeset/            versioning (changesets)
 ├── .github/workflows/     CI + release
 ├── pnpm-workspace.yaml
