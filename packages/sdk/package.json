@@ -1,6 +1,6 @@
 {
   "name": "@wokuapp/sdk",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Official server-side SDK for the Woku management API (trackers, VoC tools, action plans, tickets, delivery and capture over /v1).",
   "keywords": [
     "woku",
