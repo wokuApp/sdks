@@ -10,6 +10,7 @@ import { TicketDestinations, Tickets } from './resources/tickets';
 import { Dispatches } from './resources/dispatches';
 import { Reports } from './resources/reports';
 import { Company } from './resources/company';
+import { Journeys } from './resources/journeys';
 import { Quarantines } from './resources/quarantines';
 
 /**
@@ -44,6 +45,8 @@ export class Woku {
   readonly dispatches: Dispatches;
   readonly reports: Reports;
   readonly company: Company;
+  /** Customer journeys: moments, their tools and how each one starts. */
+  readonly journeys: Journeys;
   readonly quarantines: Quarantines;
 
   constructor(options?: WokuClientOptions | string) {
@@ -68,6 +71,7 @@ export class Woku {
     this.dispatches = new Dispatches(this.client);
     this.reports = new Reports(this.client);
     this.company = new Company(this.client);
+    this.journeys = new Journeys(this.client);
     this.quarantines = new Quarantines(this.client);
   }
 }

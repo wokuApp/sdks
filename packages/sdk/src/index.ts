@@ -31,3 +31,5 @@ export type { WokuErrorBody } from './core/errors';
 
 export * from './models';
 export type * from './types';
+
+export * from './resources/journeys';

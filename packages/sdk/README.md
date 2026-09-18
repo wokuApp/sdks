@@ -76,6 +76,42 @@ console.log(stats.responseRate);
 The key is read from `WOKU_API_KEY` when you omit `apiKey`. You can also pass
 it directly: `new Woku('sk_live_...')`.
 
+### Customer journeys
+
+Define the moments where you listen, assign a tool you already have to each
+one, and set them off by hand or from your own events.
+
+```ts
+const journey = await woku.journeys.create({
+  name: 'Sales journey',
+  moments: [
+    {
+      key: 'sale',
+      name: 'Sale',
+      tool: 'csat',
+      toolRef: { type: 'csat', id: csatToolId },
+      enabled: true,
+      channel: 'whatsapp_first',
+      trigger: { type: 'webhook' },
+      sequence: {
+        attemptOffsetsMs: [0, 28_800_000],
+        deadlineMs: 259_200_000,
+        cooldownAfterResponseMs: 3_600_000,
+      },
+    },
+  ],
+});
+
+// Store this now: it signs the journey's inbound calls and is shown once.
+console.log(journey.webhookSecret);
+
+await woku.journeys.update(journey.id, { enabled: true });
+await woku.journeys.enroll(journey.id, {
+  subjectKey: 'customer-123',
+  contact: { email: 'customer@example.com' },
+});
+```
+
 ## Pagination
 
 List methods return a `Page`. Iterate every item across pages, or walk pages:
@@ -138,7 +174,8 @@ await woku.npsTools.create(body, { idempotencyKey: 'my-key' });
 
 `trackers`, `npsTools` / `csatTools` / `cesTools`, `nps` / `csat` / `ces`,
 `wokus`, `forms`, `flows`, `actionPlans`, `actionPlanGroups`, `tickets`,
-`ticketDestinations`, `dispatches`, `reports`, `company`, `quarantines`.
+`ticketDestinations`, `dispatches`, `reports`, `company`, `quarantines`,
+`journeys`.
 
 ## License
 
