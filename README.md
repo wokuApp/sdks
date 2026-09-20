@@ -21,6 +21,12 @@ under the [`@wokuapp`](https://www.npmjs.com/org/wokuapp) npm scope.
 There is also an official Python management SDK, [`woku`](https://pypi.org/project/woku/),
 in the separate [`woku-python`](https://github.com/wokuApp/woku-python) repository.
 
+Customer journey moments create their own CSAT, CES, NPS, or woku tools. Choose
+`toolScope: 'per_enrollment'` (default) or `'shared'` for reuse within that same
+moment and configuration. Configure question variables or the uploaded woku
+image through `toolSpec`; existing tools cannot be assigned. See the
+[management SDK example](./packages/sdk/README.md#customer-journeys).
+
 ## Repository layout
 
 ```

@@ -25,9 +25,17 @@ export interface JourneyMoment {
   key: string;
   name?: string;
   description?: string;
-  tool: 'woku' | 'nps' | 'csat' | 'ces' | 'form' | 'flow';
-  /** The EXISTING tool this moment sends. */
-  toolRef: { type: JourneyMoment['tool']; id: string };
+  tool: 'woku' | 'nps' | 'csat' | 'ces';
+  /** A new tool per enrollment (default), or one shared by this moment only. */
+  toolScope?: 'per_enrollment' | 'shared';
+  toolSpec?: {
+    /** CSAT experience, CES action, or NPS company/product, not the full question. */
+    subject?: { es?: string; en?: string };
+    /** NPS recommendation audience. */
+    audience?: { es?: string; en?: string };
+    /** Woku image/video uploaded through files.upload. The moment name is its title. */
+    fileId?: string;
+  };
   enabled: boolean;
   channel: 'whatsapp_first' | 'email';
   trigger: JourneyMomentTrigger;
@@ -63,7 +71,7 @@ export interface JourneyEventInput {
 
 /**
  * Customer journeys (`/v1/journeys`): define the moments where you listen,
- * assign an existing tool to each one, and set them off by hand or from your
+ * create a tool per enrollment or share one within each moment, and set them off by hand or from your
  * own events.
  */
 export class Journeys {

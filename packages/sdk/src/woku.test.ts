@@ -14,6 +14,36 @@ afterAll(() => server.close());
 const woku = (): Woku => new Woku({ apiKey: 'sk_test', baseURL: BASE });
 
 describe('Woku facade — request shaping', () => {
+  it('creates moment-owned tools with scope and question variables', async () => {
+    let body: unknown;
+    server.use(
+      http.post(`${BASE}/v1/journeys`, async ({ request }) => {
+        body = await request.json();
+        return HttpResponse.json({ id: 'j1' });
+      }),
+    );
+    const moment = {
+      key: 'sale',
+      name: 'Sale',
+      tool: 'csat' as const,
+      toolScope: 'shared' as const,
+      toolSpec: { subject: { en: 'your purchase' } },
+      enabled: true,
+      channel: 'email' as const,
+      trigger: { type: 'manual' as const },
+      sequence: {
+        attemptOffsetsMs: [0],
+        deadlineMs: 86400000,
+        cooldownAfterResponseMs: 0,
+      },
+    };
+    await woku().journeys.create({ name: 'Sales', moments: [moment] });
+    expect(body).toEqual({ name: 'Sales', moments: [moment] });
+    expect((body as { moments: unknown[] }).moments[0]).not.toHaveProperty(
+      'toolRef',
+    );
+  });
+
   it('trackers.create posts to /v1/external-trackers with an idempotency key', async () => {
     let key: string | null = null;
     let body: unknown;

@@ -78,8 +78,15 @@ it directly: `new Woku('sk_live_...')`.
 
 ### Customer journeys
 
-Define the moments where you listen, assign a tool you already have to each
-one, and set them off by hand or from your own events.
+Custom moments create CSAT, CES, NPS, or woku tools; existing tools cannot be
+assigned. `toolScope: 'per_enrollment'` (default) creates one per enrollment.
+`'shared'` reuses one for that moment and tool configuration only. Other moments
+always get their own tools. Woku moments require `toolSpec.fileId` from an upload;
+the moment name becomes the woku title. CSAT/CES/NPS use question variables in
+`toolSpec`, never a complete question.
+
+Define the moments where you listen, create a tool for each customer or share
+one within the same moment, and set them off by hand or from your own events.
 
 ```ts
 const journey = await woku.journeys.create({
@@ -89,7 +96,8 @@ const journey = await woku.journeys.create({
       key: 'sale',
       name: 'Sale',
       tool: 'csat',
-      toolRef: { type: 'csat', id: csatToolId },
+      toolScope: 'shared', // Only customers of this moment share this tool.
+      toolSpec: { subject: { es: 'tu compra', en: 'your purchase' } },
       enabled: true,
       channel: 'whatsapp_first',
       trigger: { type: 'webhook' },
