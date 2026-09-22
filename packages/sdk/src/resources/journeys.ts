@@ -5,7 +5,10 @@ import type { WokuRecord } from '../models';
 export type JourneyStartMode = 'operator' | 'response' | 'webhook';
 export interface JourneyRecipients {
   ticketEmails: string[];
-  planEmails: string[];
+  planMembers: {
+    userId: string;
+    role: 'admin' | 'assignee';
+  }[];
 }
 export interface JourneyWebhook {
   verification?: {

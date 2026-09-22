@@ -104,7 +104,10 @@ const journey = await woku.journeys.create({
   startMode: 'webhook',
   recipients: {
     ticketEmails: ['support@example.com'],
-    planEmails: ['operations@example.com'],
+    planMembers: [
+      { userId: '507f1f77bcf86cd799439011', role: 'admin' },
+      { userId: '507f1f77bcf86cd799439012', role: 'assignee' },
+    ],
   },
   moments: [
     {
@@ -186,8 +189,9 @@ answers, tickets, plans, shared tools and other cases remain. A send already
 accepted by its provider may still arrive. `stopping` means cleanup is in progress;
 `dispatchOutcomeUncertain` identifies an interrupted in-flight send.
 
-Ticket and plan emails are independent. Extra plan recipients gain no account or
-membership. Definitions remain off until activated and required resources are ready.
+Tickets go to email destinations. Plans go to an action-plan group made of existing
+company users; `planMembers` controls its admins and assignees. Definitions remain
+off until activated and required resources are ready.
 Existing definitions retain their contract; create a new v2 journey to adopt these
 rules. Current participations retain their original definition version.
 

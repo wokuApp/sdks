@@ -37,13 +37,15 @@ it('preserves the v2 policy and keeps cursor pagination scoped to a journey', as
     startMode: 'response',
     recipients: {
       ticketEmails: ['a@example.com'],
-      planEmails: ['b@example.com'],
+      planMembers: [{ userId: '507f1f77bcf86cd799439011', role: 'admin' }],
     },
   });
   expect(created).toMatchObject({
     authoringVersion: 2,
     startMode: 'response',
-    recipients: { planEmails: ['b@example.com'] },
+    recipients: {
+      planMembers: [{ userId: '507f1f77bcf86cd799439011', role: 'admin' }],
+    },
   });
   expect(
     (await sdk().journeys.listEnrollments('j1', { cursor: 'last1', limit: 20 }))

@@ -2608,11 +2608,17 @@ export interface components {
             /** @description A sample sender payload. Previewing never sends an evaluation. */
             payload: Record<string, never>;
         };
+        JourneyPlanMemberDto: {
+            /** @description Company member user id. */
+            userId: string;
+            /** @enum {string} */
+            role: "admin" | "assignee";
+        };
         JourneyRecipientsDto: {
             /** @description Ticket email recipients, including the creator by default. */
             ticketEmails: string[];
-            /** @description Plan email recipients; does not grant group membership. */
-            planEmails: string[];
+            /** @description Platform users who belong to the journey action-plan group. */
+            planMembers: components["schemas"]["JourneyPlanMemberDto"][];
         };
         V1CreateJourneyBodyDto: {
             /**
