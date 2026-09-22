@@ -2615,6 +2615,10 @@ export interface components {
             role: "admin" | "assignee";
         };
         JourneyRecipientsDto: {
+            /** @description Omit to keep ticket creation enabled. */
+            ticketsEnabled?: boolean;
+            /** @description Omit to keep plan creation enabled. */
+            plansEnabled?: boolean;
             /** @description Ticket email recipients, including the creator by default. */
             ticketEmails: string[];
             /** @description Platform users who belong to the journey action-plan group. */

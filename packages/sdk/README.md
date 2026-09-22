@@ -90,6 +90,7 @@ Each moment creates its own CSAT, CES, NPS, or woku tool. `toolScope` is
 `'per_enrollment'` or `'shared'` within that moment and configuration. Existing
 tools cannot be assigned. Use `toolSpec` for question variables, or an uploaded
 `fileId` for Woku. The example uses one initial send and no reminders.
+For a bilingual Woku, set `toolSpec.descriptionEn` to its English title.
 
 ```ts
 const day = 86_400_000;
@@ -103,6 +104,8 @@ const journey = await woku.journeys.create({
   authoringVersion: 2,
   startMode: 'webhook',
   recipients: {
+    ticketsEnabled: true,
+    plansEnabled: true,
     ticketEmails: ['support@example.com'],
     planMembers: [
       { userId: '507f1f77bcf86cd799439011', role: 'admin' },
@@ -192,6 +195,10 @@ accepted by its provider may still arrive. `stopping` means cleanup is in progre
 Tickets go to email destinations. Plans go to an action-plan group made of existing
 company users; `planMembers` controls its admins and assignees. Definitions remain
 off until activated and required resources are ready.
+Set `recipients.ticketsEnabled` or `recipients.plansEnabled` to `false` to stop that
+journey action independently. Both default to enabled when omitted. Disabled
+actions do not require completed recipients; their current settings remain
+available if re-enabled later.
 Existing definitions retain their contract; create a new v2 journey to adopt these
 rules. Current participations retain their original definition version.
 

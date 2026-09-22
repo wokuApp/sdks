@@ -4,6 +4,9 @@ import type { WokuRecord } from '../models';
 
 export type JourneyStartMode = 'operator' | 'response' | 'webhook';
 export interface JourneyRecipients {
+  /** Optional. Omitted means enabled for existing journeys. */
+  ticketsEnabled?: boolean;
+  plansEnabled?: boolean;
   ticketEmails: string[];
   planMembers: {
     userId: string;
@@ -60,6 +63,8 @@ export interface JourneyMoment {
     audience?: { es?: string; en?: string };
     /** Woku image/video uploaded through files.upload. The moment name is its title. */
     fileId?: string;
+    /** Optional English Woku title shown in the English survey. */
+    descriptionEn?: string;
   };
   enabled: boolean;
   channel: 'whatsapp_first' | 'email';

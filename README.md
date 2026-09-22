@@ -27,7 +27,8 @@ moment and configuration. Configure question variables or the uploaded woku
 image through `toolSpec`; existing tools cannot be assigned. See the
 [management SDK example](./packages/sdk/README.md#customer-journeys).
 Journey v2 adds operator, first-answer and webhook initiation, independent moment
-connections, secondary wait fallbacks, ticket emails/plan groups, and typed case
+connections, secondary wait fallbacks, optional ticket and plan actions with
+independent recipients, and typed case
 activity. Use `journeys.listEnrollments`, `getEnrollment` and `stopEnrollment` to
 operate one exact case; `connections`, `mintMomentUrl`, `setSenderSecret` and
 `previewMoment` configure and check its external systems without sending tests.
