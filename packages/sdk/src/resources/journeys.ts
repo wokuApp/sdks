@@ -2,8 +2,30 @@ import type { WokuClient } from '../core/client';
 import type { RequestOptions } from '../core/options';
 import type { WokuRecord } from '../models';
 
+export type JourneyStartMode = 'operator' | 'response' | 'webhook';
+export interface JourneyRecipients {
+  ticketEmails: string[];
+  planEmails: string[];
+}
+export interface JourneyWebhook {
+  verification?: {
+    mode: 'url_token' | 'woku_signature' | 'sender_hmac';
+    header?: string;
+    encoding?: 'hex' | 'base64';
+    prefix?: string;
+    signedPayload?: 'body' | 'timestamp_dot_body';
+    timestampHeader?: string;
+  };
+  payload?: {
+    subjectKey?: string;
+    email?: string;
+    phone?: string;
+    match?: { path: string; equals: string }[];
+  };
+}
+
 /** How a moment starts. */
-export interface JourneyMomentTrigger {
+export interface JourneyMomentTrigger extends JourneyWebhook {
   /**
    * `manual` fires when a subject is enrolled, `event` on one of your own
    * event names, `webhook` on the moment's own signed url, and `afterStage`
@@ -39,6 +61,11 @@ export interface JourneyMoment {
   enabled: boolean;
   channel: 'whatsapp_first' | 'email';
   trigger: JourneyMomentTrigger;
+  /** Independent of timing: a webhook can advance an otherwise timed moment. */
+  webhook?: JourneyWebhook;
+  /** Secondary wait for a webhook-primary moment, anchored to an earlier moment. */
+  fallbackAfterMs?: number;
+  fallbackFromStage?: string;
   sequence: {
     attemptOffsetsMs: number[];
     deadlineMs: number;
@@ -47,9 +74,77 @@ export interface JourneyMoment {
 }
 
 export interface JourneyInput {
+  authoringVersion?: 1 | 2;
+  startMode?: JourneyStartMode;
+  recipients?: JourneyRecipients;
   name?: string;
   enabled?: boolean;
   moments?: JourneyMoment[];
+}
+
+export interface Journey extends WokuRecord {
+  id: string;
+  name?: string;
+  enabled: boolean;
+  version: number;
+  moments: JourneyMoment[];
+  authoringVersion?: 1 | 2;
+  startMode?: JourneyStartMode;
+  recipients?: JourneyRecipients;
+  routing?: {
+    ticketsReady: boolean;
+    plansReady: boolean;
+    ticketDestinationId?: string;
+    actionPlanGroupId?: string;
+  };
+}
+export interface CreatedJourney extends Journey {
+  webhookSecret: string;
+}
+export interface JourneyEnrollment extends WokuRecord {
+  id: string;
+  subjectKey: string;
+  contact: { email?: string; phone?: string };
+  lifecycle: 'pending' | 'running' | 'stopping' | 'stopped';
+  definitionVersion?: number;
+  startedAt?: string;
+  startSource?: JourneyStartMode;
+  stoppedAt?: string;
+  stoppedBy?: string;
+  stopReason?: string;
+  dispatchOutcomeUncertain?: boolean;
+  next?: {
+    stageKey: string;
+    name: string;
+    source: JourneyStartMode | 'timer' | 'fallback';
+    scheduledFor?: string;
+  } | null;
+  moments: {
+    key: string;
+    name?: string;
+    status: string;
+    toolId?: string;
+    toolType?: string;
+    toolScope?: 'shared' | 'per_enrollment';
+    sentAt?: string;
+    respondedAt?: string;
+    activationSource?: string;
+    hookReceivedAt?: string;
+  }[];
+}
+export interface JourneyEnrollmentPage {
+  items: JourneyEnrollment[];
+  nextCursor?: string;
+}
+export interface ListJourneyEnrollmentsParams {
+  cursor?: string;
+  limit?: number;
+}
+export interface JourneyConnection {
+  stageKey: string;
+  mode: string;
+  configured: boolean;
+  url: string;
 }
 
 export interface EnrollInput {
@@ -78,13 +173,13 @@ export class Journeys {
   constructor(private readonly client: WokuClient) {}
 
   /** Every journey of your company. */
-  list(opts?: RequestOptions): Promise<WokuRecord[]> {
-    return this.client.request<WokuRecord[]>('get', '/v1/journeys', opts);
+  list(opts?: RequestOptions): Promise<Journey[]> {
+    return this.client.request<Journey[]>('get', '/v1/journeys', opts);
   }
 
   /** One journey with its moments. */
-  get(journeyId: string, opts?: RequestOptions): Promise<WokuRecord> {
-    return this.client.request<WokuRecord>(
+  get(journeyId: string, opts?: RequestOptions): Promise<Journey> {
+    return this.client.request<Journey>(
       'get',
       `/v1/journeys/${journeyId}`,
       opts,
@@ -98,8 +193,8 @@ export class Journeys {
   create(
     body: JourneyInput & { name: string },
     opts?: RequestOptions,
-  ): Promise<WokuRecord> {
-    return this.client.request<WokuRecord>('post', '/v1/journeys', {
+  ): Promise<CreatedJourney> {
+    return this.client.request<CreatedJourney>('post', '/v1/journeys', {
       ...opts,
       body,
     });
@@ -114,11 +209,111 @@ export class Journeys {
     journeyId: string,
     body: JourneyInput,
     opts?: RequestOptions,
-  ): Promise<WokuRecord> {
-    return this.client.request<WokuRecord>(
-      'patch',
-      `/v1/journeys/${journeyId}`,
+  ): Promise<Journey> {
+    return this.client.request<Journey>('patch', `/v1/journeys/${journeyId}`, {
+      ...opts,
+      body,
+    });
+  }
+
+  /** Cursor page of exact customer cases; pass nextCursor to retrieve another page. */
+  listEnrollments(
+    journeyId: string,
+    params?: ListJourneyEnrollmentsParams,
+    opts?: RequestOptions,
+  ): Promise<JourneyEnrollmentPage> {
+    return this.client.request(
+      'get',
+      `/v1/journeys/${encodeURIComponent(journeyId)}/enrollments`,
+      { ...opts, query: { ...params, ...opts?.query } },
+    );
+  }
+
+  /** History and next step for one exact participation. */
+  getEnrollment(
+    journeyId: string,
+    enrollmentId: string,
+    opts?: RequestOptions,
+  ): Promise<JourneyEnrollment> {
+    return this.client.request(
+      'get',
+      `/v1/journeys/${encodeURIComponent(journeyId)}/enrollments/${encodeURIComponent(enrollmentId)}`,
+      opts,
+    );
+  }
+
+  /** Cancel future work for this case. Accepted provider sends cannot be recalled. */
+  stopEnrollment(
+    journeyId: string,
+    enrollmentId: string,
+    body: { reason?: string } = {},
+    opts?: RequestOptions,
+  ): Promise<JourneyEnrollment> {
+    return this.client.request(
+      'post',
+      `/v1/journeys/${encodeURIComponent(journeyId)}/enrollments/${encodeURIComponent(enrollmentId)}/stop`,
       { ...opts, body },
+    );
+  }
+
+  /** Credential readiness is not evidence that an actual webhook has arrived. */
+  connections(
+    journeyId: string,
+    opts?: RequestOptions,
+  ): Promise<JourneyConnection[]> {
+    return this.client.request(
+      'get',
+      `/v1/journeys/${encodeURIComponent(journeyId)}/connections`,
+      opts,
+    );
+  }
+
+  /** Replaces this moment's URL credential. Store the returned URL in the sender. */
+  async mintMomentUrl(
+    journeyId: string,
+    stageKey: string,
+    opts?: RequestOptions,
+  ): Promise<{ token: string; url: string }> {
+    const result = await this.client.request<{ token: string; url: string }>(
+      'post',
+      `/v1/journeys/${encodeURIComponent(journeyId)}/moments/${encodeURIComponent(stageKey)}/url-token`,
+      { ...opts, body: {} },
+    );
+    return {
+      ...result,
+      url: new URL(result.url, this.client.baseURL).toString(),
+    };
+  }
+
+  /** Store the external sender's signing secret encrypted; it is never returned. */
+  setSenderSecret(
+    journeyId: string,
+    stageKey: string,
+    senderSecret: string,
+    opts?: RequestOptions,
+  ): Promise<void> {
+    return this.client.request(
+      'post',
+      `/v1/journeys/${encodeURIComponent(journeyId)}/moments/${encodeURIComponent(stageKey)}/sender-secret`,
+      { ...opts, body: { senderSecret } },
+    );
+  }
+
+  /** Test saved payload mapping without creating a participation or sending a tool. */
+  previewMoment(
+    journeyId: string,
+    stageKey: string,
+    payload: Record<string, unknown>,
+    opts?: RequestOptions,
+  ): Promise<{
+    matches: boolean;
+    subjectKey: string;
+    contact: { email?: string; phone?: string };
+  }> {
+    return this.client.request(
+      'post',
+      `/v1/journeys/${encodeURIComponent(journeyId)}/moments/${encodeURIComponent(stageKey)}/preview`,
+      { ...opts, body: { payload } },
     );
   }
 

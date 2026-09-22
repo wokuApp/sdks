@@ -34,9 +34,9 @@ export type ShareWokuParams = Schemas['V1ShareWokuBodyDto'];
 
 export type UpdateTicketParams = Schemas['UpdateTicketBodyDTO'];
 export type CreateTicketDestinationParams =
-  Schemas['CreateTicketDestinationDto'];
+  Schemas['V1CreateTicketDestinationDto'];
 export type UpdateTicketDestinationParams =
-  Schemas['UpdateTicketDestinationDto'];
+  Schemas['V1UpdateTicketDestinationDto'];
 
 export type CreateActionPlanGroupParams = Schemas['CreateActionPlanGroupDto'];
 export type UpdateActionPlanGroupParams = Schemas['UpdateActionPlanGroupDto'];

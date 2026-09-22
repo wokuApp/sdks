@@ -78,51 +78,122 @@ it directly: `new Woku('sk_live_...')`.
 
 ### Customer journeys
 
-Custom moments create CSAT, CES, NPS, or woku tools; existing tools cannot be
-assigned. `toolScope: 'per_enrollment'` (default) creates one per enrollment.
-`'shared'` reuses one for that moment and tool configuration only. Other moments
-always get their own tools. Woku moments require `toolSpec.fileId` from an upload;
-the moment name becomes the woku title. CSAT/CES/NPS use question variables in
-`toolSpec`, never a complete question.
+Use `authoringVersion: 2` for the business-form execution contract. Choose
+`startMode: 'operator'`, `'response'`, or `'webhook'` for the first moment.
+Only operator mode uses `enroll`. Response mode starts when the customer answers
+the first tool through a shared link or QR, not when the link is opened.
+Later moments use a delay or their own webhook. A webhook advances a timed moment
+and cancels its wait. A webhook-primary moment can have a secondary fallback that
+evaluates that same moment once.
 
-Define the moments where you listen, create a tool for each customer or share
-one within the same moment, and set them off by hand or from your own events.
+Each moment creates its own CSAT, CES, NPS, or woku tool. `toolScope` is
+`'per_enrollment'` or `'shared'` within that moment and configuration. Existing
+tools cannot be assigned. Use `toolSpec` for question variables, or an uploaded
+`fileId` for Woku. The example uses one initial send and no reminders.
 
 ```ts
+const day = 86_400_000;
+const sequence = {
+  attemptOffsetsMs: [0],
+  deadlineMs: 3 * day,
+  cooldownAfterResponseMs: 0,
+};
 const journey = await woku.journeys.create({
-  name: 'Sales journey',
+  name: 'Purchase and delivery',
+  authoringVersion: 2,
+  startMode: 'webhook',
+  recipients: {
+    ticketEmails: ['support@example.com'],
+    planEmails: ['operations@example.com'],
+  },
   moments: [
     {
       key: 'sale',
-      name: 'Sale',
+      name: 'Purchase',
       tool: 'csat',
-      toolScope: 'shared', // Only customers of this moment share this tool.
-      toolSpec: { subject: { es: 'tu compra', en: 'your purchase' } },
       enabled: true,
-      channel: 'whatsapp_first',
+      channel: 'email',
       trigger: { type: 'webhook' },
-      sequence: {
-        attemptOffsetsMs: [0, 28_800_000],
-        deadlineMs: 259_200_000,
-        cooldownAfterResponseMs: 3_600_000,
+      webhook: { verification: { mode: 'url_token' } },
+      toolSpec: { subject: { es: 'tu compra', en: 'your purchase' } },
+      sequence,
+    },
+    {
+      key: 'delivery',
+      name: 'Delivery',
+      tool: 'ces',
+      enabled: true,
+      channel: 'email',
+      trigger: { type: 'webhook' },
+      webhook: { verification: { mode: 'url_token' } },
+      fallbackFromStage: 'sale',
+      fallbackAfterMs: 5 * day,
+      toolSpec: {
+        subject: { es: 'recibir tu pedido', en: 'receiving your order' },
       },
+      sequence,
     },
   ],
 });
 
-// Store this now: it signs the journey's inbound calls and is shown once.
-console.log(journey.webhookSecret);
-
+// Generate once and securely store each URL in its sending system.
+// Calling mintMomentUrl again replaces the previous credential.
+const sale = await woku.journeys.mintMomentUrl(journey.id, 'sale');
+const delivery = await woku.journeys.mintMomentUrl(journey.id, 'delivery');
 await woku.journeys.update(journey.id, { enabled: true });
-await woku.journeys.enroll(journey.id, {
-  subjectKey: 'customer-123',
-  contact: { email: 'customer@example.com' },
+
+// CRM and logistics use different URLs but the same purchase reference.
+await fetch(sale.url, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'X-Woku-Event-Id': 'crm-order-123',
+  },
+  body: JSON.stringify({
+    subjectKey: 'order-123',
+    contact: { email: 'customer@example.com' },
+  }),
 });
+await fetch(delivery.url, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'X-Woku-Event-Id': 'delivery-order-123',
+  },
+  body: JSON.stringify({ subjectKey: 'order-123' }),
+});
+
+const page = await woku.journeys.listEnrollments(journey.id, { limit: 20 });
+const evaluation = page.items.find((item) => item.subjectKey === 'order-123');
+if (evaluation) {
+  await woku.journeys.stopEnrollment(
+    journey.id,
+    evaluation.id,
+    {
+      reason: 'Customer requested no further evaluations',
+    },
+    { idempotencyKey: `stop-${evaluation.id}` },
+  );
+}
 ```
+
+`getEnrollment` reads one case. `connections` reports credential readiness;
+`previewMoment` checks a sample against the saved payload mapping without sending.
+`setSenderSecret` configures senders that sign with their own secret.
+Enrollment lists use `{ items, nextCursor }`, not `Page`: pass `nextCursor` as the
+next call's `cursor`. Stop is durable and specific to the selected participation;
+answers, tickets, plans, shared tools and other cases remain. A send already
+accepted by its provider may still arrive. `stopping` means cleanup is in progress;
+`dispatchOutcomeUncertain` identifies an interrupted in-flight send.
+
+Ticket and plan emails are independent. Extra plan recipients gain no account or
+membership. Definitions remain off until activated and required resources are ready.
+Existing definitions retain their contract; create a new v2 journey to adopt these
+rules. Current participations retain their original definition version.
 
 ## Pagination
 
-List methods return a `Page`. Iterate every item across pages, or walk pages:
+Paginated resource methods return a `Page` (journey enrollments use the cursor envelope described above). Iterate every item across pages, or walk pages:
 
 ```ts
 for await (const ticket of await woku.tickets.list({ severity: 'high' })) {

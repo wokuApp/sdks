@@ -12,11 +12,11 @@ under the [`@wokuapp`](https://www.npmjs.com/org/wokuapp) npm scope.
 
 ## Packages
 
-| Package                                            | Description                                                                                                                                                      | Version                                                    |
-| -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| Package                                            | Description                                                                                                                                                                                                        | Version                                                    |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------- |
 | [`@wokuapp/sdk`](./packages/sdk)                   | **Server-side** SDK for the Woku management API (`/v1`): customer journeys, trackers, VoC tools (NPS/CSAT/CES), wokus, forms, flows, action plans, tickets, dispatches and sends. Typed, retrying, auto-paginated. | ![npm](https://img.shields.io/npm/v/@wokuapp/sdk)          |
-| [`@wokuapp/react-native`](./packages/react-native) | React Native SDK to capture Woku ratings and NPS (text + audio) inside iOS and Android apps, with offline buffering and configurable intercepts.                 | ![npm](https://img.shields.io/npm/v/@wokuapp/react-native) |
-| [`@wokuapp/woku-widget`](./packages/woku-widget)   | Embeddable web widget to capture Woku and NPS feedback on a website.                                                                                             | ![npm](https://img.shields.io/npm/v/@wokuapp/woku-widget)  |
+| [`@wokuapp/react-native`](./packages/react-native) | React Native SDK to capture Woku ratings and NPS (text + audio) inside iOS and Android apps, with offline buffering and configurable intercepts.                                                                   | ![npm](https://img.shields.io/npm/v/@wokuapp/react-native) |
+| [`@wokuapp/woku-widget`](./packages/woku-widget)   | Embeddable web widget to capture Woku and NPS feedback on a website.                                                                                                                                               | ![npm](https://img.shields.io/npm/v/@wokuapp/woku-widget)  |
 
 There is also an official Python management SDK, [`woku`](https://pypi.org/project/woku/),
 in the separate [`woku-python`](https://github.com/wokuApp/woku-python) repository.
@@ -26,6 +26,11 @@ Customer journey moments create their own CSAT, CES, NPS, or woku tools. Choose
 moment and configuration. Configure question variables or the uploaded woku
 image through `toolSpec`; existing tools cannot be assigned. See the
 [management SDK example](./packages/sdk/README.md#customer-journeys).
+Journey v2 adds operator, first-answer and webhook initiation, independent moment
+connections, secondary wait fallbacks, ticket/plan recipients, and typed case
+activity. Use `journeys.listEnrollments`, `getEnrollment` and `stopEnrollment` to
+operate one exact case; `connections`, `mintMomentUrl`, `setSenderSecret` and
+`previewMoment` configure and check its external systems without sending tests.
 
 ## Repository layout
 
