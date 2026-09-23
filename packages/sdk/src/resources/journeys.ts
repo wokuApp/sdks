@@ -113,11 +113,12 @@ export interface JourneyEnrollment extends WokuRecord {
   id: string;
   subjectKey: string;
   contact: { email?: string; phone?: string };
-  lifecycle: 'pending' | 'running' | 'stopping' | 'stopped';
+  lifecycle: 'pending' | 'running' | 'stopping' | 'stopped' | 'completed';
   definitionVersion?: number;
   startedAt?: string;
   startSource?: JourneyStartMode;
   stoppedAt?: string;
+  completedAt?: string;
   stoppedBy?: string;
   stopReason?: string;
   dispatchOutcomeUncertain?: boolean;
@@ -127,6 +128,7 @@ export interface JourneyEnrollment extends WokuRecord {
     source: JourneyStartMode | 'timer' | 'fallback';
     scheduledFor?: string;
   } | null;
+  pendingMoments?: { key: string; name: string }[];
   moments: {
     key: string;
     name?: string;

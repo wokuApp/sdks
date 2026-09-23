@@ -1537,7 +1537,7 @@ export interface paths {
         put?: never;
         /**
          * Enroll a subject in this journey
-         * @description Starts an operator-led v2 participation without requiring its first answer. Legacy definitions retain their enrollment behavior. Use one subjectKey per purchase or case; a stopped reference cannot be restarted.
+         * @description Starts an operator-led v2 participation without requiring its first answer. A v2 contact can have one unfinished participation per journey. The same subjectKey can start a new cycle after completion or stopping finishes; each cycle has a distinct enrollment id. Legacy definitions retain their enrollment behavior.
          */
         post: operations["V1JourneysController_enroll"];
         delete?: never;
@@ -1722,7 +1722,7 @@ export interface paths {
         put?: never;
         /**
          * Emit one of your own events
-         * @description Every journey of your company whose moments listen for that name reacts. Names starting with `journey.` are reserved.
+         * @description Eligible journeys whose moments listen for that name react. Operator-led v2 journeys require an open enrollment for that subject. Names starting with `journey.` are reserved.
          */
         post: operations["V1JourneyEventsController_emit"];
         delete?: never;

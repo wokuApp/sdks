@@ -170,7 +170,11 @@ await fetch(delivery.url, {
 });
 
 const page = await woku.journeys.listEnrollments(journey.id, { limit: 20 });
-const evaluation = page.items.find((item) => item.subjectKey === 'order-123');
+const evaluation = page.items.find(
+  (item) =>
+    item.subjectKey === 'order-123' &&
+    (item.lifecycle === 'pending' || item.lifecycle === 'running'),
+);
 if (evaluation) {
   await woku.journeys.stopEnrollment(
     journey.id,
@@ -191,6 +195,11 @@ next call's `cursor`. Stop is durable and specific to the selected participation
 answers, tickets, plans, shared tools and other cases remain. A send already
 accepted by its provider may still arrive. `stopping` means cleanup is in progress;
 `dispatchOutcomeUncertain` identifies an interrupted in-flight send.
+
+`pendingMoments` names the moments that have not yet sent an invitation. A v2
+participation completes when the customer answers its final tool or 30 days
+after that tool's first send. The same `subjectKey` can be enrolled again once
+the previous participation is completed or stopped; each cycle has its own `id`.
 
 Tickets go to email destinations. Plans go to an action-plan group made of existing
 company users; `planMembers` controls its admins and assignees. Definitions remain

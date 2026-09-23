@@ -32,6 +32,9 @@ independent recipients, and typed case
 activity. Use `journeys.listEnrollments`, `getEnrollment` and `stopEnrollment` to
 operate one exact case; `connections`, `mintMomentUrl`, `setSenderSecret` and
 `previewMoment` configure and check its external systems without sending tests.
+One enrollment key may complete the same journey repeatedly, with one active
+cycle per journey at a time. `JourneyEnrollment` exposes `completed` and the
+unsent `pendingMoments`.
 
 ## Repository layout
 
