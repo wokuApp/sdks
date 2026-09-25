@@ -22,8 +22,11 @@ There is also an official Python management SDK, [`woku`](https://pypi.org/proje
 in the separate [`woku-python`](https://github.com/wokuApp/woku-python) repository.
 
 Customer journey moments create their own CSAT, CES, NPS, or woku tools. Choose
-`toolScope: 'per_enrollment'` (default) or `'shared'` for reuse within that same
-moment and configuration. Configure question variables or the uploaded woku
+`toolScope: 'shared'` (default for new v2 moments) or `'per_enrollment'` to
+create one tool per participation. A shared tool stays within that same moment
+and configuration. The authoring form suggests a 10-day wait for later moments;
+the API still requires an explicit delay. In v2, `delayMs: 0` means a one-hour
+wait. Configure question variables or the uploaded woku
 image through `toolSpec`; existing tools cannot be assigned. See the
 [management SDK example](./packages/sdk/README.md#customer-journeys).
 Journey v2 adds operator, first-answer and webhook initiation, independent moment

@@ -86,8 +86,11 @@ Later moments use a delay or their own webhook. A webhook advances a timed momen
 and cancels its wait. A webhook-primary moment can have a secondary fallback that
 evaluates that same moment once.
 
-Each moment creates its own CSAT, CES, NPS, or woku tool. `toolScope` is
-`'per_enrollment'` or `'shared'` within that moment and configuration. Existing
+Each moment creates its own CSAT, CES, NPS, or woku tool. `toolScope` defaults
+to `'shared'` for new v2 moments, reusing the tool within that moment and
+configuration. Use `'per_enrollment'` for one tool per participation. Later
+moments receive a suggested 10-day wait in the authoring form; API callers must
+specify the delay. In v2, `delayMs: 0` means one hour. Existing
 tools cannot be assigned. Use `toolSpec` for question variables, or an uploaded
 `fileId` for Woku. The example uses one initial send and no reminders.
 For a bilingual Woku, set `toolSpec.descriptionEn` to its English title.

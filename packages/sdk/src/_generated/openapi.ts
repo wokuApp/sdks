@@ -2643,7 +2643,7 @@ export interface components {
              * @default false
              */
             enabled: boolean;
-            /** @description The moments of the journey. Each creates a woku, CSAT, CES, or NPS from toolSpec. toolScope is per_enrollment (default) or shared within this moment only. Existing toolRef assignments are rejected. In v2 only the first moment can be manual. Later moments use webhook or afterStage; independent webhook settings also let a webhook advance a timed moment. fallbackAfterMs is the optional secondary wait for a webhook-primary moment, anchored to fallbackFromStage. Legacy definitions retain their triggers. */
+            /** @description The moments of the journey. Each creates a woku, CSAT, CES, or NPS from toolSpec. New v2 moments default to shared within that moment; per_enrollment creates one tool per participation. Existing toolRef assignments are rejected. A zero-day afterStage delay means one hour. In v2 only the first moment can be manual. Later moments use webhook or afterStage; independent webhook settings also let a webhook advance a timed moment. fallbackAfterMs is the optional secondary wait for a webhook-primary moment, anchored to fallbackFromStage. Legacy definitions retain their triggers. */
             moments?: Record<string, never>[];
         };
         V1UpdateJourneyBodyDto: {
