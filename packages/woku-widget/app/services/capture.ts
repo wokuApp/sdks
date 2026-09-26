@@ -27,7 +27,10 @@ export interface ApiHeaders {
   'Content-Type'?: string;
 }
 
-function buildHeaders(publishableKey: string, json = false): Record<string, string> {
+function buildHeaders(
+  publishableKey: string,
+  json = false,
+): Record<string, string> {
   const h: Record<string, string> = { 'x-woku-key': publishableKey };
   if (json) h['Content-Type'] = 'application/json';
   return h;
@@ -59,6 +62,8 @@ export interface CreateWokuTextnoteParams {
   qualification: number; // 1-5
   description: string;
   clientEmail?: string;
+  clientPhone?: string;
+  dispatchToken?: string;
   anonymous?: boolean;
 }
 
@@ -69,6 +74,8 @@ export interface CreateWokuVoicemailParams {
   qualification: number; // 1-5
   file: Blob;
   clientEmail?: string;
+  clientPhone?: string;
+  dispatchToken?: string;
   anonymous?: boolean;
 }
 
@@ -88,6 +95,8 @@ export interface CreateNpsParams {
   score: number; // 0-10
   npsToolId?: string;
   clientEmail?: string;
+  clientPhone?: string;
+  dispatchToken?: string;
   anonymous?: boolean;
 }
 
@@ -118,21 +127,41 @@ export async function fetchWokuReview(
   publishableKey: string,
   wokuId: string,
 ): Promise<WokuReviewData> {
-  const res = await fetch(`${apiBaseUrl}/v1/wokus/${encodeURIComponent(wokuId)}/review`, {
-    headers: buildHeaders(publishableKey),
-  });
+  const res = await fetch(
+    `${apiBaseUrl}/v1/wokus/${encodeURIComponent(wokuId)}/review`,
+    {
+      headers: buildHeaders(publishableKey),
+    },
+  );
   return handleResponse<WokuReviewData>(res);
 }
 
-export async function createWokuTextnote(params: CreateWokuTextnoteParams): Promise<unknown> {
-  const { apiBaseUrl, publishableKey, wokuId, qualification, description, clientEmail, anonymous } =
-    params;
+export async function createWokuTextnote(
+  params: CreateWokuTextnoteParams,
+): Promise<unknown> {
+  const {
+    apiBaseUrl,
+    publishableKey,
+    wokuId,
+    qualification,
+    description,
+    clientEmail,
+    clientPhone,
+    dispatchToken,
+    anonymous,
+  } = params;
 
   const body: Record<string, unknown> = {
     qualification,
     description,
     responseChannel: 'widget-web',
-    ...(anonymous || !clientEmail ? { anonymous: true } : { clientEmail }),
+    ...(anonymous || (!clientEmail && !clientPhone)
+      ? { anonymous: true }
+      : {
+          ...(clientEmail ? { clientEmail } : {}),
+          ...(clientPhone ? { clientPhone } : {}),
+        }),
+    ...(dispatchToken ? { dispatchToken } : {}),
   };
 
   const res = await fetch(
@@ -146,9 +175,20 @@ export async function createWokuTextnote(params: CreateWokuTextnoteParams): Prom
   return handleResponse(res);
 }
 
-export async function createWokuVoicemail(params: CreateWokuVoicemailParams): Promise<unknown> {
-  const { apiBaseUrl, publishableKey, wokuId, qualification, file, clientEmail, anonymous } =
-    params;
+export async function createWokuVoicemail(
+  params: CreateWokuVoicemailParams,
+): Promise<unknown> {
+  const {
+    apiBaseUrl,
+    publishableKey,
+    wokuId,
+    qualification,
+    file,
+    clientEmail,
+    clientPhone,
+    dispatchToken,
+    anonymous,
+  } = params;
 
   const formData = new FormData();
   formData.append('file', file);
@@ -158,6 +198,8 @@ export async function createWokuVoicemail(params: CreateWokuVoicemailParams): Pr
   formData.append('qualification', qualification.toString());
   formData.append('responseChannel', 'widget-web');
   if (clientEmail && !anonymous) formData.append('clientEmail', clientEmail);
+  if (clientPhone && !anonymous) formData.append('clientPhone', clientPhone);
+  if (dispatchToken) formData.append('dispatchToken', dispatchToken);
   if (anonymous) formData.append('anonymous', 'true');
 
   const res = await fetch(
@@ -187,14 +229,31 @@ export async function fetchNpsTool(
   return handleResponse<NpsToolData>(res);
 }
 
-export async function createNps(params: CreateNpsParams): Promise<NpsSubmitResult> {
-  const { apiBaseUrl, publishableKey, score, npsToolId, clientEmail, anonymous } = params;
+export async function createNps(
+  params: CreateNpsParams,
+): Promise<NpsSubmitResult> {
+  const {
+    apiBaseUrl,
+    publishableKey,
+    score,
+    npsToolId,
+    clientEmail,
+    clientPhone,
+    dispatchToken,
+    anonymous,
+  } = params;
 
   const body: Record<string, unknown> = {
     score,
     responseChannel: 'widget-web',
     ...(npsToolId ? { npsToolId } : {}),
-    ...(anonymous || !clientEmail ? { anonymous: true } : { clientEmail }),
+    ...(anonymous || (!clientEmail && !clientPhone)
+      ? { anonymous: true }
+      : {
+          ...(clientEmail ? { clientEmail } : {}),
+          ...(clientPhone ? { clientPhone } : {}),
+        }),
+    ...(dispatchToken ? { dispatchToken } : {}),
   };
 
   const res = await fetch(`${apiBaseUrl}/v1/nps`, {
@@ -205,7 +264,9 @@ export async function createNps(params: CreateNpsParams): Promise<NpsSubmitResul
   return handleResponse<NpsSubmitResult>(res);
 }
 
-export async function createNpsTextnote(params: CreateNpsTextnoteParams): Promise<unknown> {
+export async function createNpsTextnote(
+  params: CreateNpsTextnoteParams,
+): Promise<unknown> {
   const { apiBaseUrl, publishableKey, npsId, description } = params;
 
   const res = await fetch(
@@ -219,7 +280,9 @@ export async function createNpsTextnote(params: CreateNpsTextnoteParams): Promis
   return handleResponse(res);
 }
 
-export async function createNpsVoicemail(params: CreateNpsVoicemailParams): Promise<unknown> {
+export async function createNpsVoicemail(
+  params: CreateNpsVoicemailParams,
+): Promise<unknown> {
   const { apiBaseUrl, publishableKey, npsId, file } = params;
 
   const formData = new FormData();
@@ -256,7 +319,7 @@ export async function fetchCompanyBranding(
     const res = await fetch(`${apiBaseUrl}/v1/companies/me`, {
       headers: buildHeaders(publishableKey),
     });
-    return handleResponse<CompanyBranding>(res);
+    return await handleResponse<CompanyBranding>(res);
   } catch {
     return {};
   }

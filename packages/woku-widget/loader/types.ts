@@ -26,6 +26,9 @@ export interface UrlRule {
 export interface WokuWidgetConfig {
   companyId: string;
   publishableKey: string;
+  email?: string;
+  phone?: string;
+  dispatchToken?: string;
   captureType: 'woku' | 'nps';
   /** Required when captureType === 'woku' */
   wokuId?: string;
@@ -54,7 +57,13 @@ export interface PostMessageToApp {
 }
 
 export interface PostMessageFromApp {
-  type: 'woku:ready' | 'woku:resize' | 'woku:open' | 'woku:close' | 'woku:submit' | 'woku:skip';
+  type:
+    | 'woku:ready'
+    | 'woku:resize'
+    | 'woku:open'
+    | 'woku:close'
+    | 'woku:submit'
+    | 'woku:skip';
   payload?: unknown;
 }
 

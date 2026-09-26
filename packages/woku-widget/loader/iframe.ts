@@ -25,7 +25,8 @@ export function createIframeManager(
   behavior: string,
   onMessage: (msg: PostMessageFromApp) => void,
 ): IframeManager {
-  const widgetBaseUrl = config.widgetBaseUrl ?? `${CDN_ORIGIN}/sdks/woku-widget/v1`;
+  const widgetBaseUrl =
+    config.widgetBaseUrl ?? `${CDN_ORIGIN}/sdks/woku-widget/v1`;
   const appOrigin = extractOrigin(widgetBaseUrl);
   const zIndex = config.theme?.zIndex ?? 999999;
 
@@ -34,8 +35,12 @@ export function createIframeManager(
     companyId: config.companyId,
     captureType: config.captureType,
     ...(config.lang ? { lang: config.lang } : {}),
-    ...(config.captureType === 'woku' && config.wokuId ? { wokuId: config.wokuId } : {}),
-    ...(config.captureType === 'nps' && config.npsToolId ? { npsToolId: config.npsToolId } : {}),
+    ...(config.captureType === 'woku' && config.wokuId
+      ? { wokuId: config.wokuId }
+      : {}),
+    ...(config.captureType === 'nps' && config.npsToolId
+      ? { npsToolId: config.npsToolId }
+      : {}),
     branding: String(config.branding !== false),
   });
 
@@ -61,7 +66,8 @@ export function createIframeManager(
 
   // postMessage handler
   const messageHandler = (event: MessageEvent) => {
-    if (event.origin !== appOrigin) return;
+    if (event.origin !== appOrigin || event.source !== iframe.contentWindow)
+      return;
 
     const msg = event.data as PostMessageFromApp;
     if (!msg?.type?.startsWith('woku:')) return;
@@ -115,7 +121,10 @@ function extractOrigin(url: string): string {
   }
 }
 
-function overlayStyles(behavior: string, zIndex: number): Partial<CSSStyleDeclaration> {
+function overlayStyles(
+  behavior: string,
+  zIndex: number,
+): Partial<CSSStyleDeclaration> {
   const base: Partial<CSSStyleDeclaration> = {
     position: 'fixed',
     zIndex: String(zIndex),
@@ -126,7 +135,8 @@ function overlayStyles(behavior: string, zIndex: number): Partial<CSSStyleDeclar
     return {
       ...base,
       inset: '0',
-      backgroundColor: behavior === 'modal' ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0)',
+      backgroundColor:
+        behavior === 'modal' ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0)',
       alignItems: 'center',
       justifyContent: 'center',
     };

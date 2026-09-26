@@ -1,3 +1,4 @@
+import { fetchCompanyBranding } from '../../app/services/capture';
 /**
  * Unit tests for the ambivalent capture service.
  * Tests endpoint selection and payload construction for woku vs nps modes.
@@ -44,7 +45,12 @@ afterEach(() => {
 
 describe('Woku capture endpoints', () => {
   it('fetchWokuReview calls GET /v1/wokus/:id/review with publishable key', async () => {
-    const data = { _id: 'wku1', description: 'Test', imageUrl: '', anonymousDisabled: false };
+    const data = {
+      _id: 'wku1',
+      description: 'Test',
+      imageUrl: '',
+      anonymousDisabled: false,
+    };
     vi.stubGlobal('fetch', mockFetch(data));
 
     const result = await fetchWokuReview(BASE, PK, 'wku1');
@@ -96,7 +102,10 @@ describe('Woku capture endpoints', () => {
       anonymous: true,
     });
 
-    const [, opts] = (fetch as ReturnType<typeof vi.fn>).mock.calls[0] as [string, RequestInit];
+    const [, opts] = (fetch as ReturnType<typeof vi.fn>).mock.calls[0] as [
+      string,
+      RequestInit,
+    ];
     const body = JSON.parse(opts.body as string) as Record<string, unknown>;
     expect(body.anonymous).toBe(true);
     expect(body.clientEmail).toBeUndefined();
@@ -113,7 +122,10 @@ describe('Woku capture endpoints', () => {
       description: 'Excellent',
     });
 
-    const [, opts] = (fetch as ReturnType<typeof vi.fn>).mock.calls[0] as [string, RequestInit];
+    const [, opts] = (fetch as ReturnType<typeof vi.fn>).mock.calls[0] as [
+      string,
+      RequestInit,
+    ];
     expect((opts.headers as Record<string, string>)['x-woku-key']).toBe(PK);
   });
 
@@ -137,7 +149,9 @@ describe('Woku capture endpoints', () => {
     expect(opts.method).toBe('POST');
     expect(opts.body).toBeInstanceOf(FormData);
     // Content-Type must NOT be set manually for multipart (browser sets boundary)
-    expect((opts.headers as Record<string, string>)['Content-Type']).toBeUndefined();
+    expect(
+      (opts.headers as Record<string, string>)['Content-Type'],
+    ).toBeUndefined();
   });
 });
 
@@ -206,7 +220,10 @@ describe('NPS capture endpoints', () => {
 
     await createNps({ apiBaseUrl: BASE, publishableKey: PK, score: 7 });
 
-    const [, opts] = (fetch as ReturnType<typeof vi.fn>).mock.calls[0] as [string, RequestInit];
+    const [, opts] = (fetch as ReturnType<typeof vi.fn>).mock.calls[0] as [
+      string,
+      RequestInit,
+    ];
     const body = JSON.parse(opts.body as string) as Record<string, unknown>;
     expect(body.npsToolId).toBeUndefined();
     expect(body.score).toBe(7);
@@ -217,7 +234,10 @@ describe('NPS capture endpoints', () => {
 
     await createNps({ apiBaseUrl: BASE, publishableKey: PK, score: 5 });
 
-    const [, opts] = (fetch as ReturnType<typeof vi.fn>).mock.calls[0] as [string, RequestInit];
+    const [, opts] = (fetch as ReturnType<typeof vi.fn>).mock.calls[0] as [
+      string,
+      RequestInit,
+    ];
     const body = JSON.parse(opts.body as string) as Record<string, unknown>;
     expect(body.anonymous).toBe(true);
   });
@@ -271,8 +291,13 @@ describe('NPS capture endpoints', () => {
       description: 'test',
     });
 
-    const [, opts] = (fetch as ReturnType<typeof vi.fn>).mock.calls[0] as [string, RequestInit];
-    expect((opts.headers as Record<string, string>)['x-woku-key']).toBe('pk_abc');
+    const [, opts] = (fetch as ReturnType<typeof vi.fn>).mock.calls[0] as [
+      string,
+      RequestInit,
+    ];
+    expect((opts.headers as Record<string, string>)['x-woku-key']).toBe(
+      'pk_abc',
+    );
   });
 });
 
@@ -334,4 +359,52 @@ describe('Error handling', () => {
       createNps({ apiBaseUrl: BASE, publishableKey: PK, score: 5 }),
     ).rejects.toThrow('HTTP 401');
   });
+});
+
+it('does not fail the public widget when optional company branding requires a management key', async () => {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(
+      async () =>
+        new Response(JSON.stringify({ message: 'Forbidden' }), { status: 403 }),
+    ),
+  );
+  await expect(fetchCompanyBranding(BASE, PK)).resolves.toEqual({});
+});
+
+it('sends identified journey context for Woku and NPS without anonymous fallbacks', async () => {
+  const context = {
+    apiBaseUrl: BASE,
+    publishableKey: PK,
+    clientPhone: '56912345678',
+    dispatchToken: 'jent_test',
+  };
+  await createWokuTextnote({
+    ...context,
+    wokuId: 'w1',
+    qualification: 4,
+    description: 'Delivery',
+  });
+  await createNps({ ...context, npsToolId: 'n1', score: 9 });
+  for (const [url, options] of (fetch as ReturnType<typeof vi.fn>).mock.calls) {
+    expect(url).not.toContain('jent_test');
+    const body = JSON.parse(options.body);
+    expect(body.clientPhone).toBe('56912345678');
+    expect(body.dispatchToken).toBe('jent_test');
+    expect(body.anonymous).not.toBe(true);
+  }
+});
+it('preserves identified journey context in Woku audio multipart', async () => {
+  await createWokuVoicemail({
+    apiBaseUrl: BASE,
+    publishableKey: PK,
+    wokuId: 'w1',
+    qualification: 5,
+    file: new Blob(['audio'], { type: 'audio/mp4' }),
+    clientPhone: '56912345678',
+    dispatchToken: 'jent_test',
+  });
+  const [, options] = (fetch as ReturnType<typeof vi.fn>).mock.calls[0];
+  expect(options.body.get('dispatchToken')).toBe('jent_test');
+  expect(options.body.get('clientPhone')).toBe('56912345678');
 });

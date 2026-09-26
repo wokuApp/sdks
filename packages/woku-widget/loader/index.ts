@@ -47,8 +47,14 @@ const DEFAULT_API_BASE = 'https://clientapi.woku.app';
 // ---------------------------------------------------------------------------
 
 function init(config: WokuWidgetConfig): void {
+  if (config.publishableKey.startsWith('sk_'))
+    throw new Error(
+      'Use a publishable key, never a management key, in the widget.',
+    );
   if (_config) {
-    console.warn('[WokuWidget] Already initialized. Call destroy() first to reinitialize.');
+    console.warn(
+      '[WokuWidget] Already initialized. Call destroy() first to reinitialize.',
+    );
     return;
   }
 
@@ -114,7 +120,9 @@ async function injectAndShow(): Promise<void> {
   if (!_config || _iframeManager) return;
 
   const behavior =
-    ((window as unknown as Record<string, unknown>).__wokuBehavior as string | undefined) ?? 'modal';
+    ((window as unknown as Record<string, unknown>).__wokuBehavior as
+      | string
+      | undefined) ?? 'modal';
 
   _iframeManager = createIframeManager(_config, behavior, handleAppMessage);
   _iframeManager.show();
@@ -128,7 +136,12 @@ function handleAppMessage(msg: PostMessageFromApp): void {
       // Send full config to the micro-app
       const configMsg: PostMessageToApp = {
         type: 'woku:config',
-        payload: _config,
+        payload: {
+          ..._config,
+          behavior:
+            (window as unknown as Record<string, unknown>).__wokuBehavior ??
+            'modal',
+        },
       };
       _iframeManager.sendMessage(configMsg);
 

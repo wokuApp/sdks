@@ -22,12 +22,16 @@ export default function Root() {
   const urlConfig = useRef(parseUrlConfig());
 
   useEffect(() => {
-    // Signal ready to the loader; it will respond with woku:config
-    sendToHost('woku:ready');
+    let configured = false;
 
     const cleanup = onHostMessage((msg) => {
       if (msg.type === 'woku:config') {
-        const full = mergeConfig(urlConfig.current, msg.payload as Partial<WidgetAppConfig>);
+        configured = true;
+        clearTimeout(fallback);
+        const full = mergeConfig(
+          urlConfig.current,
+          msg.payload as Partial<WidgetAppConfig>,
+        );
         setConfig(full);
       }
 
@@ -38,7 +42,7 @@ export default function Root() {
 
     // If no postMessage arrives within 1s (e.g. DEV mode), use URL params only
     const fallback = setTimeout(() => {
-      if (!config) {
+      if (!configured) {
         const partial = urlConfig.current;
         if (partial.companyId && partial.captureType) {
           setConfig(mergeConfig(partial, {}));
@@ -46,11 +50,12 @@ export default function Root() {
       }
     }, 1000);
 
+    // Install the receiver before announcing readiness.
+    sendToHost('woku:ready');
     return () => {
       cleanup();
       clearTimeout(fallback);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (!config) {
@@ -108,8 +113,7 @@ function AppShell({ messages }: { messages: ReturnType<typeof getMessages> }) {
   // In modal/fullscreen mode the overlay is already open from the loader,
   // so we start open automatically.
   const isModal =
-    typeof window !== 'undefined' &&
-    (window as unknown as Record<string, unknown>).__wokuBehavior === 'modal';
+    config.behavior === 'modal' || config.behavior === 'fullscreen';
 
   useEffect(() => {
     if (isModal) setOpen(true);
