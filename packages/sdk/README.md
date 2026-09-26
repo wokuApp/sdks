@@ -95,6 +95,12 @@ tools cannot be assigned. Use `toolSpec` for question variables, or an uploaded
 `fileId` for Woku. The example uses one initial send and no reminders.
 For a bilingual Woku, set `toolSpec.descriptionEn` to its English title.
 
+Agents with a local terminal can upload an image or MP4 to
+`POST /v1/woku-media` using multipart and the company key. The response's
+`fileId` can be used as `toolSpec.fileId` in a journey Woku moment or with the
+MCP `create_woku` tool. The generated `Schemas` map includes the media upload
+response type; this SDK does not yet wrap the binary upload endpoint.
+
 ```ts
 const day = 86_400_000;
 const sequence = {

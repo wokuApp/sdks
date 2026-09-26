@@ -735,6 +735,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/woku-media": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Upload a Woku image or MP4 video
+         * @description Send one local file with a company secret key. Images up to 10 MB are optimized to WebP; MP4 videos can be up to 25 MB. Returns a Woku fileId for standalone Wokus or journey moments.
+         */
+        post: operations["V1WokuMediaController_upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/companies/me": {
         parameters: {
             query?: never;
@@ -2080,6 +2100,13 @@ export interface components {
             /** @description Array of email addresses */
             clientEmails?: string[];
         };
+        WokuMediaUploadResultDto: {
+            /** Format: ObjectId */
+            fileId: string;
+            filename: string;
+            /** @enum {string} */
+            type: "image" | "video";
+        };
         V1ApiKeyResultDto: {
             /** @description The new company secret API key. The previous key is now invalid; store this value, it is not retrievable again. */
             apiKey: string;
@@ -2607,6 +2634,8 @@ export interface components {
         PreviewJourneyMomentDto: {
             /** @description A sample sender payload. Previewing never sends an evaluation. */
             payload: Record<string, never>;
+            /** @description Unsaved version of this moment for a side-effect-free preview. */
+            stage?: Record<string, never>;
         };
         JourneyPlanMemberDto: {
             /** @description Company member user id. */
@@ -4316,6 +4345,49 @@ export interface operations {
         };
         responses: {
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1WokuMediaController_upload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Media stored for reuse in Wokus and journey moments */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WokuMediaUploadResultDto"];
+                };
+            };
+            /** @description Missing, invalid or oversized media */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Invalid company key */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };

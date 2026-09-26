@@ -39,6 +39,11 @@ One enrollment key may complete the same journey repeatedly, with one active
 cycle per journey at a time. `JourneyEnrollment` exposes `completed` and the
 unsent `pendingMoments`.
 
+For local agent media, the public API accepts multipart at `POST /v1/woku-media`
+and returns a `fileId` for a Woku moment or the MCP `create_woku` tool. The JS
+SDK includes its response in the generated `Schemas` types; binary upload has
+no SDK convenience method yet.
+
 ## Repository layout
 
 ```

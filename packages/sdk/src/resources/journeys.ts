@@ -54,7 +54,7 @@ export interface JourneyMoment {
   name?: string;
   description?: string;
   tool: 'woku' | 'nps' | 'csat' | 'ces';
-  /** A new tool per enrollment (default), or one shared by this moment only. */
+  /** V2 defaults to one tool shared within this moment; per_enrollment creates one per case. */
   toolScope?: 'per_enrollment' | 'shared';
   toolSpec?: {
     /** CSAT experience, CES action, or NPS company/product, not the full question. */
