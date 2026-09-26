@@ -175,3 +175,12 @@ score submissions have no automatic transport retry.
 Widget supports Woku/NPS; React Native supports all four instruments. Use only pk\_
 keys; management keys are rejected. The API key used to prepare a journey stays
 on your backend and is never passed to the loader.
+
+### Reconfiguration
+
+A new company, API/authorization context, instrument, prepared response token or configured contact resets
+the evaluation state. This also initializes contact when host configuration
+arrives after the URL fallback. Repeating the same configuration or changing
+only presentation preserves current feedback. After `destroy()`, callbacks
+from an earlier asynchronous initialization cannot register triggers for a new
+widget instance.

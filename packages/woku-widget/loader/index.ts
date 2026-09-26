@@ -68,18 +68,21 @@ function init(config: WokuWidgetConfig): void {
   if (!passesUrlRules(_config.urlRules)) return;
 
   // Gate 2: quarantine (async — fire triggers only if not quarantined)
-  const apiBase = _config.apiBaseUrl ?? DEFAULT_API_BASE;
+  const initializedConfig = _config;
+  const apiBase = initializedConfig.apiBaseUrl ?? DEFAULT_API_BASE;
 
-  void isInQuarantine(apiBase, _config.companyId, _config.publishableKey).then(
-    (quarantined) => {
-      if (quarantined || !_config) return;
+  void isInQuarantine(
+    apiBase,
+    initializedConfig.companyId,
+    initializedConfig.publishableKey,
+  ).then((quarantined) => {
+    if (quarantined || _config !== initializedConfig) return;
 
-      // Register triggers — fire will inject the iframe
-      _cleanupTriggers = registerTriggers(_config.triggers, () => {
-        void injectAndShow();
-      });
-    },
-  );
+    // Register triggers — fire will inject the iframe
+    _cleanupTriggers = registerTriggers(_config.triggers, () => {
+      void injectAndShow();
+    });
+  });
 }
 
 function show(): void {

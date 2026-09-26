@@ -70,7 +70,20 @@ export default function Root() {
   const messages = getMessages(locale);
 
   return (
-    <WidgetProvider config={config}>
+    <WidgetProvider
+      key={JSON.stringify([
+        config.companyId,
+        config.apiBaseUrl,
+        config.publishableKey,
+        config.captureType,
+        config.wokuId,
+        config.npsToolId,
+        config.dispatchToken,
+        config.email,
+        config.phone,
+      ])}
+      config={config}
+    >
       <AppShell messages={messages} />
     </WidgetProvider>
   );
