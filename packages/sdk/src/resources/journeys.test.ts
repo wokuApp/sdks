@@ -112,3 +112,37 @@ it('generates a URL for one moment and tests mapping without sending', async () 
   expect(preview.preview?.folder?.secondaryKey).toBe('order1');
   expect(preview.preview?.clientFields.tier).toBe('gold');
 });
+
+it('prepares customer entry without enrolling and preserves its response capability', async () => {
+  server.use(
+    http.get(`${BASE}/v1/journey-entries/j1`, () =>
+      HttpResponse.json({
+        name: 'Purchase',
+        tool: 'csat',
+        requiresReference: true,
+      }),
+    ),
+    http.post(`${BASE}/v1/journey-entries/j1`, async ({ request }) => {
+      expect(await request.json()).toEqual({
+        requestId: '07c19e38-5cf4-4ef5-9e26-88802610c510',
+        email: 'client@example.com',
+        reference: 'order1',
+      });
+      return HttpResponse.json({
+        companyId: 'c1',
+        tool: 'csat',
+        toolId: 't1',
+        token: 'jent_test',
+        subjectKey: 'client@example.com',
+      });
+    }),
+  );
+  expect((await sdk().journeys.entryInfo('j1')).requiresReference).toBe(true);
+  const entry = await sdk().journeys.prepareEntry('j1', {
+    requestId: '07c19e38-5cf4-4ef5-9e26-88802610c510',
+    email: 'client@example.com',
+    reference: 'order1',
+  });
+  expect(entry.token).toBe('jent_test');
+  expect(entry.toolId).toBe('t1');
+});

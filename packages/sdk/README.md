@@ -299,3 +299,10 @@ image URL paths, folders and tracker mappings. HTTP uses `sequence`; MCP uses
 without verifying signatures or sending. Unknown HTTP and MCP moment fields now
 return a validation error. `webhookSecret` is the legacy journey-wide signature,
 separate from per-moment URL tokens and sender HMAC secrets.
+
+`journeys.entryInfo` reads customer entry metadata; `journeys.prepareEntry`
+prepares its first tool with a UUID request ID and identified contact. Neither
+starts the journey. Pass the returned token as `dispatchToken` when capturing
+its first valid answer. Journey reads, progress, previews, enrollment and event
+results now use the generated public shapes directly. Server-side SDK keys
+remain on the server; browser entry does not need a company secret key.

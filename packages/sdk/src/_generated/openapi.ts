@@ -2045,6 +2045,8 @@ export interface components {
             folderId: string | null;
         };
         V1CreateTextnoteBodyDto: {
+            /** @description Opaque invitation or prepared journey-entry response token. Consumed after saving feedback; never stored on the review. */
+            dispatchToken?: string;
             /**
              * @description Star rating (1-5)
              * @example 5
@@ -2065,6 +2067,8 @@ export interface components {
             responseChannel?: string;
         };
         V1CreateVoicemailBodyDto: {
+            /** @description Opaque invitation or prepared journey-entry response token. Consumed after saving feedback; never stored on the review. */
+            dispatchToken?: string;
             /**
              * Format: binary
              * @description Audio file for the voicemail
@@ -2240,6 +2244,8 @@ export interface components {
             externalId?: string;
         };
         V1CaptureBodyDto: {
+            /** @description Opaque invitation or prepared journey-entry response token. Consumed after saving feedback; never stored on the review. */
+            dispatchToken?: string;
             /** @description Client-generated idempotency id */
             id?: string;
             /**
@@ -2752,7 +2758,7 @@ export interface components {
             folder?: components["schemas"]["V1JourneyPreviewFolderDto"];
             /** @description Resolved additional client fields. */
             clientFields: {
-                [key: string]: unknown;
+                [key: string]: string | number | boolean;
             };
         };
         V1JourneyPreviewResponseDto: {
@@ -2987,6 +2993,11 @@ export interface components {
         };
         V1CreateJourneyBodyDto: {
             /**
+             * @deprecated
+             * @description Legacy body API key. Prefer Authorization: Bearer. Consumed by authentication and never forwarded to journey commands.
+             */
+            authHeader?: string;
+            /**
              * @description Use 2 for the business-form contract. Existing v1 definitions keep their execution rules.
              * @enum {number}
              */
@@ -3029,6 +3040,11 @@ export interface components {
         };
         V1UpdateJourneyBodyDto: {
             /**
+             * @deprecated
+             * @description Legacy body API key. Prefer Authorization: Bearer. Consumed by authentication and never forwarded to journey commands.
+             */
+            authHeader?: string;
+            /**
              * @description Use 2 for the business-form contract. Existing v1 definitions keep their execution rules.
              * @enum {number}
              */
@@ -3050,6 +3066,11 @@ export interface components {
         };
         V1EnrollSubjectBodyDto: {
             /**
+             * @deprecated
+             * @description Legacy body API key. Prefer Authorization: Bearer. Consumed by authentication and never forwarded to journey commands.
+             */
+            authHeader?: string;
+            /**
              * @description Your own key for who is enrolled: a customer id, an order, a ticket.
              * @example cliente-123
              */
@@ -3065,6 +3086,11 @@ export interface components {
             journeyId: string;
         };
         V1EmitJourneyEventBodyDto: {
+            /**
+             * @deprecated
+             * @description Legacy body API key. Prefer Authorization: Bearer. Consumed by authentication and never forwarded to journey commands.
+             */
+            authHeader?: string;
             /** @example crm.deal.won */
             event: string;
             /** @example cliente-123 */
@@ -3075,6 +3101,14 @@ export interface components {
         };
         V1JourneyEventResponseDto: {
             journeys: number;
+        };
+        JourneyEntryInfoDto: {
+            name?: string;
+            momentName?: string;
+            /** @enum {string} */
+            tool: "woku" | "csat" | "ces" | "nps";
+            /** @description A case reference is required when later moments start on webhooks. */
+            requiresReference: boolean;
         };
         PrepareJourneyEntryDto: {
             /**
@@ -3087,6 +3121,15 @@ export interface components {
             /** @example 56912345678 */
             phone?: string;
             reference?: string;
+        };
+        PreparedJourneyEntryDto: {
+            companyId: string;
+            /** @enum {string} */
+            tool: "woku" | "csat" | "ces" | "nps";
+            toolId: string;
+            /** @description Opaque response capability for this prepared first tool. Keep private; preparing alone does not start the journey. */
+            token: string;
+            subjectKey: string;
         };
     };
     responses: never;
@@ -6941,6 +6984,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Secure webhook ingress is not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     V1JourneysController_setSenderSecret: {
@@ -7407,6 +7457,22 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
+                content: {
+                    "application/json": components["schemas"]["JourneyEntryInfoDto"];
+                };
+            };
+            /** @description Invalid contact, case reference or request ID */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description This evaluation is not available */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
         };
@@ -7427,6 +7493,36 @@ export interface operations {
         };
         responses: {
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PreparedJourneyEntryDto"];
+                };
+            };
+            /** @description Invalid contact, case reference or request ID */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description This evaluation is not available */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Customer or case already has an active evaluation */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Preparation is still in progress; retry with the same requestId */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };
