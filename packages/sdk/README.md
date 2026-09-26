@@ -100,6 +100,8 @@ Agents with a local terminal can upload an image or MP4 to
 `fileId` can be used as `toolSpec.fileId` in a journey Woku moment or with the
 MCP `create_woku` tool. The generated `Schemas` map includes the media upload
 response type; this SDK does not yet wrap the binary upload endpoint.
+The endpoint returns `400` for invalid media and `413` for multipart requests
+over 25 MB.
 
 ```ts
 const day = 86_400_000;

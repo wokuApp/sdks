@@ -4377,7 +4377,7 @@ export interface operations {
                     "application/json": components["schemas"]["WokuMediaUploadResultDto"];
                 };
             };
-            /** @description Missing, invalid or oversized media */
+            /** @description Missing, invalid media or image over 10 MB */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -4388,6 +4388,13 @@ export interface operations {
             };
             /** @description Invalid company key */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The media upload exceeds 25 MB */
+            413: {
                 headers: {
                     [name: string]: unknown;
                 };

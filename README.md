@@ -43,6 +43,8 @@ For local agent media, the public API accepts multipart at `POST /v1/woku-media`
 and returns a `fileId` for a Woku moment or the MCP `create_woku` tool. The JS
 SDK includes its response in the generated `Schemas` types; binary upload has
 no SDK convenience method yet.
+The upload endpoint returns `400` for invalid media and `413` for multipart
+requests over 25 MB.
 
 ## Repository layout
 
