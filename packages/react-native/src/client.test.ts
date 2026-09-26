@@ -203,3 +203,54 @@ it('preserves token, phone and language in multipart without putting them in the
   });
   expect(req.url).not.toContain('jent_');
 });
+
+it('bounds response-body reading with the same timeout as the transport', async () => {
+  vi.useFakeTimers();
+  try {
+    let signal: AbortSignal | undefined;
+    const client = new WokuClient({
+      apiUrl: 'https://api.test',
+      companyId: 'c1',
+      publicKey: 'pk_test',
+      timeoutMs: 25,
+      http: {
+        request: async (req) => {
+          signal = req.signal;
+          return mkResponse({ json: () => new Promise(() => undefined) });
+        },
+      },
+    });
+    let outcome: unknown;
+    const sending = client.send(submission).catch((error) => {
+      outcome = error;
+    });
+    await vi.advanceTimersByTimeAsync(26);
+    expect(outcome).toBeInstanceOf(WokuNetworkError);
+    expect(signal?.aborted).toBe(true);
+    await sending;
+  } finally {
+    vi.useRealTimers();
+  }
+});
+
+it('returns a string for nested API validation errors rather than persisting an object', async () => {
+  const client = mkClient({
+    request: async () =>
+      mkResponse({
+        ok: false,
+        status: 400,
+        json: async () => ({
+          statusCode: 400,
+          message: {
+            message: ['Invalid contact', 'Invalid tool'],
+            error: 'Bad Request',
+          },
+        }),
+      }),
+  });
+  expect(await client.send(submission)).toMatchObject({
+    status: 'failed',
+    retryable: false,
+    error: 'Invalid contact, Invalid tool',
+  });
+});

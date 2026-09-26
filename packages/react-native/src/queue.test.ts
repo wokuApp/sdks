@@ -179,3 +179,30 @@ it('keeps captures beyond the server dedup window for manual reconciliation with
   expect(send).not.toHaveBeenCalled();
   expect((await queue.failures())[0]?.reason).toContain('Retry window expired');
 });
+
+it('does not start sending snapshot rows removed by clear during an in-flight flush', async () => {
+  const storage = new InMemoryStorage();
+  const queue = new OfflineQueue({ storage, companyId: 'c1' });
+  await queue.enqueue(sub('a'));
+  await queue.enqueue(sub('b'));
+  let started!: () => void;
+  const firstStarted = new Promise<void>((resolve) => {
+    started = resolve;
+  });
+  let release!: () => void;
+  const response = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  const send = vi.fn(async (capture: CaptureSubmission) => {
+    started();
+    await response;
+    return sent(capture.id);
+  });
+  const flushing = queue.flush(send);
+  await firstStarted;
+  await new OfflineQueue({ storage, companyId: 'c1' }).clear();
+  release();
+  await flushing;
+  expect(send).toHaveBeenCalledOnce();
+  expect(await queue.size()).toBe(0);
+});

@@ -136,3 +136,9 @@ postMessage. Package READMEs describe retry, identity and storage constraints.
 Management and Native packages ship checked ESM/CJS exports with matching
 type declarations. Management types regenerate from a vendored API v1 spec;
 `pnpm --filter @wokuapp/sdk check:generated` detects drift standalone.
+
+Capture failure handling also covers stalled response bodies and failures while
+persisting a local acknowledgement. Clearing Native queues prevents further
+snapshot sends; accepted or in-flight requests cannot be recalled. Widget
+reconfiguration resets evaluation identity while preserving progress for
+presentation-only changes, and initialization gates are scoped to their instance.

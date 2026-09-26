@@ -97,16 +97,60 @@ export class WokuClient {
 
     const controller = new AbortController();
     let timer: ReturnType<typeof setTimeout> | undefined;
-    let response;
     try {
-      response = await Promise.race([
-        this.http.request({
-          method: 'POST',
-          url: this.endpoint,
-          headers,
-          body: requestBody,
-          signal: controller.signal,
-        }),
+      return await Promise.race([
+        (async (): Promise<SubmissionResult> => {
+          const response = await this.http.request({
+            method: 'POST',
+            url: this.endpoint,
+            headers,
+            body: requestBody,
+            signal: controller.signal,
+          });
+          if (response.ok) {
+            const body = (await this.safeJson(response.json)) as {
+              id?: string;
+              remoteId?: string;
+            } | null;
+            return {
+              id: submission.id,
+              status: 'sent',
+              remoteId: body?.remoteId ?? body?.id,
+            };
+          }
+          if (response.status === 429) {
+            const raw = response.headers.get('Retry-After');
+            const retryAfter = raw === null ? undefined : Number(raw);
+            throw new WokuQuarantineError(
+              'Submission blocked by quarantine',
+              retryAfter !== undefined && Number.isFinite(retryAfter)
+                ? Math.max(0, retryAfter)
+                : undefined,
+            );
+          }
+          const body = (await this.safeJson(response.json)) as {
+            message?: unknown;
+          } | null;
+          const value = body?.message;
+          const message =
+            value && typeof value === 'object' && !Array.isArray(value)
+              ? (value as { message?: unknown }).message
+              : value;
+          const detail = Array.isArray(message)
+            ? message.filter((item) => typeof item === 'string').join(', ')
+            : message;
+          const error =
+            typeof detail === 'string' && detail
+              ? detail
+              : `HTTP ${response.status}`;
+          this.logger.warn(`woku capture rejected: ${error}`);
+          return {
+            id: submission.id,
+            status: 'failed',
+            error,
+            retryable: response.status === 408 || response.status >= 500,
+          };
+        })(),
         new Promise<never>((_resolve, reject) => {
           timer = setTimeout(() => {
             controller.abort();
@@ -115,44 +159,13 @@ export class WokuClient {
         }),
       ]);
     } catch (err) {
-      throw new WokuNetworkError((err as Error).message);
+      if (err instanceof WokuQuarantineError) throw err;
+      throw new WokuNetworkError(
+        err instanceof Error ? err.message : 'Capture request failed',
+      );
     } finally {
       if (timer) clearTimeout(timer);
     }
-
-    if (response.ok) {
-      const body = (await this.safeJson(response.json)) as {
-        id?: string;
-        remoteId?: string;
-      } | null;
-      return {
-        id: submission.id,
-        status: 'sent',
-        remoteId: body?.remoteId ?? body?.id,
-      };
-    }
-
-    if (response.status === 429) {
-      const retryAfter = Number(response.headers.get('Retry-After'));
-      throw new WokuQuarantineError(
-        'Submission blocked by quarantine',
-        Number.isFinite(retryAfter) ? retryAfter : undefined,
-      );
-    }
-
-    const body = (await this.safeJson(response.json)) as {
-      message?: string | string[];
-    } | null;
-    const error = Array.isArray(body?.message)
-      ? body.message.join(', ')
-      : (body?.message ?? `HTTP ${response.status}`);
-    this.logger.warn(`woku capture rejected: ${error}`);
-    return {
-      id: submission.id,
-      status: 'failed',
-      error,
-      retryable: response.status === 408 || response.status >= 500,
-    };
   }
 
   private async safeJson(

@@ -181,3 +181,15 @@ removes only the current company's pending and retained failed rows.
 
 The published package includes separate ESM/CJS JavaScript and matching
 `.d.ts`/`.d.cts` exports. Both imports are checked against the packed artifact.
+
+### Delivery failures and clearing
+
+`timeoutMs` covers receiving the response and reading its body. Validation
+messages use the API's nested error envelope and remain strings. If the server
+confirms a capture but local acknowledgement cannot be stored, the capture call
+still returns `sent`; the pending row retains its original ID for a safe later
+flush. A storage failure before enqueue prevents the network request.
+
+`clearQueue()` removes this company's rows and prevents an active flush from
+starting further sends from its old snapshot. An already started request may
+finish and cannot be recalled.

@@ -4,6 +4,7 @@ import { WokuSdk } from './sdk';
 import {
   InMemoryStorage,
   type HttpClient,
+  type HttpRequest,
   type HttpResponse,
 } from './adapters';
 import { WokuValidationError } from './errors';
@@ -132,4 +133,41 @@ it('keeps a rejected capture available for inspection without replaying its perm
   expect(await sdk.failedCaptures()).toHaveLength(1);
   await sdk.flush();
   expect(request).toHaveBeenCalledTimes(1);
+});
+
+it('returns confirmed delivery even when local acknowledgement persistence fails', async () => {
+  const memory = new InMemoryStorage();
+  let writes = 0;
+  const storage = {
+    getItem: memory.getItem.bind(memory),
+    removeItem: memory.removeItem.bind(memory),
+    setItem: (key: string, value: string) => {
+      if (++writes === 2)
+        throw new Error('Storage write failed after acceptance');
+      memory.setItem(key, value);
+    },
+  };
+  const request = vi.fn(async (_req: HttpRequest) => ({
+    ...ok,
+    json: async () => ({ remoteId: 'accepted-response' }),
+  }));
+  const sdk = new WokuSdk({
+    apiUrl: 'https://api.test',
+    publicKey: 'pk_test',
+    companyId: 'c1',
+    storage,
+    http: { request },
+  });
+  const result = await sdk.captureCsat({ csatId: 'csat1', score: 5 });
+  expect(result).toMatchObject({
+    status: 'sent',
+    remoteId: 'accepted-response',
+  });
+  expect(await sdk.pendingCount()).toBe(1);
+  await sdk.flush();
+  const bodies = request.mock.calls.map(([req]) =>
+    JSON.parse(req.body as string),
+  );
+  expect(bodies[1].id).toBe(bodies[0].id);
+  expect(await sdk.pendingCount()).toBe(0);
 });

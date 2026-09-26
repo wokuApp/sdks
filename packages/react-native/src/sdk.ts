@@ -18,7 +18,7 @@ import type {
 export interface WokuSdkConfig extends WokuClientConfig {
   /** Storage adapter for the offline queue (MMKV/AsyncStorage in RN). */
   storage?: Storage;
-  /** Drop a queued submission after this many failed attempts. */
+  /** Retain a failed submission for inspection after this many flush attempts. */
   maxQueueAttempts?: number;
 }
 
@@ -180,7 +180,16 @@ export class WokuSdk {
     try {
       const result = await this.client.send(submission);
       if (result.status === 'sent') {
-        await this.queue.acknowledge(submission);
+        try {
+          await this.queue.acknowledge(submission);
+        } catch {
+          // Delivery is confirmed. Keep its original id for a later deduplicated
+          // flush rather than making callers think they must submit again.
+          this.logger.warn(
+            'Capture accepted; local acknowledgement is pending',
+            { id: submission.id },
+          );
+        }
         return result;
       }
       if (result.retryable === false) {

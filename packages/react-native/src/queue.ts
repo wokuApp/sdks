@@ -183,7 +183,19 @@ export class OfflineQueue {
     let sent = 0,
       failed = 0,
       quarantined = false;
-    for (const submission of batch) {
+    for (const candidate of batch) {
+      // A clear/reject while another request is in flight invalidates this snapshot.
+      const current = await this.mutation(async () =>
+        (await this.load()).find(
+          (item) =>
+            this.owned(item) &&
+            !item.failure &&
+            item.submission.id === candidate.id &&
+            item.submission.companyId === candidate.companyId,
+        ),
+      );
+      if (!current) continue;
+      const submission = current.submission;
       // The server deduplicates for 24h; keep older uncertain captures for
       // inspection rather than resubmitting them outside that protection.
       if (
