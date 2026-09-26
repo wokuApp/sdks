@@ -1802,8 +1802,26 @@ export interface components {
              */
             error: string;
         };
-        CreateWokuApiDto: Record<string, never>;
-        CreateWokuFormDataApiDto: Record<string, never>;
+        CreateWokuApiDto: {
+            /** @description The subject evaluated by this Woku */
+            description: string;
+            /** @description Public image or MP4 URL */
+            fileUrl: string;
+            folderSecondaryKey?: string;
+            parentFolderSecondaryKey?: string;
+            /** Format: email */
+            clientEmail?: string;
+            clientPhone?: number;
+        };
+        CreateWokuFormDataApiDto: {
+            /** @description The subject evaluated by this Woku */
+            description: string;
+            folderSecondaryKey?: string;
+            parentFolderSecondaryKey?: string;
+            /** Format: email */
+            clientEmail?: string;
+            clientPhone?: string;
+        };
         CreateExternalTrackerDefinitionDTO: {
             /**
              * @description Tracker name. Identifies the tracker within the company catalog. Unique per company.
@@ -1898,9 +1916,13 @@ export interface components {
             /** @example Zendesk Soporte Chile */
             name: string;
             /** @description Non-secret provider config (validated per kind). */
-            config: Record<string, never>;
+            config: {
+                [key: string]: unknown;
+            };
             /** @description Provider credentials (write-only, encrypted). */
-            credentials: Record<string, never>;
+            credentials: {
+                [key: string]: string;
+            };
             /** @description Per-destination AI triage context. */
             aiContext?: string;
             routingConditions?: components["schemas"]["TicketRoutingConditionDto"][];
@@ -1910,9 +1932,13 @@ export interface components {
         };
         V1UpdateTicketDestinationDto: {
             name?: string;
-            config?: Record<string, never>;
+            config?: {
+                [key: string]: unknown;
+            };
             /** @description Present = credential rotation. */
-            credentials?: Record<string, never>;
+            credentials?: {
+                [key: string]: string;
+            };
             /** @description Per-destination AI triage context. */
             aiContext?: string;
             routingConditions?: components["schemas"]["TicketRoutingConditionDto"][];
@@ -2141,6 +2167,8 @@ export interface components {
              * @description Respondent email. Omit for an anonymous capture.
              */
             clientEmail?: string;
+            /** @description Respondent phone when email is not supplied. */
+            clientPhone?: string;
             /** @description Whether the submission is anonymous (no client email stored). */
             anonymous?: boolean;
             /**
@@ -2274,6 +2302,16 @@ export interface components {
             comment?: string;
             audio?: components["schemas"]["V1CaptureAudioDto"];
             respondent?: components["schemas"]["V1CaptureRespondentDto"];
+        };
+        V1CaptureResultDto: {
+            /** @description Client submission id, echoed without replacing the server id. */
+            id?: string;
+            /** @enum {string} */
+            kind: "woku" | "nps" | "csat" | "ces";
+            /** @description Server id of the created feedback resource. */
+            remoteId?: string;
+            /** @enum {string} */
+            status: "accepted";
         };
         V1CreateNpsInvitationsBodyDto: {
             /**
@@ -2414,7 +2452,9 @@ export interface components {
              *       "field-uuid-2": 5
              *     }
              */
-            answers: Record<string, never>;
+            answers: {
+                [key: string]: unknown;
+            };
             /**
              * @description Inbound response channel. Defaults to 'api'; a value provided here REPLACES 'api' (user-defined channel). Stored on the response.
              * @example my-crm
@@ -3079,7 +3119,9 @@ export interface components {
             contact: components["schemas"]["V1JourneyContactDto"];
             trackers?: components["schemas"]["V1JourneyTrackerDto"][];
             /** @description Anything you want kept with it */
-            metadata?: Record<string, never>;
+            metadata?: {
+                [key: string]: unknown;
+            };
         };
         V1JourneyEnrollmentResponseDto: {
             subjectKey: string;
@@ -3097,7 +3139,9 @@ export interface components {
             subjectKey: string;
             contact?: components["schemas"]["V1JourneyContactDto"];
             trackers?: components["schemas"]["V1JourneyTrackerDto"][];
-            metadata?: Record<string, never>;
+            metadata?: {
+                [key: string]: unknown;
+            };
         };
         V1JourneyEventResponseDto: {
             journeys: number;
@@ -5510,7 +5554,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["V1CaptureResultDto"];
+                };
             };
             /** @description Validation error */
             400: {

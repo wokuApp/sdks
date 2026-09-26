@@ -31,13 +31,17 @@ export class Wokus {
     return this.client.request<WokuResource>('post', '/v1/wokus', {
       ...opts,
       body,
-      idempotent: true,
+      maxRetries: 0,
     });
   }
 
   /** Get one woku with aggregated review stats. */
   get(id: string, opts?: RequestOptions): Promise<WokuResource> {
-    return this.client.request<WokuResource>('get', `/v1/wokus/${id}`, opts);
+    return this.client.request<WokuResource>(
+      'get',
+      `/v1/wokus/${encodeURIComponent(id)}`,
+      opts,
+    );
   }
 
   update(
@@ -45,16 +49,20 @@ export class Wokus {
     body: UpdateWokuParams,
     opts?: RequestOptions,
   ): Promise<WokuResource> {
-    return this.client.request<WokuResource>('patch', `/v1/wokus/${id}`, {
-      ...opts,
-      body,
-    });
+    return this.client.request<WokuResource>(
+      'patch',
+      `/v1/wokus/${encodeURIComponent(id)}`,
+      {
+        ...opts,
+        body,
+      },
+    );
   }
 
   delete(id: string, opts?: RequestOptions): Promise<DeletedResult> {
     return this.client.request<DeletedResult>(
       'delete',
-      `/v1/wokus/${id}`,
+      `/v1/wokus/${encodeURIComponent(id)}`,
       opts,
     );
   }
@@ -65,18 +73,30 @@ export class Wokus {
     body: UpdateWokuSettingsParams,
     opts?: RequestOptions,
   ): Promise<WokuResource> {
-    return this.client.request<WokuResource>('patch', `/v1/wokus/${id}/settings`, {
-      ...opts,
-      body,
-    });
+    return this.client.request<WokuResource>(
+      'patch',
+      `/v1/wokus/${encodeURIComponent(id)}/settings`,
+      {
+        ...opts,
+        body,
+      },
+    );
   }
 
   /** Move the woku into a folder, or to the root with `{ folderId: null }`. */
-  move(id: string, body: MoveWokuParams, opts?: RequestOptions): Promise<WokuResource> {
-    return this.client.request<WokuResource>('patch', `/v1/wokus/${id}/move`, {
-      ...opts,
-      body,
-    });
+  move(
+    id: string,
+    body: MoveWokuParams,
+    opts?: RequestOptions,
+  ): Promise<WokuResource> {
+    return this.client.request<WokuResource>(
+      'patch',
+      `/v1/wokus/${encodeURIComponent(id)}/move`,
+      {
+        ...opts,
+        body,
+      },
+    );
   }
 
   /** List the reviews of a woku (paginated). */
@@ -86,7 +106,7 @@ export class Wokus {
     opts?: RequestOptions,
   ): Promise<Page<WokuRecord>> {
     return this.client.getPage<WokuRecord>(
-      `/v1/wokus/${id}/reviews`,
+      `/v1/wokus/${encodeURIComponent(id)}/reviews`,
       params,
       opts,
     );
@@ -100,7 +120,7 @@ export class Wokus {
   ): Promise<InvitationsResult> {
     return this.client.request<InvitationsResult>(
       'post',
-      `/v1/wokus/${id}/invitations`,
+      `/v1/wokus/${encodeURIComponent(id)}/invitations`,
       { ...opts, body, idempotent: true },
     );
   }
@@ -111,9 +131,13 @@ export class Wokus {
     body: ShareWokuParams,
     opts?: RequestOptions,
   ): Promise<WokuRecord> {
-    return this.client.request<WokuRecord>('post', `/v1/wokus/${id}/share`, {
-      ...opts,
-      body,
-    });
+    return this.client.request<WokuRecord>(
+      'post',
+      `/v1/wokus/${encodeURIComponent(id)}/share`,
+      {
+        ...opts,
+        body,
+      },
+    );
   }
 }

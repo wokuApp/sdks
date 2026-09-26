@@ -1,3 +1,4 @@
+import { WokuError } from '../core/errors';
 import type { WokuClient } from '../core/client';
 import type { RequestOptions } from '../core/options';
 import type { Schemas } from '../types';
@@ -57,7 +58,7 @@ export class Journeys {
     return this.client.request(
       'post',
       `/v1/journey-entries/${encodeURIComponent(journeyId)}`,
-      { ...opts, body },
+      { ...opts, body, maxRetries: 0 },
     );
   }
 
@@ -87,6 +88,7 @@ export class Journeys {
     return this.client.request<CreatedJourney>('post', '/v1/journeys', {
       ...opts,
       body,
+      idempotent: true,
     });
   }
 
@@ -123,6 +125,31 @@ export class Journeys {
     );
   }
 
+  /** Iterate exact cases lazily, preserving options while advancing the server cursor. */
+  async *iterEnrollments(
+    journeyId: string,
+    params?: ListJourneyEnrollmentsParams,
+    opts?: RequestOptions,
+  ): AsyncGenerator<JourneyEnrollment> {
+    let query: Record<string, unknown> = { ...params, ...opts?.query };
+    const seen = new Set<string>();
+    for (;;) {
+      const page = await this.listEnrollments(journeyId, undefined, {
+        ...opts,
+        query,
+      });
+      for (const item of page.items) yield item;
+      const next = page.nextCursor;
+      if (!next) return;
+      if (seen.has(next) || next === query.cursor)
+        throw new WokuError('Enrollment pagination did not advance.', {
+          code: 'pagination_error',
+        });
+      seen.add(next);
+      query = { ...query, cursor: next };
+    }
+  }
+
   /** History and next step for one exact participation. */
   getEnrollment(
     journeyId: string,
@@ -146,7 +173,7 @@ export class Journeys {
     return this.client.request(
       'post',
       `/v1/journeys/${encodeURIComponent(journeyId)}/enrollments/${encodeURIComponent(enrollmentId)}/stop`,
-      { ...opts, body },
+      { ...opts, body, idempotent: true },
     );
   }
 
@@ -171,7 +198,7 @@ export class Journeys {
     const result = await this.client.request<{ token: string; url: string }>(
       'post',
       `/v1/journeys/${encodeURIComponent(journeyId)}/moments/${encodeURIComponent(stageKey)}/url-token`,
-      { ...opts, body: {} },
+      { ...opts, body: {}, idempotent: true },
     );
     return {
       ...result,
@@ -189,7 +216,7 @@ export class Journeys {
     return this.client.request(
       'post',
       `/v1/journeys/${encodeURIComponent(journeyId)}/moments/${encodeURIComponent(stageKey)}/sender-secret`,
-      { ...opts, body: { senderSecret } },
+      { ...opts, body: { senderSecret }, maxRetries: 0 },
     );
   }
 
@@ -203,7 +230,7 @@ export class Journeys {
     return this.client.request(
       'post',
       `/v1/journeys/${encodeURIComponent(journeyId)}/moments/${encodeURIComponent(stageKey)}/preview`,
-      { ...opts, body: { payload } },
+      { ...opts, body: { payload }, maxRetries: 0 },
     );
   }
 
@@ -227,7 +254,7 @@ export class Journeys {
     return this.client.request<Schemas['V1JourneySecretResponseDto']>(
       'post',
       `/v1/journeys/${encodeURIComponent(journeyId)}/webhook-secret`,
-      { ...opts, body: {} },
+      { ...opts, body: {}, maxRetries: 0 },
     );
   }
 
@@ -243,7 +270,7 @@ export class Journeys {
     return this.client.request<Schemas['V1JourneyEnrollmentResponseDto']>(
       'post',
       `/v1/journeys/${encodeURIComponent(journeyId)}/enrollments`,
-      { ...opts, body },
+      { ...opts, body, idempotent: true },
     );
   }
 
@@ -261,6 +288,7 @@ export class Journeys {
       {
         ...opts,
         body,
+        idempotent: true,
       },
     );
   }

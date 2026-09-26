@@ -54,7 +54,11 @@ export class Tickets {
   }
 
   get(id: string, opts?: RequestOptions): Promise<Ticket> {
-    return this.client.request<Ticket>('get', `/v1/tickets/${id}`, opts);
+    return this.client.request<Ticket>(
+      'get',
+      `/v1/tickets/${encodeURIComponent(id)}`,
+      opts,
+    );
   }
 
   update(
@@ -62,10 +66,14 @@ export class Tickets {
     body: UpdateTicketParams,
     opts?: RequestOptions,
   ): Promise<Ticket> {
-    return this.client.request<Ticket>('patch', `/v1/tickets/${id}`, {
-      ...opts,
-      body,
-    });
+    return this.client.request<Ticket>(
+      'patch',
+      `/v1/tickets/${encodeURIComponent(id)}`,
+      {
+        ...opts,
+        body,
+      },
+    );
   }
 }
 
@@ -84,7 +92,7 @@ export class TicketDestinations {
   get(id: string, opts?: RequestOptions): Promise<WokuRecord> {
     return this.client.request<WokuRecord>(
       'get',
-      `/v1/ticket-destinations/${id}`,
+      `/v1/ticket-destinations/${encodeURIComponent(id)}`,
       opts,
     );
   }
@@ -96,7 +104,7 @@ export class TicketDestinations {
     return this.client.request<WokuRecord>('post', '/v1/ticket-destinations', {
       ...opts,
       body,
-      idempotent: true,
+      maxRetries: 0,
     });
   }
 
@@ -107,7 +115,7 @@ export class TicketDestinations {
   ): Promise<WokuRecord> {
     return this.client.request<WokuRecord>(
       'patch',
-      `/v1/ticket-destinations/${id}`,
+      `/v1/ticket-destinations/${encodeURIComponent(id)}`,
       { ...opts, body },
     );
   }
@@ -115,7 +123,7 @@ export class TicketDestinations {
   delete(id: string, opts?: RequestOptions): Promise<WokuRecord> {
     return this.client.request<WokuRecord>(
       'delete',
-      `/v1/ticket-destinations/${id}`,
+      `/v1/ticket-destinations/${encodeURIComponent(id)}`,
       opts,
     );
   }
@@ -127,7 +135,7 @@ export class TicketDestinations {
   test(id: string, opts?: RequestOptions): Promise<TestConnectionResult> {
     return this.client.request<TestConnectionResult>(
       'post',
-      `/v1/ticket-destinations/${id}/test`,
+      `/v1/ticket-destinations/${encodeURIComponent(id)}/test`,
       { ...opts, body: { confirm: true } },
     );
   }

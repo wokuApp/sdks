@@ -31,7 +31,11 @@ export class NpsTools {
   }
 
   get(id: string, opts?: RequestOptions): Promise<NpsTool> {
-    return this.client.request<NpsTool>('get', `/v1/nps-tool/${id}`, opts);
+    return this.client.request<NpsTool>(
+      'get',
+      `/v1/nps-tool/${encodeURIComponent(id)}`,
+      opts,
+    );
   }
 
   update(
@@ -39,16 +43,20 @@ export class NpsTools {
     body: UpdateNpsToolParams,
     opts?: RequestOptions,
   ): Promise<NpsTool> {
-    return this.client.request<NpsTool>('patch', `/v1/nps-tools/${id}`, {
-      ...opts,
-      body,
-    });
+    return this.client.request<NpsTool>(
+      'patch',
+      `/v1/nps-tools/${encodeURIComponent(id)}`,
+      {
+        ...opts,
+        body,
+      },
+    );
   }
 
   delete(id: string, opts?: RequestOptions): Promise<DeletedResult> {
     return this.client.request<DeletedResult>(
       'delete',
-      `/v1/nps-tools/${id}`,
+      `/v1/nps-tools/${encodeURIComponent(id)}`,
       opts,
     );
   }
@@ -74,7 +82,11 @@ export class CsatTools {
   }
 
   get(id: string, opts?: RequestOptions): Promise<CsatTool> {
-    return this.client.request<CsatTool>('get', `/v1/csat-tool/${id}`, opts);
+    return this.client.request<CsatTool>(
+      'get',
+      `/v1/csat-tool/${encodeURIComponent(id)}`,
+      opts,
+    );
   }
 
   update(
@@ -82,16 +94,20 @@ export class CsatTools {
     body: UpdateCsatToolParams,
     opts?: RequestOptions,
   ): Promise<CsatTool> {
-    return this.client.request<CsatTool>('patch', `/v1/csat-tools/${id}`, {
-      ...opts,
-      body,
-    });
+    return this.client.request<CsatTool>(
+      'patch',
+      `/v1/csat-tools/${encodeURIComponent(id)}`,
+      {
+        ...opts,
+        body,
+      },
+    );
   }
 
   delete(id: string, opts?: RequestOptions): Promise<DeletedResult> {
     return this.client.request<DeletedResult>(
       'delete',
-      `/v1/csat-tools/${id}`,
+      `/v1/csat-tools/${encodeURIComponent(id)}`,
       opts,
     );
   }
@@ -117,7 +133,11 @@ export class CesTools {
   }
 
   get(id: string, opts?: RequestOptions): Promise<CesTool> {
-    return this.client.request<CesTool>('get', `/v1/ces-tool/${id}`, opts);
+    return this.client.request<CesTool>(
+      'get',
+      `/v1/ces-tool/${encodeURIComponent(id)}`,
+      opts,
+    );
   }
 
   update(
@@ -125,16 +145,20 @@ export class CesTools {
     body: UpdateCesToolParams,
     opts?: RequestOptions,
   ): Promise<CesTool> {
-    return this.client.request<CesTool>('patch', `/v1/ces-tools/${id}`, {
-      ...opts,
-      body,
-    });
+    return this.client.request<CesTool>(
+      'patch',
+      `/v1/ces-tools/${encodeURIComponent(id)}`,
+      {
+        ...opts,
+        body,
+      },
+    );
   }
 
   delete(id: string, opts?: RequestOptions): Promise<DeletedResult> {
     return this.client.request<DeletedResult>(
       'delete',
-      `/v1/ces-tools/${id}`,
+      `/v1/ces-tools/${encodeURIComponent(id)}`,
       opts,
     );
   }

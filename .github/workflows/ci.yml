@@ -22,6 +22,9 @@ jobs:
       - name: Install
         run: pnpm install --frozen-lockfile
 
+      - name: Generated API contract drift
+        run: pnpm --filter @wokuapp/sdk check:generated
+
       - name: Typecheck
         run: pnpm typecheck
 

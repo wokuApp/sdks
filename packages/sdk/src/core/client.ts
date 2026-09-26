@@ -1,3 +1,4 @@
+import { version as SDK_VERSION } from '../../package.json';
 import {
   WokuAPIError,
   WokuConnectionError,
@@ -14,7 +15,7 @@ export type FetchLike = (
   init: {
     method: string;
     headers: Record<string, string>;
-    body?: string;
+    body?: string | FormData;
     signal?: AbortSignal;
   },
 ) => Promise<{
@@ -60,7 +61,6 @@ const DEFAULT_MAX_RETRIES = 2;
 const RETRY_BASE_MS = 500;
 const RETRY_CAP_MS = 8_000;
 const RETRYABLE_STATUS = new Set([408, 429, 500, 502, 503, 504]);
-const SDK_VERSION = '0.1.0';
 
 const randomId = (): string => {
   const c = (globalThis as { crypto?: { randomUUID?: () => string } }).crypto;
@@ -68,8 +68,30 @@ const randomId = (): string => {
   return `idmp_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 12)}`;
 };
 
-const sleep = (ms: number): Promise<void> =>
-  new Promise((resolve) => setTimeout(resolve, ms));
+const sleep = (ms: number, signal?: AbortSignal): Promise<void> =>
+  ms > 2_147_483_647
+    ? sleep(2_147_483_647, signal).then(() => sleep(ms - 2_147_483_647, signal))
+    : new Promise((resolve, reject) => {
+        if (signal?.aborted) {
+          reject(
+            new WokuConnectionError('Request aborted', { code: 'aborted' }),
+          );
+          return;
+        }
+        const cleanup = (): void => signal?.removeEventListener('abort', abort);
+        const timer = setTimeout(() => {
+          cleanup();
+          resolve();
+        }, ms);
+        const abort = (): void => {
+          clearTimeout(timer);
+          cleanup();
+          reject(
+            new WokuConnectionError('Request aborted', { code: 'aborted' }),
+          );
+        };
+        signal?.addEventListener('abort', abort, { once: true });
+      });
 
 /**
  * Transport core: turns a resource call into an authenticated HTTP request
@@ -136,13 +158,19 @@ export class WokuClient {
         : undefined);
     const headers = this.buildHeaders(method, { ...args, idempotencyKey });
     const bodyText =
-      args.body === undefined ? undefined : JSON.stringify(args.body);
+      args.body === undefined
+        ? undefined
+        : args.body instanceof FormData
+          ? args.body
+          : JSON.stringify(args.body);
     const maxRetries = args.maxRetries ?? this.maxRetries;
     const timeout = args.timeout ?? this.timeout;
     // Retries are only safe on GET or when the write carries an idempotency key.
     const retryable =
       method.toUpperCase() === 'GET' ||
-      Boolean(headers['X-Woku-Idempotency-Key']);
+      (method.toUpperCase() === 'POST' &&
+        args.idempotent === true &&
+        Boolean(headers['X-Woku-Idempotency-Key']));
 
     let attempt = 0;
     for (;;) {
@@ -164,8 +192,9 @@ export class WokuClient {
           requestId,
           retryAfterSeconds,
         );
+        apiError.idempotencyKey = idempotencyKey;
         if (retryable && attempt < maxRetries && RETRYABLE_STATUS.has(status)) {
-          await sleep(this.backoff(attempt, apiError));
+          await sleep(this.backoff(attempt, apiError), args.signal);
           attempt += 1;
           continue;
         }
@@ -173,11 +202,18 @@ export class WokuClient {
       } catch (error) {
         if (error instanceof WokuAPIError) throw error;
         const connError = toConnectionError(error);
+        connError.idempotencyKey = idempotencyKey;
         // A caller-initiated abort rejects promptly; it is never retried (only
         // a timeout, which carries a different code, stays retryable).
         if (connError.code === 'aborted') throw connError;
         if (retryable && attempt < maxRetries) {
-          await sleep(this.backoff(attempt));
+          try {
+            await sleep(this.backoff(attempt), args.signal);
+          } catch (waitingError) {
+            if (waitingError instanceof WokuError)
+              waitingError.idempotencyKey = idempotencyKey;
+            throw waitingError;
+          }
           attempt += 1;
           continue;
         }
@@ -212,12 +248,26 @@ export class WokuClient {
     return new Page<T>(
       envelope,
       (page, pageOpts) =>
-        this.getPage<T>(path, { ...base, page }, { ...opts, ...pageOpts }),
+        this.getPage<T>(
+          path,
+          { ...query, page },
+          {
+            ...opts,
+            ...pageOpts,
+            query: { ...opts?.query, ...pageOpts?.query, page },
+          },
+        ),
       opts,
     );
   }
 
   private buildUrl(path: string, query?: Record<string, unknown>): string {
+    if (/^\s*[a-z][a-z0-9+.-]*:/i.test(path) || path.startsWith('//')) {
+      throw new WokuError(
+        'Use an API path relative to baseURL, not an external URL.',
+        { code: 'config_error' },
+      );
+    }
     const url = `${this.baseURL}${path.startsWith('/') ? path : `/${path}`}`;
     if (!query) return url;
     const search = new URLSearchParams();
@@ -237,19 +287,30 @@ export class WokuClient {
     method: string,
     args: RequestArgs,
   ): Record<string, string> {
-    const headers: Record<string, string> = {
+    const defaults: Record<string, string> = {
       Accept: 'application/json',
       'User-Agent': `woku-sdk-js/${SDK_VERSION}`,
-      ...this.defaultHeaders,
-      ...args.headers,
     };
+    const merged = new Map<string, [string, string]>();
+    for (const source of [defaults, this.defaultHeaders, args.headers ?? {}]) {
+      for (const [name, value] of Object.entries(source))
+        merged.set(name.toLowerCase(), [name, value]);
+    }
+    merged.set('authorization', ['Authorization', `Bearer ${this.apiKey}`]);
+    const headers = Object.fromEntries(merged.values());
     // Authorization is applied last so caller/default headers can never unset
     // the secret key (the documented guarantee on RequestOptions.headers).
     headers['Authorization'] = `Bearer ${this.apiKey}`;
     if (args.body !== undefined) {
-      headers['Content-Type'] = 'application/json';
+      for (const name of Object.keys(headers))
+        if (name.toLowerCase() === 'content-type') delete headers[name];
+      if (!(args.body instanceof FormData))
+        headers['Content-Type'] = 'application/json';
     }
     if (args.idempotencyKey !== undefined && method.toUpperCase() === 'POST') {
+      for (const name of Object.keys(headers))
+        if (name.toLowerCase() === 'x-woku-idempotency-key')
+          delete headers[name];
       headers['X-Woku-Idempotency-Key'] = args.idempotencyKey;
     }
     return headers;
@@ -259,7 +320,7 @@ export class WokuClient {
     url: string,
     method: string,
     headers: Record<string, string>,
-    body: string | undefined,
+    body: string | FormData | undefined,
     timeout: number,
     signal?: AbortSignal,
   ): Promise<{
@@ -268,6 +329,8 @@ export class WokuClient {
     requestId?: string;
     retryAfterSeconds?: number;
   }> {
+    if (signal?.aborted)
+      throw new WokuConnectionError('Request aborted', { code: 'aborted' });
     const controller = new AbortController();
     let timedOut = false;
     const timer = setTimeout(() => {
@@ -312,7 +375,12 @@ export class WokuClient {
       apiError && typeof apiError.retryAfterSeconds === 'number'
         ? apiError.retryAfterSeconds * 1000
         : undefined;
-    if (retryAfter !== undefined) return Math.min(retryAfter, RETRY_CAP_MS);
+    if (
+      retryAfter !== undefined &&
+      Number.isFinite(retryAfter) &&
+      retryAfter >= 0
+    )
+      return retryAfter;
     const ceiling = Math.min(RETRY_CAP_MS, RETRY_BASE_MS * 2 ** attempt);
     return Math.random() * ceiling;
   }

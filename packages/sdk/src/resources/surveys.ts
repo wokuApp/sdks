@@ -44,7 +44,11 @@ export class Nps {
 
   /** Get one NPS response. */
   getResponse(id: string, opts?: RequestOptions): Promise<WokuRecord> {
-    return this.client.request<WokuRecord>('get', `/v1/nps/${id}`, opts);
+    return this.client.request<WokuRecord>(
+      'get',
+      `/v1/nps/${encodeURIComponent(id)}`,
+      opts,
+    );
   }
 }
 
@@ -71,7 +75,11 @@ export class Csat {
   }
 
   getResponse(id: string, opts?: RequestOptions): Promise<WokuRecord> {
-    return this.client.request<WokuRecord>('get', `/v1/csat/${id}`, opts);
+    return this.client.request<WokuRecord>(
+      'get',
+      `/v1/csat/${encodeURIComponent(id)}`,
+      opts,
+    );
   }
 }
 
@@ -102,6 +110,10 @@ export class Ces {
   }
 
   getResponse(id: string, opts?: RequestOptions): Promise<WokuRecord> {
-    return this.client.request<WokuRecord>('get', `/v1/ces/${id}`, opts);
+    return this.client.request<WokuRecord>(
+      'get',
+      `/v1/ces/${encodeURIComponent(id)}`,
+      opts,
+    );
   }
 }

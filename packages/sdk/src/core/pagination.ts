@@ -1,3 +1,4 @@
+import { WokuError } from './errors';
 import type { RequestOptions } from './options';
 
 /** The paginated envelope every `/v1` list endpoint returns. */
@@ -53,7 +54,13 @@ export class Page<T> implements AsyncIterable<T> {
     if (!this.hasNextPage()) {
       throw new RangeError('No next page');
     }
-    return this.fetchPage(this.page + 1, this.options);
+    return this.fetchPage(this.page + 1, this.options).then((next) => {
+      if (next.page <= this.page)
+        throw new WokuError('Pagination did not advance.', {
+          code: 'pagination_error',
+        });
+      return next;
+    });
   }
 
   /** Yield every item across all pages, fetching lazily as needed. */

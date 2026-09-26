@@ -146,3 +146,38 @@ it('prepares customer entry without enrolling and preserves its response capabil
   expect(entry.token).toBe('jent_test');
   expect(entry.toolId).toBe('t1');
 });
+
+it('iterates cursor pages lazily and advances past an initial query override', async () => {
+  const requested: string[] = [];
+  server.use(
+    http.get(`${BASE}/v1/journeys/j1/enrollments`, ({ request }) => {
+      const cursor = new URL(request.url).searchParams.get('cursor') ?? '';
+      requested.push(cursor);
+      return HttpResponse.json({
+        items: [{ id: cursor || 'first' }],
+        nextCursor: cursor === 'second' ? null : 'second',
+      });
+    }),
+  );
+  const results: string[] = [];
+  for await (const enrollment of sdk().journeys.iterEnrollments(
+    'j1',
+    {},
+    { query: { cursor: 'initial' } },
+  ))
+    results.push(enrollment.id);
+  expect(results).toEqual(['initial', 'second']);
+  expect(requested).toEqual(['initial', 'second']);
+});
+
+it('rejects a repeated enrollment cursor rather than looping forever', async () => {
+  server.use(
+    http.get(`${BASE}/v1/journeys/j1/enrollments`, () =>
+      HttpResponse.json({ items: [], nextCursor: 'same' }),
+    ),
+  );
+  const iterator = sdk().journeys.iterEnrollments('j1');
+  await expect(iterator.next()).rejects.toMatchObject({
+    code: 'pagination_error',
+  });
+});

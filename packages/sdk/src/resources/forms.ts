@@ -16,7 +16,11 @@ export class Forms {
   }
 
   get(id: string, opts?: RequestOptions): Promise<WokuRecord> {
-    return this.client.request<WokuRecord>('get', `/v1/forms/${id}`, opts);
+    return this.client.request<WokuRecord>(
+      'get',
+      `/v1/forms/${encodeURIComponent(id)}`,
+      opts,
+    );
   }
 
   /** List the responses of a form (paginated). */
@@ -26,7 +30,7 @@ export class Forms {
     opts?: RequestOptions,
   ): Promise<Page<WokuRecord>> {
     return this.client.getPage<WokuRecord>(
-      `/v1/forms/${id}/responses`,
+      `/v1/forms/${encodeURIComponent(id)}/responses`,
       params,
       opts,
     );
@@ -40,7 +44,7 @@ export class Forms {
   ): Promise<InvitationsResult> {
     return this.client.request<InvitationsResult>(
       'post',
-      `/v1/forms/${id}/invitations`,
+      `/v1/forms/${encodeURIComponent(id)}/invitations`,
       { ...opts, body, idempotent: true },
     );
   }

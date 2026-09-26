@@ -51,7 +51,7 @@ export class Trackers {
   get(id: string, opts?: RequestOptions): Promise<Tracker> {
     return this.client.request<Tracker>(
       'get',
-      `/v1/external-trackers/${id}`,
+      `/v1/external-trackers/${encodeURIComponent(id)}`,
       opts,
     );
   }
@@ -64,7 +64,7 @@ export class Trackers {
   ): Promise<Tracker> {
     return this.client.request<Tracker>(
       'patch',
-      `/v1/external-trackers/${id}`,
+      `/v1/external-trackers/${encodeURIComponent(id)}`,
       { ...opts, body },
     );
   }
@@ -73,7 +73,7 @@ export class Trackers {
   activate(id: string, opts?: RequestOptions): Promise<Tracker> {
     return this.client.request<Tracker>(
       'patch',
-      `/v1/external-trackers/${id}/activate`,
+      `/v1/external-trackers/${encodeURIComponent(id)}/activate`,
       opts,
     );
   }
@@ -82,7 +82,7 @@ export class Trackers {
   deactivate(id: string, opts?: RequestOptions): Promise<Tracker> {
     return this.client.request<Tracker>(
       'patch',
-      `/v1/external-trackers/${id}/deactivate`,
+      `/v1/external-trackers/${encodeURIComponent(id)}/deactivate`,
       opts,
     );
   }
@@ -100,13 +100,10 @@ export class Trackers {
   }
 
   /** List the tracker values assigned to a woku. */
-  listWokuValues(
-    wokuId: string,
-    opts?: RequestOptions,
-  ): Promise<WokuRecord[]> {
+  listWokuValues(wokuId: string, opts?: RequestOptions): Promise<WokuRecord[]> {
     return this.client.request<WokuRecord[]>(
       'get',
-      `/v1/external-trackers/wokus/${wokuId}`,
+      `/v1/external-trackers/wokus/${encodeURIComponent(wokuId)}`,
       opts,
     );
   }
@@ -119,8 +116,8 @@ export class Trackers {
   ): Promise<WokuRecord> {
     return this.client.request<WokuRecord>(
       'post',
-      `/v1/external-trackers/wokus/${wokuId}`,
-      { ...opts, body, idempotent: true },
+      `/v1/external-trackers/wokus/${encodeURIComponent(wokuId)}`,
+      { ...opts, body, maxRetries: 0 },
     );
   }
 
@@ -132,7 +129,7 @@ export class Trackers {
   ): Promise<WokuRecord> {
     return this.client.request<WokuRecord>(
       'delete',
-      `/v1/external-trackers/wokus/${wokuId}/${encodeURIComponent(trackerName)}`,
+      `/v1/external-trackers/wokus/${encodeURIComponent(wokuId)}/${encodeURIComponent(trackerName)}`,
       opts,
     );
   }
@@ -157,7 +154,7 @@ export class Trackers {
   ): Promise<WokuRecord[]> {
     return this.client.request<WokuRecord[]>(
       'get',
-      `/v1/external-trackers/${entityType}/${id}`,
+      `/v1/external-trackers/${encodeURIComponent(entityType)}/${encodeURIComponent(id)}`,
       opts,
     );
   }
@@ -171,8 +168,8 @@ export class Trackers {
   ): Promise<WokuRecord> {
     return this.client.request<WokuRecord>(
       'post',
-      `/v1/external-trackers/${entityType}/${id}`,
-      { ...opts, body, idempotent: true },
+      `/v1/external-trackers/${encodeURIComponent(entityType)}/${encodeURIComponent(id)}`,
+      { ...opts, body, maxRetries: 0 },
     );
   }
 
@@ -185,7 +182,7 @@ export class Trackers {
   ): Promise<WokuRecord> {
     return this.client.request<WokuRecord>(
       'delete',
-      `/v1/external-trackers/${entityType}/${id}/${encodeURIComponent(trackerName)}`,
+      `/v1/external-trackers/${encodeURIComponent(entityType)}/${encodeURIComponent(id)}/${encodeURIComponent(trackerName)}`,
       opts,
     );
   }

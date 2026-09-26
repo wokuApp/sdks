@@ -5,8 +5,9 @@ export interface RequestOptions {
   /** Retry budget for this call (overrides the client default). */
   maxRetries?: number;
   /**
-   * Idempotency key for a POST. One is generated automatically for creates;
-   * pass your own to make a specific call safe to retry with the same result.
+   * Idempotency key for a POST. Protected writes generate one automatically.
+   * Reuse an explicit key only for the same request within the 24h replay window.
+   * A key does not add retry support to an unprotected endpoint.
    */
   idempotencyKey?: string;
   /** Caller-owned abort signal; aborting rejects with a connection error. */

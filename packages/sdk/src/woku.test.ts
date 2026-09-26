@@ -67,7 +67,7 @@ describe('Woku facade — request shaping', () => {
     expect(key).toBeTruthy();
   });
 
-  it('trackers.assignToWoku upserts a tracker value with an idempotency key', async () => {
+  it('trackers.assignToWoku upserts once without claiming unsupported replay protection', async () => {
     let key: string | null = null;
     let body: unknown;
     server.use(
@@ -82,7 +82,7 @@ describe('Woku facade — request shaping', () => {
     );
     await woku().trackers.assignToWoku('w1', { name: 'crm', value: 'TX-1' });
     expect(body).toEqual({ name: 'crm', value: 'TX-1' });
-    expect(key).toBeTruthy();
+    expect(key).toBeNull();
   });
 
   it('trackers.removeFromWoku URL-encodes the tracker name in the DELETE path', async () => {

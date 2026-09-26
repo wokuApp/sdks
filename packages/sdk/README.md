@@ -12,15 +12,15 @@ Official **server-side** SDK for the [Woku](https://woku.app) management API.
 
 ## Why
 
-Manage your entire Woku account from your backend with one typed client:
+Manage supported woku resources from your backend with one typed client:
 trackers, VoC tools (NPS/CSAT/CES), wokus, forms, flows, action plans,
 support tickets, delivery tracking and survey sends over the public `/v1` API.
 
 - **Typed** request bodies (generated from the OpenAPI spec) and response models.
 - **Automatic retries** with full-jitter backoff and `Retry-After` support.
-- **Idempotent creates**: creates carry an auto-generated `Idempotency-Key`, so
-  a retry after a blip never creates twice. Action calls (`send`, `test`,
-  `reply`) are never silently replayed.
+- **Protected writes**: tracker/VoC definitions, invitations and five journey operations use
+  a stable idempotency key for retries. Other writes and uploads are
+  attempted once, even when a caller provides a key. See the retry policy below.
 - **Auto-paginated** lists: `for await (const item of await woku.tickets.list())`.
 - **Typed errors** with the server `request_id` for support.
 - **Zero runtime dependencies.**
@@ -99,7 +99,7 @@ Agents with a local terminal can upload an image or MP4 to
 `POST /v1/woku-media` using multipart and the company key. The response's
 `fileId` can be used as `toolSpec.fileId` in a journey Woku moment or with the
 MCP `create_woku` tool. The generated `Schemas` map includes the media upload
-response type; this SDK does not yet wrap the binary upload endpoint.
+response type; media.upload wraps the binary upload endpoint.
 The endpoint returns `400` for invalid media and `413` for multipart requests
 over 25 MB.
 
@@ -306,3 +306,31 @@ starts the journey. Pass the returned token as `dispatchToken` when capturing
 its first valid answer. Journey reads, progress, previews, enrollment and event
 results now use the generated public shapes directly. Server-side SDK keys
 remain on the server; browser entry does not need a company secret key.
+
+## Journey SDK v4
+
+Upload local image/MP4 bytes with `woku.media.upload({ file, filename, contentType })`.
+The result provides fileId for a Woku moment. Fetch supplies the multipart boundary;
+uploads are not retried because this endpoint has no idempotency ledger. 413 is a
+PayloadTooLargeError with the server requestId.
+
+Iterate customer cases with `for await (const item of woku.journeys.iterEnrollments(id))`.
+listEnrollments keeps its cursor envelope. Repeated cursors/pages raise code
+pagination_error instead of looping.
+
+Automatic write retries apply only to declared idempotent operations: tracker
+creation, VoC-tool creation, invitations, journey creation/enrollment/stopping,
+URL minting and journey events. Other writes are sent once. A key alone cannot
+make an unsupported endpoint safe to retry. Errors expose idempotencyKey for
+reconciling the original operation. Keep keys opaque and credential URLs out of logs.
+Retry-After is honored; abort signals interrupt backoff.
+
+Configure baseURL for staging. Absolute API paths are rejected and ids are encoded
+as single segments. Company secret keys remain server-side. Tickets and Data Studio
+are Corporate capabilities; API access remains available on every plan.
+
+See [the example](../../examples/journey-hybrid.ts) for a typed four-moment journey with local media, conditional
+webhook content and waits. It remains disabled and sends no evaluations.
+
+Generate API types with `pnpm generate`; `pnpm check:generated` checks drift
+against the vendored OpenAPI without requiring a sibling server checkout.
