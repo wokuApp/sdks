@@ -12,7 +12,7 @@ import {
 import type { CaptureSubmission, SubmissionResult } from './types';
 
 export interface WokuClientConfig {
-  /** Base URL of the Woku API, e.g. `https://api.woku.app`. */
+  /** Base URL of the Woku API, e.g. `https://clientapi.woku.app`. */
   apiUrl: string;
   /** Public SDK key issued per company for capture ingestion. */
   publicKey: string;
@@ -23,6 +23,10 @@ export interface WokuClientConfig {
   logger?: Logger;
   /** Ingest path appended to `apiUrl`. Defaults to `/v1/captures`. */
   capturePath?: string;
+  /** Default audio language. */
+  language?: 'es' | 'en';
+  /** Bound a transport attempt, including injected adapters. Default 30s. */
+  timeoutMs?: number;
 }
 
 // Resource-oriented v1 capture endpoint (woku-server clientapi). The channel
@@ -42,6 +46,10 @@ export class WokuClient {
   constructor(private readonly config: WokuClientConfig) {
     if (!config.apiUrl) throw new WokuConfigError('apiUrl is required');
     if (!config.publicKey) throw new WokuConfigError('publicKey is required');
+    if (config.publicKey.startsWith('sk_'))
+      throw new WokuConfigError(
+        'Use a publishable key, never a management secret key, in a mobile app.',
+      );
     if (!config.companyId) throw new WokuConfigError('companyId is required');
     this.http = config.http ?? fetchHttpClient;
     this.logger = config.logger ?? noopLogger;
@@ -57,8 +65,14 @@ export class WokuClient {
    * non-2xx responses (so the caller can decide to re-queue).
    */
   async send(submission: CaptureSubmission): Promise<SubmissionResult> {
+    if (submission.companyId !== this.config.companyId)
+      throw new WokuConfigError(
+        'Cannot deliver a capture for another company.',
+      );
+    if (submission.audio && !submission.language)
+      submission = { ...submission, language: this.config.language ?? 'es' };
     const headers: Record<string, string> = {
-      Authorization: `Bearer ${this.config.publicKey}`,
+      'x-woku-key': this.config.publicKey,
       'X-Woku-Company': this.config.companyId,
       'X-Woku-Idempotency-Key': submission.id,
     };
@@ -81,23 +95,41 @@ export class WokuClient {
       requestBody = JSON.stringify(submission);
     }
 
+    const controller = new AbortController();
+    let timer: ReturnType<typeof setTimeout> | undefined;
     let response;
     try {
-      response = await this.http.request({
-        method: 'POST',
-        url: this.endpoint,
-        headers,
-        body: requestBody,
-      });
+      response = await Promise.race([
+        this.http.request({
+          method: 'POST',
+          url: this.endpoint,
+          headers,
+          body: requestBody,
+          signal: controller.signal,
+        }),
+        new Promise<never>((_resolve, reject) => {
+          timer = setTimeout(() => {
+            controller.abort();
+            reject(new WokuNetworkError('Capture request timed out'));
+          }, this.config.timeoutMs ?? 30_000);
+        }),
+      ]);
     } catch (err) {
       throw new WokuNetworkError((err as Error).message);
+    } finally {
+      if (timer) clearTimeout(timer);
     }
 
     if (response.ok) {
       const body = (await this.safeJson(response.json)) as {
         id?: string;
+        remoteId?: string;
       } | null;
-      return { id: submission.id, status: 'sent', remoteId: body?.id };
+      return {
+        id: submission.id,
+        status: 'sent',
+        remoteId: body?.remoteId ?? body?.id,
+      };
     }
 
     if (response.status === 429) {
@@ -109,11 +141,18 @@ export class WokuClient {
     }
 
     const body = (await this.safeJson(response.json)) as {
-      message?: string;
+      message?: string | string[];
     } | null;
-    const error = body?.message ?? `HTTP ${response.status}`;
+    const error = Array.isArray(body?.message)
+      ? body.message.join(', ')
+      : (body?.message ?? `HTTP ${response.status}`);
     this.logger.warn(`woku capture rejected: ${error}`);
-    return { id: submission.id, status: 'failed', error };
+    return {
+      id: submission.id,
+      status: 'failed',
+      error,
+      retryable: response.status === 408 || response.status >= 500,
+    };
   }
 
   private async safeJson(

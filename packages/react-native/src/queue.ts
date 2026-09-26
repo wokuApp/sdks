@@ -1,146 +1,251 @@
 import { InMemoryStorage, type Storage } from './adapters';
-import { WokuQuarantineError, WokuNetworkError } from './errors';
+import { WokuConfigError, WokuQuarantineError } from './errors';
 import type { CaptureSubmission, SubmissionResult } from './types';
 
 interface QueuedItem {
   submission: CaptureSubmission;
   attempts: number;
+  failure?: string;
 }
-
+export interface FailedCapture {
+  submission: CaptureSubmission;
+  reason: string;
+}
 export interface OfflineQueueOptions {
   storage?: Storage;
-  /** Storage key for the persisted queue. */
   storageKey?: string;
-  /** Drop a submission after this many failed delivery attempts. */
   maxAttempts?: number;
+  /** Restrict reads, delivery and clearing to this company, including legacy rows. */
+  companyId?: string;
 }
-
 export interface FlushResult {
   sent: number;
   failed: number;
   remaining: number;
-  /** Set when flushing stopped early due to quarantine. */
   quarantined?: boolean;
 }
 
 const DEFAULT_KEY = 'woku.sdk.queue.v1';
-const DEFAULT_MAX_ATTEMPTS = 8;
+const mutations = new WeakMap<Storage, Map<string, Promise<void>>>();
+const flushes = new WeakMap<Storage, Map<string, Promise<FlushResult>>>();
 
-/**
- * Durable, FIFO offline buffer for captures. Persists through an
- * injectable {@link Storage} so submissions survive app restarts, and
- * flushes them through a caller-provided `send` function. Pure and
- * deterministic: no timers, no platform APIs.
- *
- * Delivery semantics on flush:
- *  - `sent`        -> removed from the queue.
- *  - quarantine    -> flush stops (server is rate-limiting the
- *                     respondent); items are kept for the next attempt.
- *  - network error -> attempt count bumped, item kept, flush continues.
- *  - `failed`      -> attempt count bumped; dropped once maxAttempts is
- *                     reached so a permanently-bad item can't wedge it.
- */
+/** Persistent FIFO with scoped ownership, atomic local mutations and retained failures. */
 export class OfflineQueue {
   private readonly storage: Storage;
   private readonly key: string;
   private readonly maxAttempts: number;
-  private items: QueuedItem[] | null = null;
+  private readonly companyId?: string;
 
   constructor(opts: OfflineQueueOptions = {}) {
     this.storage = opts.storage ?? new InMemoryStorage();
     this.key = opts.storageKey ?? DEFAULT_KEY;
-    this.maxAttempts = opts.maxAttempts ?? DEFAULT_MAX_ATTEMPTS;
+    this.maxAttempts = opts.maxAttempts ?? 8;
+    this.companyId = opts.companyId;
   }
 
+  private owned(item: QueuedItem): boolean {
+    return !this.companyId || item.submission.companyId === this.companyId;
+  }
   private async load(): Promise<QueuedItem[]> {
-    if (this.items) return this.items;
     const raw = await this.storage.getItem(this.key);
-    if (!raw) {
-      this.items = [];
-      return this.items;
-    }
+    if (!raw) return [];
     try {
-      const parsed = JSON.parse(raw) as QueuedItem[];
-      this.items = Array.isArray(parsed) ? parsed : [];
+      const parsed: unknown = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed as QueuedItem[];
     } catch {
-      this.items = [];
+      /* Preserve invalid storage instead of silently overwriting it. */
     }
-    return this.items;
+    throw new WokuConfigError(
+      'The capture queue contains invalid data; repair it before writing.',
+    );
+  }
+  private async persist(items: QueuedItem[]): Promise<void> {
+    await this.storage.setItem(this.key, JSON.stringify(items));
+  }
+  private mutation<T>(run: () => Promise<T>): Promise<T> {
+    let locks = mutations.get(this.storage);
+    if (!locks) {
+      locks = new Map();
+      mutations.set(this.storage, locks);
+    }
+    const previous = locks.get(this.key) ?? Promise.resolve();
+    const result = previous.then(run, run);
+    const settled = result.then(
+      () => undefined,
+      () => undefined,
+    );
+    locks.set(this.key, settled);
+    void settled.then(() => {
+      if (locks?.get(this.key) === settled) locks.delete(this.key);
+    });
+    return result;
   }
 
-  private async persist(): Promise<void> {
-    await this.storage.setItem(this.key, JSON.stringify(this.items ?? []));
-  }
-
-  /** Adds a submission to the tail of the queue (dedup by id). */
   async enqueue(submission: CaptureSubmission): Promise<void> {
-    const items = await this.load();
-    if (items.some((i) => i.submission.id === submission.id)) return;
-    items.push({ submission, attempts: 0 });
-    await this.persist();
+    if (this.companyId && submission.companyId !== this.companyId)
+      throw new WokuConfigError(
+        'Cannot enqueue a capture from another company.',
+      );
+    const snapshot = JSON.parse(
+      JSON.stringify(submission),
+    ) as CaptureSubmission;
+    return this.mutation(async () => {
+      const items = await this.load();
+      if (
+        items.some(
+          (item) =>
+            item.submission.id === snapshot.id &&
+            item.submission.companyId === snapshot.companyId,
+        )
+      )
+        return;
+      items.push({ submission: snapshot, attempts: 0 });
+      await this.persist(items);
+    });
+  }
+  size(): Promise<number> {
+    return this.mutation(
+      async () =>
+        (await this.load()).filter((item) => this.owned(item) && !item.failure)
+          .length,
+    );
+  }
+  pending(): Promise<CaptureSubmission[]> {
+    return this.mutation(async () =>
+      (await this.load())
+        .filter((item) => this.owned(item) && !item.failure)
+        .map((item) => item.submission),
+    );
+  }
+  failures(): Promise<FailedCapture[]> {
+    return this.mutation(async () =>
+      (await this.load())
+        .filter((item) => this.owned(item) && item.failure)
+        .map((item) => ({
+          submission: item.submission,
+          reason: item.failure!,
+        })),
+    );
   }
 
-  async size(): Promise<number> {
-    return (await this.load()).length;
+  acknowledge(submission: CaptureSubmission): Promise<void> {
+    return this.mutation(async () => {
+      const items = await this.load();
+      await this.persist(
+        items.filter(
+          (item) =>
+            !(
+              item.submission.id === submission.id &&
+              item.submission.companyId === submission.companyId &&
+              this.owned(item)
+            ),
+        ),
+      );
+    });
+  }
+  reject(submission: CaptureSubmission, reason: string): Promise<void> {
+    return this.mutation(async () => {
+      const items = await this.load();
+      const item = items.find(
+        (row) =>
+          row.submission.id === submission.id &&
+          row.submission.companyId === submission.companyId &&
+          this.owned(row),
+      );
+      if (item) {
+        item.failure = reason;
+        await this.persist(items);
+      }
+    });
   }
 
-  /** Returns a copy of the pending submissions (oldest first). */
-  async pending(): Promise<CaptureSubmission[]> {
-    return (await this.load()).map((i) => i.submission);
-  }
-
-  /**
-   * Attempts to deliver every queued submission through `send`, applying
-   * the delivery semantics documented on the class. Persists once at the
-   * end and returns a summary.
-   */
-  async flush(
+  flush(
     send: (submission: CaptureSubmission) => Promise<SubmissionResult>,
   ): Promise<FlushResult> {
-    const items = await this.load();
-    const survivors: QueuedItem[] = [];
-    let sent = 0;
-    let failed = 0;
-    let quarantined = false;
-
-    for (let index = 0; index < items.length; index++) {
-      const item = items[index] as QueuedItem;
-      if (quarantined) {
-        survivors.push(item);
+    let jobs = flushes.get(this.storage);
+    if (!jobs) {
+      jobs = new Map();
+      flushes.set(this.storage, jobs);
+    }
+    const scope = JSON.stringify([this.key, this.companyId ?? '*']);
+    const existing = jobs.get(scope);
+    if (existing) return existing;
+    const result = this.runFlush(send).finally(() => {
+      if (jobs?.get(scope) === result) jobs.delete(scope);
+    });
+    jobs.set(scope, result);
+    return result;
+  }
+  private async runFlush(
+    send: (submission: CaptureSubmission) => Promise<SubmissionResult>,
+  ): Promise<FlushResult> {
+    const batch = await this.pending();
+    let sent = 0,
+      failed = 0,
+      quarantined = false;
+    for (const submission of batch) {
+      // The server deduplicates for 24h; keep older uncertain captures for
+      // inspection rather than resubmitting them outside that protection.
+      if (
+        submission.createdAt > 0 &&
+        Date.now() - submission.createdAt >= 24 * 60 * 60 * 1000
+      ) {
+        await this.reject(
+          submission,
+          'Retry window expired; inspect delivery before resubmitting.',
+        );
+        failed++;
         continue;
       }
+      let permanent = false;
+      let reason: string | undefined;
+      let accepted = false;
       try {
-        const result = await send(item.submission);
-        if (result.status === 'sent') {
-          sent++;
-        } else {
-          item.attempts++;
-          if (item.attempts >= this.maxAttempts) failed++;
-          else survivors.push(item);
-        }
-      } catch (err) {
-        if (err instanceof WokuQuarantineError) {
+        const result = await send(submission);
+        accepted = result.status === 'sent';
+        reason = result.error;
+        permanent = result.retryable === false;
+      } catch (error) {
+        if (error instanceof WokuQuarantineError) {
           quarantined = true;
-          survivors.push(item);
-        } else if (err instanceof WokuNetworkError) {
-          item.attempts++;
-          survivors.push(item);
-        } else {
-          item.attempts++;
-          if (item.attempts >= this.maxAttempts) failed++;
-          else survivors.push(item);
+          break;
         }
+        reason = error instanceof Error ? error.message : 'Delivery failed';
       }
+      const outcome = await this.mutation(async () => {
+        const items = await this.load();
+        const index = items.findIndex(
+          (item) =>
+            item.submission.id === submission.id &&
+            item.submission.companyId === submission.companyId &&
+            !item.failure,
+        );
+        if (index < 0) return 'removed';
+        if (accepted) items.splice(index, 1);
+        else {
+          const item = items[index]!;
+          item.attempts++;
+          if (permanent || item.attempts >= this.maxAttempts)
+            item.failure = reason ?? 'Attempt budget exhausted';
+        }
+        const exhausted = !accepted && Boolean(items[index]?.failure);
+        await this.persist(items);
+        return accepted ? 'sent' : exhausted ? 'failed' : 'pending';
+      });
+      if (outcome === 'sent') sent++;
+      if (outcome === 'failed') failed++;
     }
-
-    this.items = survivors;
-    await this.persist();
-    return { sent, failed, remaining: survivors.length, quarantined };
+    return { sent, failed, remaining: await this.size(), quarantined };
   }
-
-  /** Clears the queue (e.g. on logout). */
-  async clear(): Promise<void> {
-    this.items = [];
-    await this.storage.removeItem(this.key);
+  clear(): Promise<void> {
+    return this.mutation(async () => {
+      if (!this.companyId) {
+        await this.storage.removeItem(this.key);
+        return;
+      }
+      const remaining = (await this.load()).filter((item) => !this.owned(item));
+      if (remaining.length) await this.persist(remaining);
+      else await this.storage.removeItem(this.key);
+    });
   }
 }

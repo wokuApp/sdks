@@ -2,7 +2,7 @@
 
 # @wokuapp/react-native
 
-Capture **Woku ratings** and **NPS** (text + audio) from your React Native
+Capture **Woku, NPS, CSAT and CES** from your React Native
 app, with offline buffering and quarantine-aware delivery.
 
 [![npm](https://img.shields.io/npm/v/@wokuapp/react-native)](https://www.npmjs.com/package/@wokuapp/react-native)
@@ -18,15 +18,15 @@ your own ingestion, retry, or offline logic. The SDK:
 
 - Captures **Woku ratings** (1–5) and **NPS** (0–10) with optional text or
   audio comments.
-- **Buffers offline** and retries automatically when connectivity returns —
-  a tap on the subway never loses a response.
+- **Buffers offline** through your storage adapter. Call `flush()` when
+  connectivity returns; the headless core has no connectivity listener.
 - Is **quarantine-aware**: when the backend rate-limits a respondent (HTTP
   429), the SDK backs off instead of hammering it.
 - Has **zero runtime dependencies** and a **fully typed**, framework-agnostic
   core: you inject the platform adapters (storage, http, audio), so it stays
   small and testable.
 
-> **Architecture note (v0.1).** This release ships the headless TypeScript
+> **Architecture note.** This release ships the headless TypeScript
 > core plus the adapter interfaces. Pre-built React Native adapters
 > (MMKV storage, audio recorder) ship in a follow-up minor; until then you
 > wire your app's libraries to the small interfaces below (a few lines).
@@ -34,8 +34,8 @@ your own ingestion, retry, or offline logic. The SDK:
 > tagged server-side with the `mobile-sdk` response channel. Text/rating and
 > score captures are sent as JSON; **audio captures are sent as multipart**
 > (the `audio.uri` file plus a `payload` field) and become a voicemail review
-> server-side. Submissions are idempotent by their client-generated `id`, so
-> the offline queue can retry safely.
+> server-side. Submissions deduplicate by their client-generated `id` for 24h.
+> Older uncertain submissions are retained for inspection instead of replayed.
 
 ## Install
 
@@ -54,7 +54,7 @@ adapters land).
 import { WokuSdk } from '@wokuapp/react-native';
 
 const woku = new WokuSdk({
-  apiUrl: 'https://api.woku.app',
+  apiUrl: 'https://clientapi.woku.app',
   publicKey: 'pk_live_xxx', // per-company SDK key
   companyId: 'company_123',
   storage: mmkvStorageAdapter, // see "Adapters" below
@@ -116,12 +116,12 @@ const http: HttpClient = { request: async (req) => /* ... */ };
 
 `flush()` walks the queue oldest-first:
 
-| Outcome            | Behavior                                                                                               |
-| ------------------ | ------------------------------------------------------------------------------------------------------ |
-| `sent`             | removed from the queue                                                                                 |
-| quarantine (429)   | **stops** the flush, keeps everything for the next attempt                                             |
-| network error      | attempt count bumped, item kept, flush continues                                                       |
-| `failed` (4xx/5xx) | attempt count bumped; dropped after `maxQueueAttempts` (default 8) so a bad item can't wedge the queue |
+| Outcome            | Behavior                                                                               |
+| ------------------ | -------------------------------------------------------------------------------------- |
+| `sent`             | removed from the queue                                                                 |
+| quarantine (429)   | **stops** the flush, keeps everything for the next attempt                             |
+| network error      | attempt count bumped, item kept, flush continues                                       |
+| `failed` (4xx/5xx) | permanent 4xx retained as failed; transient errors retained after the 8-attempt budget |
 
 The queue persists through your `Storage` adapter, so it survives restarts.
 
@@ -131,10 +131,13 @@ The queue persists through your `Storage` adapter, so it survives restarts.
 | --------------------- | --------------------------------------------------- |
 | `new WokuSdk(config)` | Create an SDK instance.                             |
 | `captureWoku(input)`  | Submit a 1–5 rating (+ comment/audio).              |
+| `captureCsat(input)`  | Submit a 1–5 satisfaction score.                    |
+| `captureCes(input)`   | Submit a 1–5 effort score.                          |
+| `failedCaptures()`    | Inspect retained failures and their reason.         |
 | `captureNps(input)`   | Submit a 0–10 NPS score (+ review).                 |
 | `flush()`             | Retry all queued captures. Returns a `FlushResult`. |
 | `pendingCount()`      | Number of captures waiting to send.                 |
-| `clearQueue()`        | Drop the queue (e.g. on logout).                    |
+| `clearQueue()`        | Remove only this company's pending and failed rows. |
 
 Lower-level building blocks `WokuClient` and `OfflineQueue` are exported too,
 along with all types and error classes (`WokuValidationError`,
@@ -143,3 +146,38 @@ along with all types and error classes (`WokuValidationError`,
 ## License
 
 [MIT](../../LICENSE) © Woku
+
+## Identified journey responses
+
+```ts
+await sdk.captureCsat({
+  csatId: prepared.toolId,
+  score: 5,
+  respondent: { email: customer.email },
+  dispatchToken: prepared.token,
+});
+await sdk.captureCes({
+  cesId: effortToolId,
+  score: 4,
+  respondent: { phone: customer.phone },
+});
+```
+
+Use only a public pk\_ key: the transport uses x-woku-key and rejects management
+keys. remoteId is the server id. Woku/NPS audio supports language es/en (default
+Spanish); CSAT/CES audio is not supported. timeoutMs bounds an attempt (default
+30s), including injected adapters.
+
+Await capture calls and provide persistent storage. Captures are stored before
+delivery. Call flush on reconnect/foreground; the core has no connectivity listener.
+Company-scoped instances never send or clear another company's rows. Concurrent
+enqueue/flush preserves incoming data. Share one storage adapter per app and one
+SDK per company; isolate storage between API environments.
+
+Inspect failedCaptures for permanent failures, exhausted attempts and captures
+older than the server's 24-hour replay window (based on the device clock). These records are retained and are
+not blindly sent with a new id: inspect delivery before resubmitting. clearQueue
+removes only the current company's pending and retained failed rows.
+
+The published package includes separate ESM/CJS JavaScript and matching
+`.d.ts`/`.d.cts` exports. Both imports are checked against the packed artifact.

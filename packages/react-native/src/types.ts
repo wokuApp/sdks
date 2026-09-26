@@ -6,8 +6,9 @@
  * audio). React Native apps wire those adapters at init time.
  */
 
-/** The two capture flows Woku supports. */
-export type CaptureKind = 'woku' | 'nps';
+/** The four capture instruments supported by API v1. */
+export type CaptureKind = 'woku' | 'nps' | 'csat' | 'ces';
+export type CaptureLanguage = 'es' | 'en';
 
 /** An audio attachment for a text/voice comment. */
 export interface AudioAttachment {
@@ -37,17 +38,21 @@ export interface WokuCaptureInput {
   respondent?: Respondent;
   /** Arbitrary context tags attached to the submission. */
   metadata?: Record<string, unknown>;
+  dispatchToken?: string;
+  language?: CaptureLanguage;
 }
 
 /** Input for an NPS capture (score 0..10 + optional review). */
 export interface NpsCaptureInput {
-  npsId: string;
+  npsId?: string;
   /** Integer 0..10. */
   score: number;
   comment?: string;
   audio?: AudioAttachment;
   respondent?: Respondent;
   metadata?: Record<string, unknown>;
+  dispatchToken?: string;
+  language?: CaptureLanguage;
 }
 
 /** Normalized submission persisted in the offline queue and sent to Woku. */
@@ -56,13 +61,15 @@ export interface CaptureSubmission {
   id: string;
   kind: CaptureKind;
   companyId: string;
-  targetId: string;
+  targetId?: string;
   rating?: number;
   score?: number;
   comment?: string;
   audio?: AudioAttachment;
   respondent?: Respondent;
   metadata?: Record<string, unknown>;
+  dispatchToken?: string;
+  language?: CaptureLanguage;
   /** Unix epoch ms when the capture was created on the device. */
   createdAt: number;
 }
@@ -74,4 +81,23 @@ export interface SubmissionResult {
   /** Server id once accepted. */
   remoteId?: string;
   error?: string;
+  retryable?: boolean;
+}
+
+/** Focused satisfaction/effort scores; audio is not supported by these API kinds. */
+export interface CsatCaptureInput {
+  csatId: string;
+  score: number;
+  comment?: string;
+  respondent?: Respondent;
+  metadata?: Record<string, unknown>;
+  dispatchToken?: string;
+}
+export interface CesCaptureInput {
+  cesId: string;
+  score: number;
+  comment?: string;
+  respondent?: Respondent;
+  metadata?: Record<string, unknown>;
+  dispatchToken?: string;
 }
