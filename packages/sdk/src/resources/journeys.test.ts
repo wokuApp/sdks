@@ -91,6 +91,13 @@ it('generates a URL for one moment and tests mapping without sending', async () 
           matches: true,
           subjectKey: 'case1',
           contact: {},
+          preview: {
+            title: 'Late delivery',
+            imageUrl: 'https://cdn.example/image.webp',
+            trackers: [{ name: 'Order', value: 'order1' }],
+            clientFields: { tier: 'gold' },
+            folder: { secondaryKey: 'order1', name: 'Orders' },
+          },
         });
       },
     ),
@@ -98,8 +105,10 @@ it('generates a URL for one moment and tests mapping without sending', async () 
   expect((await sdk().journeys.mintMomentUrl('j1', 'sale')).url).toBe(
     'http://api.test/test-hook',
   );
-  expect(
-    (await sdk().journeys.previewMoment('j1', 'sale', { order: 'case1' }))
-      .subjectKey,
-  ).toBe('case1');
+  const preview = await sdk().journeys.previewMoment('j1', 'sale', {
+    order: 'case1',
+  });
+  expect(preview.subjectKey).toBe('case1');
+  expect(preview.preview?.folder?.secondaryKey).toBe('order1');
+  expect(preview.preview?.clientFields.tier).toBe('gold');
 });

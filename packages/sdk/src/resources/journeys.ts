@@ -1,6 +1,7 @@
 import type { WokuClient } from '../core/client';
 import type { RequestOptions } from '../core/options';
 import type { WokuRecord } from '../models';
+import type { Schemas } from '../types';
 
 export type JourneyStartMode = 'operator' | 'response' | 'webhook';
 export interface JourneyRecipients {
@@ -13,25 +14,15 @@ export interface JourneyRecipients {
     role: 'admin' | 'assignee';
   }[];
 }
-export interface JourneyWebhook {
-  verification?: {
-    mode: 'url_token' | 'woku_signature' | 'sender_hmac';
-    header?: string;
-    encoding?: 'hex' | 'base64';
-    prefix?: string;
-    signedPayload?: 'body' | 'timestamp_dot_body';
-    timestampHeader?: string;
-  };
-  payload?: {
-    subjectKey?: string;
-    email?: string;
-    phone?: string;
-    match?: { path: string; equals: string }[];
-  };
-}
+export type JourneyWebhook = Schemas['V1JourneyWebhookDto'];
+export type JourneySendWindow = Schemas['V1JourneySendWindowDto'];
+export type JourneyMomentPreview = Schemas['V1JourneyPreviewResponseDto'];
 
 /** How a moment starts. */
-export interface JourneyMomentTrigger extends JourneyWebhook {
+export interface JourneyMomentTrigger {
+  verification?: JourneyWebhook['verification'];
+  payload?: JourneyWebhook['payload'];
+  window?: JourneySendWindow;
   /**
    * `manual` fires when a subject is enrolled, `event` on one of your own
    * event names, `webhook` on the moment's own signed url, and `afterStage`
@@ -53,6 +44,8 @@ export interface JourneyMoment {
   key: string;
   name?: string;
   description?: string;
+  order?: number;
+  presentation?: Schemas['V1JourneyPresentationDto'];
   tool: 'woku' | 'nps' | 'csat' | 'ces';
   /** V2 defaults to one tool shared within this moment; per_enrollment creates one per case. */
   toolScope?: 'per_enrollment' | 'shared';
@@ -63,6 +56,8 @@ export interface JourneyMoment {
     audience?: { es?: string; en?: string };
     /** Woku image/video uploaded through files.upload. The moment name is its title. */
     fileId?: string;
+    /** Derived from fileId when saving. Dynamic image URLs use webhook.content.imageUrlPath. */
+    imageUrl?: string;
     /** Optional English Woku title shown in the English survey. */
     descriptionEn?: string;
   };
@@ -78,6 +73,7 @@ export interface JourneyMoment {
     attemptOffsetsMs: number[];
     deadlineMs: number;
     cooldownAfterResponseMs: number;
+    sendWindow?: JourneySendWindow;
   };
 }
 
@@ -198,7 +194,8 @@ export class Journeys {
 
   /**
    * Create a journey. The response carries `webhookSecret` once and only here:
-   * it is what signs this journey's inbound calls, so store it now.
+   * it signs legacy woku_signature calls. V2 URL tokens and sender secrets
+   * are configured separately per moment. Store it securely.
    */
   create(
     body: JourneyInput & { name: string },
@@ -315,11 +312,7 @@ export class Journeys {
     stageKey: string,
     payload: Record<string, unknown>,
     opts?: RequestOptions,
-  ): Promise<{
-    matches: boolean;
-    subjectKey: string;
-    contact: { email?: string; phone?: string };
-  }> {
+  ): Promise<JourneyMomentPreview> {
     return this.client.request(
       'post',
       `/v1/journeys/${encodeURIComponent(journeyId)}/moments/${encodeURIComponent(stageKey)}/preview`,
@@ -353,7 +346,7 @@ export class Journeys {
 
   /**
    * Start the journey for one subject. Enrolling the same person for a later
-   * cycle is done with a new subject key.
+   * cycle reuses the subject key after the previous cycle completes or stops.
    */
   enroll(
     journeyId: string,

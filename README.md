@@ -88,3 +88,12 @@ it bumps versions, updates changelogs, and publishes to npm.
 ## License
 
 [MIT](./LICENSE) © Woku
+
+Advanced journey moments support `webhook.contentMode`, a bounded JSON `schema`,
+`payload.clientFields`, conditional JavaScript text, localized variables, public
+image URL paths, folders and tracker mappings. HTTP uses `sequence`; MCP uses
+`cadence`. `Schemas` includes complete journey request and response shapes;
+`JourneyMomentPreview` includes resolved content. A saved preview returns `200`
+without verifying signatures or sending. Unknown HTTP and MCP moment fields now
+return a validation error. `webhookSecret` is the legacy journey-wide signature,
+separate from per-moment URL tokens and sender HMAC secrets.

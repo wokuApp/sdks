@@ -1660,7 +1660,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Test payload mapping without creating or sending an evaluation */
+        /**
+         * Test payload mapping without creating or sending an evaluation
+         * @description Uses the saved moment. Does not verify sender signatures or change enrollments.
+         */
         post: operations["V1JourneysController_previewMoment"];
         delete?: never;
         options?: never;
@@ -1680,7 +1683,7 @@ export interface paths {
         put?: never;
         /**
          * Create a journey
-         * @description The response carries `webhookSecret` once and only here: it is what signs the inbound calls of this journey. Store it now.
+         * @description The response carries `webhookSecret` once and only here: it is what signs legacy woku_signature calls. V2 url_token and sender_hmac credentials are configured separately per moment. Store the secret securely.
          */
         post: operations["V1JourneysController_create"];
         delete?: never;
@@ -1721,7 +1724,7 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Rotate the signing secret of this journey
+         * Rotate the legacy journey-wide woku_signature secret
          * @description The previous secret keeps being accepted until the next rotation, so your senders can be updated without a gap.
          */
         post: operations["V1JourneysController_rotateSecret"];
@@ -2624,18 +2627,140 @@ export interface components {
             aiSummary?: string;
             aiCategory?: string;
         };
+        V1JourneyContactDto: {
+            /**
+             * Format: email
+             * @example cliente@example.com
+             */
+            email?: string;
+            /**
+             * @description Phone with country code, digits only
+             * @example 56911111111
+             */
+            phone?: string;
+        };
+        V1JourneyPendingMomentDto: {
+            key: string;
+            name?: string;
+        };
+        V1JourneyMomentProgressDto: {
+            key: string;
+            name: string;
+            /** @enum {string} */
+            status: "pending" | "active" | "sent" | "responded" | "done" | "skipped";
+            toolId?: string;
+            /** @enum {string} */
+            toolType?: "woku" | "csat" | "ces" | "nps" | "flow" | "form";
+            /** @enum {string} */
+            toolScope?: "shared" | "per_enrollment";
+            /** Format: date-time */
+            sentAt?: string;
+            /** Format: date-time */
+            respondedAt?: string;
+            /** @enum {string} */
+            activationSource?: "operator" | "response" | "webhook" | "timer" | "fallback";
+            /** Format: date-time */
+            hookReceivedAt?: string;
+        };
+        V1JourneyParticipationDto: {
+            id: string;
+            subjectKey: string;
+            contact: components["schemas"]["V1JourneyContactDto"];
+            /** @enum {string} */
+            lifecycle: "pending" | "running" | "stopping" | "stopped" | "completed";
+            definitionVersion?: number;
+            /** Format: date-time */
+            startedAt?: string;
+            /** @enum {string} */
+            startSource?: "operator" | "response" | "webhook";
+            /** Format: date-time */
+            stoppedAt?: string;
+            /** Format: date-time */
+            completedAt?: string;
+            /** Format: date-time */
+            stopRequestedAt?: string;
+            stoppedBy?: string;
+            stopReason?: string;
+            dispatchOutcomeUncertain: boolean;
+            /** Format: date-time */
+            createdAt?: string;
+            pendingMoments: components["schemas"]["V1JourneyPendingMomentDto"][];
+            moments: components["schemas"]["V1JourneyMomentProgressDto"][];
+            next: {
+                stageKey: string;
+                name: string;
+                /** @enum {string} */
+                source: "operator" | "response" | "webhook" | "timer" | "fallback";
+                /** Format: date-time */
+                scheduledFor?: string;
+            } | null;
+        };
+        V1JourneyParticipationPageDto: {
+            items: components["schemas"]["V1JourneyParticipationDto"][];
+            /** @description Present only when another page exists; omit cursor for the first page. */
+            nextCursor?: string;
+        };
         StopJourneyParticipationDto: {
             reason?: string;
+        };
+        V1JourneyConnectionDto: {
+            stageKey: string;
+            /** @enum {string} */
+            mode: "woku_signature" | "url_token" | "sender_hmac";
+            /** @description Credential readiness, not proof of webhook delivery. */
+            configured: boolean;
+            /** @description Credential-free inbound endpoint. Minting a URL token returns the credential URL separately. */
+            url: string;
+        };
+        V1JourneyMomentUrlDto: {
+            /** @description Returned only by this operation; store securely. */
+            token: string;
+            /** @description Credential URL. Minting replaces the prior token, including for existing participations. */
+            url: string;
         };
         SetSenderSecretDto: {
             /** @description The signing secret the external system gave you. Stored encrypted; never returned. */
             senderSecret: string;
         };
-        PreviewJourneyMomentDto: {
-            /** @description A sample sender payload. Previewing never sends an evaluation. */
-            payload: Record<string, never>;
-            /** @description Unsaved version of this moment for a side-effect-free preview. */
-            stage?: Record<string, never>;
+        V1PreviewJourneyMomentDto: {
+            /** @description Sample payload. Does not verify signatures, enroll clients or send invitations. */
+            payload: {
+                [key: string]: unknown;
+            };
+        };
+        V1JourneyTrackerDto: {
+            /** @example campaign */
+            name: string;
+            /** @example black-friday */
+            value: string;
+        };
+        V1JourneyLocaleDto: {
+            es?: string;
+            en?: string;
+        };
+        V1JourneyPreviewFolderDto: {
+            secondaryKey: string;
+            name: string;
+            parentSecondaryKey?: string;
+            parentName?: string;
+        };
+        V1JourneyPreviewContentDto: {
+            title: string;
+            imageUrl?: string;
+            trackers?: components["schemas"]["V1JourneyTrackerDto"][];
+            question?: components["schemas"]["V1JourneyLocaleDto"];
+            folder?: components["schemas"]["V1JourneyPreviewFolderDto"];
+            /** @description Resolved additional client fields. */
+            clientFields: {
+                [key: string]: unknown;
+            };
+        };
+        V1JourneyPreviewResponseDto: {
+            matches: boolean;
+            subjectKey: string;
+            contact: components["schemas"]["V1JourneyContactDto"];
+            /** @description Present for matching dynamic webhook content. */
+            preview?: components["schemas"]["V1JourneyPreviewContentDto"];
         };
         JourneyPlanMemberDto: {
             /** @description Company member user id. */
@@ -2652,6 +2777,213 @@ export interface components {
             ticketEmails: string[];
             /** @description Platform users who belong to the journey action-plan group. */
             planMembers: components["schemas"]["JourneyPlanMemberDto"][];
+        };
+        V1JourneyRoutingDto: {
+            ticketsReady: boolean;
+            plansReady: boolean;
+            ticketDestinationId?: string;
+            actionPlanGroupId?: string;
+        };
+        V1JourneyToolSpecDto: {
+            /** @description Woku uploaded public media ID belonging to this company. */
+            fileId?: string;
+            /** @description Derived media URL. Saving with fileId resolves its authoritative URL. */
+            imageUrl?: string;
+            descriptionEn?: string;
+            /** @description Variable in the fixed CSAT, CES or NPS question, not the complete question. */
+            subject?: components["schemas"]["V1JourneyLocaleDto"];
+            /** @description NPS recommendation audience. */
+            audience?: components["schemas"]["V1JourneyLocaleDto"];
+        };
+        V1JourneySendWindowDto: {
+            startHour: number;
+            endHour: number;
+            /** @example America/Santiago */
+            timeZone: string;
+        };
+        V1JourneyVerificationDto: {
+            /**
+             * @description Verification configuration only. Set secret material through the credential endpoints.
+             * @enum {string}
+             */
+            mode: "woku_signature" | "url_token" | "sender_hmac";
+            header?: string;
+            /** @enum {string} */
+            encoding?: "hex" | "base64";
+            prefix?: string;
+            /** @enum {string} */
+            signedPayload?: "body" | "timestamp_dot_body";
+            timestampHeader?: string;
+        };
+        V1JourneyPayloadRuleDto: {
+            /** @example order.status */
+            path: string;
+            /** @example delivered */
+            equals: string;
+        };
+        V1JourneyClientFieldDto: {
+            /** @description Unique Client.customFields key; at most 20 mappings. */
+            key: string;
+            /** @example customer.tier */
+            path: string;
+        };
+        V1JourneyPayloadMapDto: {
+            /** @description Dotted path to the stable case reference. */
+            subjectKey?: string;
+            /** @example customer.email */
+            email?: string;
+            /** @example customer.phone */
+            phone?: string;
+            match?: components["schemas"]["V1JourneyPayloadRuleDto"][];
+            clientFields?: components["schemas"]["V1JourneyClientFieldDto"][];
+        };
+        V1JourneyTriggerDto: {
+            /** @enum {string} */
+            type: "manual" | "event" | "webhook" | "afterStage";
+            /** @description Legacy event trigger name. Reserved journey events cannot be emitted. */
+            event?: string;
+            /** @description afterStage: key of the earlier moment. */
+            stage?: string;
+            /** @enum {string} */
+            anchor?: "sent" | "response" | "event";
+            /** @description afterStage wait in milliseconds. A v2 zero delay means one hour. */
+            delayMs?: number;
+            window?: components["schemas"]["V1JourneySendWindowDto"];
+            /** @description Legacy webhook verification; use webhook.verification in v2. */
+            verification?: components["schemas"]["V1JourneyVerificationDto"];
+            /** @description Legacy webhook mapping; use webhook.payload in v2. */
+            payload?: components["schemas"]["V1JourneyPayloadMapDto"];
+        };
+        V1JourneyTextValueDto: {
+            /** @enum {string} */
+            mode: "literal" | "javascript";
+            /** @description Literal (up to 200 characters) or bounded JavaScript function body (up to 2000). JavaScript receives payload and must return a string; no IO or imports. */
+            value: string;
+        };
+        V1JourneyDynamicLocaleDto: {
+            es?: components["schemas"]["V1JourneyTextValueDto"];
+            en?: components["schemas"]["V1JourneyTextValueDto"];
+        };
+        V1JourneyTrackerMappingDto: {
+            /** @description Tracker name, at most 60 characters. Journey system trackers are reserved. */
+            name: string;
+            /** @example order.id */
+            path: string;
+        };
+        V1JourneyWebhookContentDto: {
+            description?: components["schemas"]["V1JourneyTextValueDto"];
+            descriptionEn?: components["schemas"]["V1JourneyTextValueDto"];
+            folderSecondaryKey?: components["schemas"]["V1JourneyTextValueDto"];
+            folderName?: components["schemas"]["V1JourneyTextValueDto"];
+            parentFolderSecondaryKey?: components["schemas"]["V1JourneyTextValueDto"];
+            parentFolderName?: components["schemas"]["V1JourneyTextValueDto"];
+            subject?: components["schemas"]["V1JourneyDynamicLocaleDto"];
+            audience?: components["schemas"]["V1JourneyDynamicLocaleDto"];
+            /** @description Woku only: dotted path to a public HTTPS image URL. */
+            imageUrlPath?: string;
+            trackers?: components["schemas"]["V1JourneyTrackerMappingDto"][];
+        };
+        V1JourneyWebhookDto: {
+            verification?: components["schemas"]["V1JourneyVerificationDto"];
+            payload?: components["schemas"]["V1JourneyPayloadMapDto"];
+            /**
+             * @description Content source, independent from trigger. Webhook content requires per_enrollment scope.
+             * @enum {string}
+             */
+            contentMode?: "manual" | "webhook";
+            /** @description Bounded JSON Schema: object root, at most 20000 characters, depth 8, 200 nodes and 50 properties per node. Supports type, properties, required, additionalProperties, items, enum, minLength, maxLength, minimum, maximum, minItems, maxItems, title and description. No references or regex. */
+            schema?: {
+                [key: string]: unknown;
+            };
+            content?: components["schemas"]["V1JourneyWebhookContentDto"];
+        };
+        V1JourneySequenceDto: {
+            /** @description Initial invitation and reminder offsets from activation. [0, 86400000] sends one reminder the next day. */
+            attemptOffsetsMs: number[];
+            deadlineMs: number;
+            cooldownAfterResponseMs: number;
+            sendWindow?: components["schemas"]["V1JourneySendWindowDto"];
+        };
+        V1JourneyPresentationDto: {
+            imageUrl?: string;
+            copy?: components["schemas"]["V1JourneyLocaleDto"];
+        };
+        V1JourneyLegacyToolRefDto: {
+            /** @enum {string} */
+            type: "csat" | "ces" | "woku" | "nps" | "flow" | "form";
+            id: string;
+        };
+        V1JourneyMomentReadDto: {
+            key: string;
+            name?: string;
+            description?: string;
+            /** @description Display order. Execution follows the trigger graph. */
+            order?: number;
+            /** @enum {string} */
+            tool: "woku" | "csat" | "ces" | "nps";
+            /**
+             * @description V2 defaults to shared within this moment. Dynamic webhook content requires per_enrollment.
+             * @enum {string}
+             */
+            toolScope?: "shared" | "per_enrollment";
+            toolSpec?: components["schemas"]["V1JourneyToolSpecDto"];
+            enabled: boolean;
+            trigger: components["schemas"]["V1JourneyTriggerDto"];
+            webhook?: components["schemas"]["V1JourneyWebhookDto"];
+            /** @enum {string} */
+            channel: "email" | "whatsapp_first";
+            sequence: components["schemas"]["V1JourneySequenceDto"];
+            presentation?: components["schemas"]["V1JourneyPresentationDto"];
+            /** @description Secondary wait for a webhook-primary moment. */
+            fallbackAfterMs?: number;
+            /** @description Key of the enabled moment that arms the secondary wait. */
+            fallbackFromStage?: string;
+            /** @description Legacy snapshots only. New assignments of existing tools are rejected. */
+            readonly toolRef?: components["schemas"]["V1JourneyLegacyToolRefDto"];
+        };
+        V1JourneyResponseDto: {
+            id: string;
+            key?: string;
+            name?: string;
+            enabled: boolean;
+            version: number;
+            /** @enum {number} */
+            authoringVersion?: 1 | 2;
+            /** @enum {string} */
+            startMode?: "operator" | "response" | "webhook";
+            recipients?: components["schemas"]["JourneyRecipientsDto"];
+            routing?: components["schemas"]["V1JourneyRoutingDto"];
+            moments: components["schemas"]["V1JourneyMomentReadDto"][];
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: string;
+        };
+        V1JourneyMomentDto: {
+            key: string;
+            name?: string;
+            description?: string;
+            /** @description Display order. Execution follows the trigger graph. */
+            order?: number;
+            /** @enum {string} */
+            tool: "woku" | "csat" | "ces" | "nps";
+            /**
+             * @description V2 defaults to shared within this moment. Dynamic webhook content requires per_enrollment.
+             * @enum {string}
+             */
+            toolScope?: "shared" | "per_enrollment";
+            toolSpec?: components["schemas"]["V1JourneyToolSpecDto"];
+            enabled: boolean;
+            trigger: components["schemas"]["V1JourneyTriggerDto"];
+            webhook?: components["schemas"]["V1JourneyWebhookDto"];
+            /** @enum {string} */
+            channel: "email" | "whatsapp_first";
+            sequence: components["schemas"]["V1JourneySequenceDto"];
+            presentation?: components["schemas"]["V1JourneyPresentationDto"];
+            /** @description Secondary wait for a webhook-primary moment. */
+            fallbackAfterMs?: number;
+            /** @description Key of the enabled moment that arms the secondary wait. */
+            fallbackFromStage?: string;
         };
         V1CreateJourneyBodyDto: {
             /**
@@ -2673,7 +3005,27 @@ export interface components {
              */
             enabled: boolean;
             /** @description The moments of the journey. Each creates a woku, CSAT, CES, or NPS from toolSpec. New v2 moments default to shared within that moment; per_enrollment creates one tool per participation. Existing toolRef assignments are rejected. A zero-day afterStage delay means one hour. In v2 only the first moment can be manual. Later moments use webhook or afterStage; independent webhook settings also let a webhook advance a timed moment. fallbackAfterMs is the optional secondary wait for a webhook-primary moment, anchored to fallbackFromStage. Legacy definitions retain their triggers. */
-            moments?: Record<string, never>[];
+            moments?: components["schemas"]["V1JourneyMomentDto"][];
+        };
+        V1CreatedJourneyResponseDto: {
+            id: string;
+            key?: string;
+            name?: string;
+            enabled: boolean;
+            version: number;
+            /** @enum {number} */
+            authoringVersion?: 1 | 2;
+            /** @enum {string} */
+            startMode?: "operator" | "response" | "webhook";
+            recipients?: components["schemas"]["JourneyRecipientsDto"];
+            routing?: components["schemas"]["V1JourneyRoutingDto"];
+            moments: components["schemas"]["V1JourneyMomentReadDto"][];
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: string;
+            /** @description Legacy journey-wide signature secret, returned once. It is not the per-moment URL token or sender secret. */
+            webhookSecret: string;
         };
         V1UpdateJourneyBodyDto: {
             /**
@@ -2690,25 +3042,11 @@ export interface components {
             /** @example Viaje de ventas */
             name?: string;
             enabled?: boolean;
-            moments?: Record<string, never>[];
+            moments?: components["schemas"]["V1JourneyMomentDto"][];
         };
-        V1JourneyContactDto: {
-            /**
-             * Format: email
-             * @example cliente@example.com
-             */
-            email?: string;
-            /**
-             * @description Phone with country code, digits only
-             * @example 56911111111
-             */
-            phone?: string;
-        };
-        V1JourneyTrackerDto: {
-            /** @example campaign */
-            name: string;
-            /** @example black-friday */
-            value: string;
+        V1JourneySecretResponseDto: {
+            /** @description Legacy journey-wide signature secret, returned only by create or rotate. V2 url_token and sender_hmac use separate per-moment credentials. */
+            webhookSecret: string;
         };
         V1EnrollSubjectBodyDto: {
             /**
@@ -2722,6 +3060,10 @@ export interface components {
             /** @description Anything you want kept with it */
             metadata?: Record<string, never>;
         };
+        V1JourneyEnrollmentResponseDto: {
+            subjectKey: string;
+            journeyId: string;
+        };
         V1EmitJourneyEventBodyDto: {
             /** @example crm.deal.won */
             event: string;
@@ -2730,6 +3072,9 @@ export interface components {
             contact?: components["schemas"]["V1JourneyContactDto"];
             trackers?: components["schemas"]["V1JourneyTrackerDto"][];
             metadata?: Record<string, never>;
+        };
+        V1JourneyEventResponseDto: {
+            journeys: number;
         };
         PrepareJourneyEntryDto: {
             /**
@@ -6300,6 +6645,31 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
+                content: {
+                    "application/json": components["schemas"]["V1JourneyParticipationPageDto"];
+                };
+            };
+            /** @description Invalid identifier or journey configuration */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Invalid API key, company access or entitlement */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Journey, moment or evaluation not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
         };
@@ -6308,7 +6678,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Client-generated key to make the call safe to retry. A retry with the same key returns the original result instead of acting again. */
+                /** @description Client-generated key to make the call safe to retry. A retry with the same key and operation returns the original result instead of acting again. Do not reuse it for new input: retries replay the original body. A different operation returns 422. */
                 "X-Woku-Idempotency-Key"?: string;
             };
             path: {
@@ -6327,7 +6697,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["V1JourneyEnrollmentResponseDto"];
+                };
             };
             /** @description Validation error, or the journey is switched off */
             400: {
@@ -6338,8 +6710,29 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
+            /** @description Invalid API key, company access or entitlement */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Journey, moment or evaluation not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description The subject is already enrolled */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Idempotency key reused for a different operation */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6363,6 +6756,31 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
+                content: {
+                    "application/json": components["schemas"]["V1JourneyParticipationDto"];
+                };
+            };
+            /** @description Invalid identifier or journey configuration */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Invalid API key, company access or entitlement */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Journey, moment or evaluation not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
         };
@@ -6371,7 +6789,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Client-generated key to make the call safe to retry. A retry with the same key returns the original result instead of acting again. */
+                /** @description Client-generated key to make the call safe to retry. A retry with the same key and operation returns the original result instead of acting again. Do not reuse it for new input: retries replay the original body. A different operation returns 422. */
                 "X-Woku-Idempotency-Key"?: string;
             };
             path: {
@@ -6387,6 +6805,38 @@ export interface operations {
         };
         responses: {
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["V1JourneyParticipationDto"];
+                };
+            };
+            /** @description Invalid identifier or journey configuration */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Invalid API key, company access or entitlement */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Journey, moment or evaluation not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Idempotency key reused for a different operation */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6409,6 +6859,31 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
+                content: {
+                    "application/json": components["schemas"]["V1JourneyConnectionDto"][];
+                };
+            };
+            /** @description Invalid identifier or journey configuration */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Invalid API key, company access or entitlement */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Journey, moment or evaluation not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
         };
@@ -6417,7 +6892,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Client-generated key to make the call safe to retry. A retry with the same key returns the original result instead of acting again. */
+                /** @description Client-generated key to make the call safe to retry. A retry with the same key and operation returns the original result instead of acting again. Do not reuse it for new input: retries replay the original body. A different operation returns 422. */
                 "X-Woku-Idempotency-Key"?: string;
             };
             path: {
@@ -6429,6 +6904,38 @@ export interface operations {
         requestBody?: never;
         responses: {
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["V1JourneyMomentUrlDto"];
+                };
+            };
+            /** @description Invalid identifier or journey configuration */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Invalid API key, company access or entitlement */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Journey, moment or evaluation not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Idempotency key reused for a different operation */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6452,7 +6959,31 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Secret stored encrypted, no response body */
             204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid identifier or journey configuration */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Invalid API key, company access or entitlement */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Journey, moment or evaluation not found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6472,11 +7003,36 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["PreviewJourneyMomentDto"];
+                "application/json": components["schemas"]["V1PreviewJourneyMomentDto"];
             };
         };
         responses: {
-            201: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["V1JourneyPreviewResponseDto"];
+                };
+            };
+            /** @description Invalid identifier or journey configuration */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Invalid API key, company access or entitlement */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Journey, moment or evaluation not found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6498,10 +7054,28 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["V1JourneyResponseDto"][];
+                };
+            };
+            /** @description Invalid identifier or journey configuration */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
             };
             /** @description Invalid or missing API key */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Journey, moment or evaluation not found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6513,7 +7087,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Client-generated key to make the call safe to retry. A retry with the same key returns the original result instead of acting again. */
+                /** @description Client-generated key to make the call safe to retry. A retry with the same key and operation returns the original result instead of acting again. Do not reuse it for new input: retries replay the original body. A different operation returns 422. */
                 "X-Woku-Idempotency-Key"?: string;
             };
             path?: never;
@@ -6530,7 +7104,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["V1CreatedJourneyResponseDto"];
+                };
             };
             /** @description Validation error */
             400: {
@@ -6540,6 +7116,34 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
+            };
+            /** @description Invalid API key, company access or entitlement */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Journey, moment or evaluation not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Journey key conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Idempotency key reused for a different operation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -6555,6 +7159,24 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["V1JourneyResponseDto"];
+                };
+            };
+            /** @description Invalid identifier or journey configuration */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Invalid API key, company access or entitlement */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6582,6 +7204,22 @@ export interface operations {
         responses: {
             /** @description Journey deleted */
             204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid identifier or journey configuration */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Invalid API key, company access or entitlement */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6616,7 +7254,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["V1JourneyResponseDto"];
+                };
             };
             /** @description Validation error */
             400: {
@@ -6627,8 +7267,22 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
+            /** @description Invalid API key, company access or entitlement */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Journey not found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Journey key conflict */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6652,6 +7306,24 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
+                content: {
+                    "application/json": components["schemas"]["V1JourneySecretResponseDto"];
+                };
+            };
+            /** @description Invalid identifier or journey configuration */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Invalid API key, company access or entitlement */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
             /** @description Journey not found */
@@ -6667,7 +7339,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Client-generated key to make the call safe to retry. A retry with the same key returns the original result instead of acting again. */
+                /** @description Client-generated key to make the call safe to retry. A retry with the same key and operation returns the original result instead of acting again. Do not reuse it for new input: retries replay the original body. A different operation returns 422. */
                 "X-Woku-Idempotency-Key"?: string;
             };
             path?: never;
@@ -6684,7 +7356,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["V1JourneyEventResponseDto"];
+                };
             };
             /** @description Validation error, or a reserved event name */
             400: {
@@ -6694,6 +7368,27 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
+            };
+            /** @description Invalid API key, company access or entitlement */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Journey, moment or evaluation not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Idempotency key reused for a different operation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
