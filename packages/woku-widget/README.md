@@ -135,12 +135,12 @@ Build outputs:
 ```
 cdn.woku.app/sdks/woku-widget/v1/loader.js          ← major-alias (cache 5 min)
 cdn.woku.app/sdks/woku-widget/v1/index.html         ← major-alias (cache 5 min)
-cdn.woku.app/sdks/woku-widget/v0.1.0/loader.js      ← semver-pinned (cache immutable)
-cdn.woku.app/sdks/woku-widget/v0.1.0/index.html
-cdn.woku.app/sdks/woku-widget/v0.1.0/assets/*
+cdn.woku.app/sdks/woku-widget/v0.2.0/loader.js      ← semver-pinned (cache immutable)
+cdn.woku.app/sdks/woku-widget/v0.2.0/index.html
+cdn.woku.app/sdks/woku-widget/v0.2.0/assets/*
 ```
 
-CDN publish is handled by `scripts/release-widget.sh` (infra task — not part of this package).
+Deploy `dist/app/` and `dist/loader/loader.js` to both CDN prefixes after the compatible API release. Upload hashed assets before `index.html`; keep pinned versions immutable and invalidate only the `v1` alias. CDN deployment is separate from npm publication.
 
 ## Architecture
 

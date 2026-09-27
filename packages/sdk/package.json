@@ -1,6 +1,6 @@
 {
   "name": "@wokuapp/sdk",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "Official server-side SDK for woku API v1, customer journeys, media, feedback and actions.",
   "keywords": [
     "woku",

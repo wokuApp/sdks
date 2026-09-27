@@ -71,6 +71,10 @@ pnpm typecheck      # type-check every package
 pnpm lint           # lint every package
 ```
 
+The customer journey release uses management SDK `0.3.0`, React Native `0.2.0`,
+and web widget `0.2.0`. The widget also needs its CDN assets deployed; see its
+[CDN instructions](./packages/woku-widget/README.md#cdn-paths-s3--cloudfront).
+
 ## Versioning & releases
 
 Versioning uses [Changesets](https://github.com/changesets/changesets) and
