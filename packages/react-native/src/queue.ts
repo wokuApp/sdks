@@ -51,7 +51,21 @@ export class OfflineQueue {
     if (!raw) return [];
     try {
       const parsed: unknown = JSON.parse(raw);
-      if (Array.isArray(parsed)) return parsed as QueuedItem[];
+      if (
+        Array.isArray(parsed) &&
+        parsed.every(
+          (item) =>
+            item &&
+            typeof item === 'object' &&
+            item.submission &&
+            typeof item.submission.id === 'string' &&
+            typeof item.submission.companyId === 'string' &&
+            Number.isFinite(item.submission.createdAt) &&
+            Number.isInteger(item.attempts) &&
+            item.attempts >= 0,
+        )
+      )
+        return parsed as QueuedItem[];
     } catch {
       /* Preserve invalid storage instead of silently overwriting it. */
     }

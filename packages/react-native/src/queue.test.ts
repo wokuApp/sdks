@@ -2,7 +2,11 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { OfflineQueue } from './queue';
 import { InMemoryStorage } from './adapters';
-import { WokuNetworkError, WokuQuarantineError } from './errors';
+import {
+  WokuConfigError,
+  WokuNetworkError,
+  WokuQuarantineError,
+} from './errors';
 import type { CaptureSubmission, SubmissionResult } from './types';
 
 const sub = (id: string): CaptureSubmission => ({
@@ -15,6 +19,28 @@ const sub = (id: string): CaptureSubmission => ({
 });
 
 const sent = (id: string): SubmissionResult => ({ id, status: 'sent' });
+
+it.each([
+  null,
+  {},
+  { submission: null, attempts: 0 },
+  { submission: { ...sub('a'), companyId: 4 }, attempts: 0 },
+  { submission: { ...sub('a'), createdAt: 'yesterday' }, attempts: 0 },
+  { submission: sub('a'), attempts: 'one' },
+])(
+  'rejects malformed persisted rows without modifying storage: %j',
+  async (row) => {
+    const storage = new InMemoryStorage();
+    const raw = JSON.stringify([row]);
+    await storage.setItem('woku.sdk.queue.v1', raw);
+    const queue = new OfflineQueue({ storage, companyId: 'c1' });
+    await expect(queue.pending()).rejects.toBeInstanceOf(WokuConfigError);
+    await expect(queue.enqueue(sub('new'))).rejects.toBeInstanceOf(
+      WokuConfigError,
+    );
+    expect(await storage.getItem('woku.sdk.queue.v1')).toBe(raw);
+  },
+);
 
 describe('OfflineQueue', () => {
   it('enqueues and dedupes by id', async () => {

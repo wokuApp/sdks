@@ -2,6 +2,8 @@
 
 ## 0.2.0
 
+- Reject malformed persisted queue rows without losing their stored contents.
+
 ### Minor Changes
 
 - 4adb4ec: Add media uploads and safe journey enrollment iterators, synchronize generated

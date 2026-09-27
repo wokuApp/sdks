@@ -193,3 +193,6 @@ flush. A storage failure before enqueue prevents the network request.
 `clearQueue()` removes this company's rows and prevents an active flush from
 starting further sends from its old snapshot. An already started request may
 finish and cannot be recalled.
+
+Persisted capture queues reject malformed rows with `WokuConfigError` and preserve
+the stored bytes for recovery instead of overwriting them.

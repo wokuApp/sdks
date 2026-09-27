@@ -146,3 +146,6 @@ persisting a local acknowledgement. Clearing Native queues prevents further
 snapshot sends; accepted or in-flight requests cannot be recalled. Widget
 reconfiguration resets evaluation identity while preserving progress for
 presentation-only changes, and initialization gates are scoped to their instance.
+
+Persisted capture queues reject malformed rows with `WokuConfigError` and preserve
+the stored bytes for recovery instead of overwriting them.

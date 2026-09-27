@@ -161,25 +161,28 @@ it('does not let a management key be configured as the mobile public key', () =>
 
 it('bounds a hanging custom adapter and aborts it', async () => {
   vi.useFakeTimers();
-  let signal: AbortSignal | undefined;
-  const client = new WokuClient({
-    apiUrl: 'https://clientapi.woku.app',
-    publicKey: 'pk_test',
-    companyId: 'c1',
-    timeoutMs: 25,
-    http: {
-      request: async (req) => {
-        signal = req.signal;
-        return new Promise(() => undefined);
+  try {
+    let signal: AbortSignal | undefined;
+    const client = new WokuClient({
+      apiUrl: 'https://clientapi.woku.app',
+      publicKey: 'pk_test',
+      companyId: 'c1',
+      timeoutMs: 25,
+      http: {
+        request: async (req) => {
+          signal = req.signal;
+          return new Promise(() => undefined);
+        },
       },
-    },
-  });
-  const sending = client.send(submission);
-  const checked = expect(sending).rejects.toBeInstanceOf(WokuNetworkError);
-  await vi.advanceTimersByTimeAsync(25);
-  await checked;
-  expect(signal?.aborted).toBe(true);
-  vi.useRealTimers();
+    });
+    const sending = client.send(submission);
+    const checked = expect(sending).rejects.toBeInstanceOf(WokuNetworkError);
+    await vi.advanceTimersByTimeAsync(25);
+    await checked;
+    expect(signal?.aborted).toBe(true);
+  } finally {
+    vi.useRealTimers();
+  }
 });
 
 it('preserves token, phone and language in multipart without putting them in the URL', async () => {
