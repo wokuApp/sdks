@@ -1,7 +1,17 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  type ReactNode,
+} from 'react';
 import type { WidgetAppConfig } from '../config';
 import type { WokuReviewData } from '../services/capture';
-import { fetchWokuReview, fetchCompanyBranding, type CompanyBranding } from '../services/capture';
+import {
+  fetchWokuReview,
+  fetchCompanyBranding,
+  type CompanyBranding,
+} from '../services/capture';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -53,7 +63,8 @@ const WidgetContext = createContext<WidgetContextType | null>(null);
 
 export function useWidgetContext(): WidgetContextType {
   const ctx = useContext(WidgetContext);
-  if (!ctx) throw new Error('useWidgetContext must be used within WidgetProvider');
+  if (!ctx)
+    throw new Error('useWidgetContext must be used within WidgetProvider');
   return ctx;
 }
 
@@ -67,11 +78,17 @@ interface WidgetProviderProps {
   children: ReactNode;
 }
 
-export function WidgetProvider({ config, initialEmail, children }: WidgetProviderProps) {
+export function WidgetProvider({
+  config,
+  initialEmail,
+  children,
+}: WidgetProviderProps) {
   const [step, setStep] = useState<CaptureStep>('qualifier');
 
   // Woku
-  const [qualification, setQualification] = useState<number | undefined>(undefined);
+  const [qualification, setQualification] = useState<number | undefined>(
+    undefined,
+  );
   const [wokuData, setWokuData] = useState<WokuReviewData | null>(null);
 
   // NPS
@@ -95,7 +112,7 @@ export function WidgetProvider({ config, initialEmail, children }: WidgetProvide
   useEffect(() => {
     const emailToUse = initialEmail ?? config.email;
     if (emailToUse) {
-      const regex = /^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/;
+      const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (regex.test(emailToUse)) {
         setEmail(emailToUse);
         setAnonymous(false);
@@ -117,11 +134,13 @@ export function WidgetProvider({ config, initialEmail, children }: WidgetProvide
         const [brandingData] = await Promise.all([
           fetchCompanyBranding(config.apiBaseUrl, config.publishableKey),
           config.captureType === 'woku' && config.wokuId
-            ? fetchWokuReview(config.apiBaseUrl, config.publishableKey, config.wokuId).then(
-                (data) => {
-                  if (!cancelled) setWokuData(data);
-                },
-              )
+            ? fetchWokuReview(
+                config.apiBaseUrl,
+                config.publishableKey,
+                config.wokuId,
+              ).then((data) => {
+                if (!cancelled) setWokuData(data);
+              })
             : Promise.resolve(),
         ]);
         if (!cancelled) setBranding(brandingData);
@@ -136,8 +155,12 @@ export function WidgetProvider({ config, initialEmail, children }: WidgetProvide
     return () => {
       cancelled = true;
     };
-     
-  }, [config.captureType, config.wokuId, config.apiBaseUrl, config.publishableKey]);
+  }, [
+    config.captureType,
+    config.wokuId,
+    config.apiBaseUrl,
+    config.publishableKey,
+  ]);
 
   const reset = () => {
     setStep('qualifier');
@@ -173,7 +196,9 @@ export function WidgetProvider({ config, initialEmail, children }: WidgetProvide
     reset,
   };
 
-  return <WidgetContext.Provider value={value}>{children}</WidgetContext.Provider>;
+  return (
+    <WidgetContext.Provider value={value}>{children}</WidgetContext.Provider>
+  );
 }
 
 // Augment config type to include optional email (passed from loader)

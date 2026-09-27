@@ -16,13 +16,11 @@ website via a lightweight loader `<script>` (~2.5 KB gzipped) that injects an `<
   WokuWidget.init({
     companyId: 'YOUR_COMPANY_ID',
     publishableKey: 'pk_live_...',
-    captureType: 'nps',          // 'nps' | 'woku'
+    captureType: 'nps', // 'nps' | 'woku'
     // wokuId: 'WOKU_ID',        // required when captureType === 'woku'
     // npsToolId: 'NPS_TOOL_ID', // optional for NPS (omit for company-level NPS)
     // lang: 'es',               // 'es' | 'en'; auto-detected from browser if omitted
-    triggers: [
-      { type: 'time', value: 5, behavior: 'modal' },
-    ],
+    triggers: [{ type: 'time', value: 5, behavior: 'modal' }],
   });
 </script>
 ```
@@ -32,25 +30,28 @@ page — all styles live inside the iframe (zero risk of clashing with host styl
 
 ## captureType
 
-| Value | Rating UI | API endpoint |
-|-------|-----------|--------------|
-| `'woku'` | 5-star rating (1-5) | `POST /v1/wokus/:wokuId/textnotes` \| `/voicemails` |
-| `'nps'` | NPS scale (0-10) | `POST /v1/nps` → `POST /v1/nps/:npsId/textnotes` \| `/voicemails` |
+| Value    | Rating UI           | API endpoint                                                      |
+| -------- | ------------------- | ----------------------------------------------------------------- |
+| `'woku'` | 5-star rating (1-5) | `POST /v1/wokus/:wokuId/textnotes` \| `/voicemails`               |
+| `'nps'`  | NPS scale (0-10)    | `POST /v1/nps` → `POST /v1/nps/:npsId/textnotes` \| `/voicemails` |
 
 ## WokuWidgetConfig
 
 ```typescript
 interface WokuWidgetConfig {
   companyId: string;
-  publishableKey: string;           // pk_... safe to embed in the page
+  publishableKey: string; // pk_... safe to embed in the page
   captureType: 'woku' | 'nps';
 
-  wokuId?: string;                  // required when captureType === 'woku'
-  npsToolId?: string;               // optional for NPS — omit for company-level
-  apiBaseUrl?: string;              // default: https://clientapi.woku.app
-  widgetBaseUrl?: string;           // default: https://cdn.woku.app/sdks/woku-widget/v1
-  lang?: string;                    // 'es' | 'en'; auto-detect if omitted
-  branding?: boolean;               // show "Powered by Woku"; default: true
+  wokuId?: string; // required when captureType === 'woku'
+  email?: string; // preidentified customer
+  phone?: string; // alternative to email
+  dispatchToken?: string; // prepared journey response token
+  npsToolId?: string; // optional for NPS — omit for company-level
+  apiBaseUrl?: string; // default: https://clientapi.woku.app
+  widgetBaseUrl?: string; // default: https://cdn.woku.app/sdks/woku-widget/v1
+  lang?: string; // 'es' | 'en'; auto-detect if omitted
+  branding?: boolean; // show "Powered by Woku"; default: true
 
   triggers: TriggerConfig[];
   theme?: ThemeConfig;
@@ -59,7 +60,7 @@ interface WokuWidgetConfig {
 
 interface TriggerConfig {
   type: 'time' | 'scroll' | 'exit-intent' | 'custom-event' | 'click-selector';
-  value?: number | string;          // seconds, scroll%, event name, or CSS selector
+  value?: number | string; // seconds, scroll%, event name, or CSS selector
   behavior: 'modal' | 'banner' | 'side-tab' | 'fullscreen';
 }
 ```
@@ -67,14 +68,22 @@ interface TriggerConfig {
 ## Programmatic API
 
 ```javascript
-WokuWidget.show();           // show the widget manually
-WokuWidget.hide();           // hide the widget
-WokuWidget.destroy();        // remove the iframe + clean up all listeners
+WokuWidget.show(); // show the widget manually
+WokuWidget.hide(); // hide the widget
+WokuWidget.destroy(); // remove the iframe + clean up all listeners
 
-WokuWidget.on('open',   () => { /* widget opened */ });
-WokuWidget.on('close',  () => { /* widget closed */ });
-WokuWidget.on('submit', (data) => { console.log('submitted:', data); });
-WokuWidget.on('skip',   () => { /* user skipped feedback */ });
+WokuWidget.on('open', () => {
+  /* widget opened */
+});
+WokuWidget.on('close', () => {
+  /* widget closed */
+});
+WokuWidget.on('submit', (data) => {
+  console.log('submitted:', data);
+});
+WokuWidget.on('skip', () => {
+  /* user skipped feedback */
+});
 ```
 
 ## CSP requirements
@@ -115,23 +124,23 @@ pnpm --filter woku-widget test:run
 
 Build outputs:
 
-| File | Description |
-|------|-------------|
+| File                    | Description                                          |
+| ----------------------- | ---------------------------------------------------- |
 | `dist/loader/loader.js` | Loader IIFE (~2.5 KB gzipped) — `<script src="...">` |
-| `dist/app/index.html` | Micro-app entry — loaded inside the iframe |
-| `dist/app/assets/*` | Hashed JS/CSS bundles for the micro-app |
+| `dist/app/index.html`   | Micro-app entry — loaded inside the iframe           |
+| `dist/app/assets/*`     | Hashed JS/CSS bundles for the micro-app              |
 
 ## CDN paths (S3 + CloudFront)
 
 ```
 cdn.woku.app/sdks/woku-widget/v1/loader.js          ← major-alias (cache 5 min)
 cdn.woku.app/sdks/woku-widget/v1/index.html         ← major-alias (cache 5 min)
-cdn.woku.app/sdks/woku-widget/v0.1.0/loader.js      ← semver-pinned (cache immutable)
-cdn.woku.app/sdks/woku-widget/v0.1.0/index.html
-cdn.woku.app/sdks/woku-widget/v0.1.0/assets/*
+cdn.woku.app/sdks/woku-widget/v0.2.0/loader.js      ← semver-pinned (cache immutable)
+cdn.woku.app/sdks/woku-widget/v0.2.0/index.html
+cdn.woku.app/sdks/woku-widget/v0.2.0/assets/*
 ```
 
-CDN publish is handled by `scripts/release-widget.sh` (infra task — not part of this package).
+Deploy `dist/app/` and `dist/loader/loader.js` to both CDN prefixes after the compatible API release. Upload hashed assets before `index.html`; keep pinned versions immutable and invalidate only the `v1` alias. CDN deployment is separate from npm publication.
 
 ## Architecture
 
@@ -151,3 +160,27 @@ Host page
 
 The micro-app inside the iframe runs React 19 + Base UI + Tailwind v4 + lucide-react.
 Host styles do not affect it; host JS does not share the same global scope.
+
+## Journey response context
+
+Pass email, phone and dispatchToken in WokuWidget.init after your backend prepares
+the entry. They travel only in postMessage, never iframe URLs or submit events.
+A token-bound response requires identity and respects anonymousDisabled.
+
+The bridge verifies the actual parent/iframe. Valid config survives the fallback
+deadline. Optional branding failures do not block public capture. Once NPS is
+confirmed, its id is reused when retrying an optional attachment. Uncertain REST
+score submissions have no automatic transport retry.
+
+Widget supports Woku/NPS; React Native supports all four instruments. Use only pk\_
+keys; management keys are rejected. The API key used to prepare a journey stays
+on your backend and is never passed to the loader.
+
+### Reconfiguration
+
+A new company, API/authorization context, instrument, prepared response token or configured contact resets
+the evaluation state. This also initializes contact when host configuration
+arrives after the URL fallback. Repeating the same configuration or changing
+only presentation preserves current feedback. After `destroy()`, callbacks
+from an earlier asynchronous initialization cannot register triggers for a new
+widget instance.

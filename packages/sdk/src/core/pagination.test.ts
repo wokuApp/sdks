@@ -77,11 +77,39 @@ describe('Page', () => {
   it('getNextPage throws on the last page (guard with hasNextPage)', async () => {
     server.use(
       http.get(`${BASE}/v1/events`, () =>
-        HttpResponse.json({ data: [{ id: 'a' }], total: 1, page: 1, limit: 20 }),
+        HttpResponse.json({
+          data: [{ id: 'a' }],
+          total: 1,
+          page: 1,
+          limit: 20,
+        }),
       ),
     );
     const page = await client().getPage<{ id: string }>('/v1/events');
     expect(page.hasNextPage()).toBe(false);
     expect(() => page.getNextPage()).toThrow(RangeError);
   });
+});
+
+it('advances beyond a page supplied in request-option query overrides', async () => {
+  const requested: number[] = [];
+  server.use(
+    http.get(`${BASE}/v1/items`, ({ request }) => {
+      const page = Number(new URL(request.url).searchParams.get('page'));
+      requested.push(page);
+      return HttpResponse.json({ data: [page], total: 3, page, limit: 1 });
+    }),
+  );
+  const page = await client().getPage<number>(
+    '/v1/items',
+    { page: 1, limit: 1 },
+    { query: { page: 2 } },
+  );
+  const values: number[] = [];
+  for await (const value of page) {
+    values.push(value);
+    if (values.length === 3) break;
+  }
+  expect(values).toEqual([2, 3]);
+  expect(requested).toEqual([2, 3]);
 });

@@ -49,7 +49,7 @@ describe('WokuClient', () => {
     const req = request.mock.calls[0][0];
     expect(req.method).toBe('POST');
     expect(req.url).toBe('https://api.woku.app/v1/captures');
-    expect(req.headers.Authorization).toBe('Bearer pk_test');
+    expect(req.headers['x-woku-key']).toBe('pk_test');
     expect(req.headers['X-Woku-Company']).toBe('c1');
     expect(req.headers['X-Woku-Idempotency-Key']).toBe('cap_1');
     expect(req.headers['Content-Type']).toBe('application/json');
@@ -123,6 +123,137 @@ describe('WokuClient', () => {
       id: 'cap_1',
       status: 'failed',
       error: 'bad rating',
+      retryable: false,
     });
+  });
+});
+
+it('authenticates a capture with the publishable-key header the API actually resolves', async () => {
+  const http = {
+    request: vi.fn(async () =>
+      mkResponse({
+        json: async () => ({ id: 'client-id', remoteId: 'server-id' }),
+      }),
+    ),
+  };
+  const client = new WokuClient({
+    apiUrl: 'https://clientapi.woku.app',
+    publicKey: 'pk_test',
+    companyId: 'c1',
+    http,
+  });
+  const result = await client.send(submission);
+  expect(http.request.mock.calls[0]?.[0].headers['x-woku-key']).toBe('pk_test');
+  expect(http.request.mock.calls[0]?.[0].headers.Authorization).toBeUndefined();
+  expect(result.remoteId).toBe('server-id');
+});
+
+it('does not let a management key be configured as the mobile public key', () => {
+  expect(
+    () =>
+      new WokuClient({
+        apiUrl: 'https://clientapi.woku.app',
+        publicKey: 'sk_secret',
+        companyId: 'c1',
+      }),
+  ).toThrow(WokuConfigError);
+});
+
+it('bounds a hanging custom adapter and aborts it', async () => {
+  vi.useFakeTimers();
+  try {
+    let signal: AbortSignal | undefined;
+    const client = new WokuClient({
+      apiUrl: 'https://clientapi.woku.app',
+      publicKey: 'pk_test',
+      companyId: 'c1',
+      timeoutMs: 25,
+      http: {
+        request: async (req) => {
+          signal = req.signal;
+          return new Promise(() => undefined);
+        },
+      },
+    });
+    const sending = client.send(submission);
+    const checked = expect(sending).rejects.toBeInstanceOf(WokuNetworkError);
+    await vi.advanceTimersByTimeAsync(25);
+    await checked;
+    expect(signal?.aborted).toBe(true);
+  } finally {
+    vi.useRealTimers();
+  }
+});
+
+it('preserves token, phone and language in multipart without putting them in the URL', async () => {
+  const request = vi.fn(async () => mkResponse({}));
+  await mkClient({ request }).send({
+    ...submission,
+    kind: 'woku',
+    rating: 5,
+    respondent: { phone: '56912345678' },
+    dispatchToken: 'jent_test',
+    language: 'en',
+    audio: { uri: 'file:///audio.m4a', mimeType: 'audio/mp4' },
+  });
+  const req = request.mock.calls[0][0];
+  expect(
+    JSON.parse((req.body as FormData).get('payload') as string),
+  ).toMatchObject({
+    dispatchToken: 'jent_test',
+    language: 'en',
+    respondent: { phone: '56912345678' },
+  });
+  expect(req.url).not.toContain('jent_');
+});
+
+it('bounds response-body reading with the same timeout as the transport', async () => {
+  vi.useFakeTimers();
+  try {
+    let signal: AbortSignal | undefined;
+    const client = new WokuClient({
+      apiUrl: 'https://api.test',
+      companyId: 'c1',
+      publicKey: 'pk_test',
+      timeoutMs: 25,
+      http: {
+        request: async (req) => {
+          signal = req.signal;
+          return mkResponse({ json: () => new Promise(() => undefined) });
+        },
+      },
+    });
+    let outcome: unknown;
+    const sending = client.send(submission).catch((error) => {
+      outcome = error;
+    });
+    await vi.advanceTimersByTimeAsync(26);
+    expect(outcome).toBeInstanceOf(WokuNetworkError);
+    expect(signal?.aborted).toBe(true);
+    await sending;
+  } finally {
+    vi.useRealTimers();
+  }
+});
+
+it('returns a string for nested API validation errors rather than persisting an object', async () => {
+  const client = mkClient({
+    request: async () =>
+      mkResponse({
+        ok: false,
+        status: 400,
+        json: async () => ({
+          statusCode: 400,
+          message: {
+            message: ['Invalid contact', 'Invalid tool'],
+            error: 'Bad Request',
+          },
+        }),
+      }),
+  });
+  expect(await client.send(submission)).toMatchObject({
+    status: 'failed',
+    retryable: false,
+    error: 'Invalid contact, Invalid tool',
   });
 });

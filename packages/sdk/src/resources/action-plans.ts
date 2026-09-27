@@ -36,7 +36,7 @@ export class ActionPlans {
   get(id: string, opts?: RequestOptions): Promise<WokuRecord> {
     return this.client.request<WokuRecord>(
       'get',
-      `/v1/action-plans/${id}`,
+      `/v1/action-plans/${encodeURIComponent(id)}`,
       opts,
     );
   }
@@ -45,7 +45,7 @@ export class ActionPlans {
   events(id: string, opts?: RequestOptions): Promise<WokuRecord[]> {
     return this.client.request<WokuRecord[]>(
       'get',
-      `/v1/action-plans/${id}/events`,
+      `/v1/action-plans/${encodeURIComponent(id)}/events`,
       opts,
     );
   }
@@ -54,7 +54,7 @@ export class ActionPlans {
   getConversation(id: string, opts?: RequestOptions): Promise<WokuRecord> {
     return this.client.request<WokuRecord>(
       'get',
-      `/v1/action-plans/${id}/conversation`,
+      `/v1/action-plans/${encodeURIComponent(id)}/conversation`,
       opts,
     );
   }
@@ -67,7 +67,7 @@ export class ActionPlans {
   reply(id: string, text: string, opts?: RequestOptions): Promise<WokuRecord> {
     return this.client.request<WokuRecord>(
       'post',
-      `/v1/action-plans/${id}/conversation`,
+      `/v1/action-plans/${encodeURIComponent(id)}/conversation`,
       { ...opts, body: { text, confirm: true } },
     );
   }
@@ -79,8 +79,8 @@ export class ActionPlans {
   ): Promise<WokuRecord> {
     return this.client.request<WokuRecord>(
       'post',
-      `/v1/action-plans/${id}/tasks`,
-      { ...opts, body, idempotent: true },
+      `/v1/action-plans/${encodeURIComponent(id)}/tasks`,
+      { ...opts, body, maxRetries: 0 },
     );
   }
 
@@ -92,7 +92,7 @@ export class ActionPlans {
   ): Promise<WokuRecord> {
     return this.client.request<WokuRecord>(
       'patch',
-      `/v1/action-plans/${id}/tasks/${taskId}`,
+      `/v1/action-plans/${encodeURIComponent(id)}/tasks/${encodeURIComponent(taskId)}`,
       { ...opts, body },
     );
   }
@@ -104,7 +104,7 @@ export class ActionPlans {
   ): Promise<WokuRecord> {
     return this.client.request<WokuRecord>(
       'patch',
-      `/v1/action-plans/${id}/tasks/reorder`,
+      `/v1/action-plans/${encodeURIComponent(id)}/tasks/reorder`,
       { ...opts, body },
     );
   }
@@ -116,7 +116,7 @@ export class ActionPlans {
   ): Promise<WokuRecord> {
     return this.client.request<WokuRecord>(
       'delete',
-      `/v1/action-plans/${id}/tasks/${taskId}`,
+      `/v1/action-plans/${encodeURIComponent(id)}/tasks/${encodeURIComponent(taskId)}`,
       opts,
     );
   }
@@ -148,7 +148,7 @@ export class ActionPlans {
   ): Promise<WokuRecord> {
     return this.client.request<WokuRecord>(
       'post',
-      `/v1/action-plans/${id}/${action}`,
+      `/v1/action-plans/${encodeURIComponent(id)}/${action}`,
       opts,
     );
   }
@@ -172,7 +172,7 @@ export class ActionPlanGroups {
   get(id: string, opts?: RequestOptions): Promise<WokuRecord> {
     return this.client.request<WokuRecord>(
       'get',
-      `/v1/action-plan-groups/${id}`,
+      `/v1/action-plan-groups/${encodeURIComponent(id)}`,
       opts,
     );
   }
@@ -184,7 +184,7 @@ export class ActionPlanGroups {
     return this.client.request<WokuRecord>('post', '/v1/action-plan-groups', {
       ...opts,
       body,
-      idempotent: true,
+      maxRetries: 0,
     });
   }
 
@@ -195,7 +195,7 @@ export class ActionPlanGroups {
   ): Promise<WokuRecord> {
     return this.client.request<WokuRecord>(
       'patch',
-      `/v1/action-plan-groups/${id}`,
+      `/v1/action-plan-groups/${encodeURIComponent(id)}`,
       { ...opts, body },
     );
   }
@@ -207,7 +207,7 @@ export class ActionPlanGroups {
   ): Promise<WokuRecord> {
     return this.client.request<WokuRecord>(
       'patch',
-      `/v1/action-plan-groups/${id}/enabled`,
+      `/v1/action-plan-groups/${encodeURIComponent(id)}/enabled`,
       { ...opts, body: { enabled } },
     );
   }
@@ -215,7 +215,7 @@ export class ActionPlanGroups {
   delete(id: string, opts?: RequestOptions): Promise<WokuRecord> {
     return this.client.request<WokuRecord>(
       'delete',
-      `/v1/action-plan-groups/${id}`,
+      `/v1/action-plan-groups/${encodeURIComponent(id)}`,
       opts,
     );
   }

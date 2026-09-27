@@ -1,7 +1,7 @@
 {
   "name": "@wokuapp/react-native",
-  "version": "0.1.0",
-  "description": "React Native SDK to capture Woku ratings and NPS (text + audio) with offline buffering and configurable intercepts.",
+  "version": "0.2.0",
+  "description": "React Native SDK for Woku, NPS, CSAT and CES captures, identified journeys and scoped offline buffering.",
   "keywords": [
     "woku",
     "react-native",
@@ -9,7 +9,10 @@
     "nps",
     "sdk",
     "customer-feedback",
-    "voice-of-customer"
+    "voice-of-customer",
+    "csat",
+    "ces",
+    "customer-journeys"
   ],
   "license": "MIT",
   "author": "Woku",
@@ -29,9 +32,14 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./package.json": "./package.json"
   },
@@ -56,7 +64,9 @@
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "check:publint": "pnpm --filter @wokuapp/sdk exec publint ../react-native --strict",
+    "check:exports": "pnpm --filter @wokuapp/sdk exec attw --pack ../react-native"
   },
   "peerDependencies": {
     "react": ">=17",

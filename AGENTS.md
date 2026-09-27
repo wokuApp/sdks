@@ -23,6 +23,6 @@ Never ship an SDK change that leaves an example or a listed method stale.
 - Versioning: **changesets** (`pnpm changeset`, one file per change). On merge to
   `main` the release opens a "Version Packages" PR. Code, comments and commits in
   English.
-- Never present integrations that are not in production (only Shopify and Zendesk
-  are). No `actionPlans.send` to Jira/Monday/ClickUp/Notion; ticket destinations
+- Never present integrations that are not in production. Verify the current
+  integration catalog before documenting one. No `actionPlans.send` to Jira/Monday/ClickUp/Notion; ticket destinations
   are zendesk/custom/email only.

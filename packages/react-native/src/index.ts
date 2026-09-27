@@ -14,7 +14,7 @@ export { WokuClient } from './client';
 export type { WokuClientConfig } from './client';
 
 export { OfflineQueue } from './queue';
-export type { OfflineQueueOptions, FlushResult } from './queue';
+export type { OfflineQueueOptions, FlushResult, FailedCapture } from './queue';
 
 export { InMemoryStorage, fetchHttpClient, noopLogger } from './adapters';
 export type {
@@ -35,6 +35,9 @@ export {
 
 export type {
   CaptureKind,
+  CaptureLanguage,
+  CsatCaptureInput,
+  CesCaptureInput,
   AudioAttachment,
   Respondent,
   WokuCaptureInput,

@@ -9,12 +9,16 @@
 export interface WidgetAppConfig {
   companyId: string;
   publishableKey: string;
+  email?: string;
+  phone?: string;
+  dispatchToken?: string;
   captureType: 'woku' | 'nps';
   wokuId?: string;
   npsToolId?: string;
   apiBaseUrl: string;
   lang?: string;
   branding: boolean;
+  behavior?: 'modal' | 'fullscreen' | 'banner' | 'side-tab';
   theme?: {
     primaryColor?: string;
     fontFamily?: string;
@@ -30,7 +34,8 @@ export function parseUrlConfig(): Partial<WidgetAppConfig> {
 
   return {
     companyId: params.get('companyId') ?? undefined,
-    captureType: (params.get('captureType') as 'woku' | 'nps' | null) ?? undefined,
+    captureType:
+      (params.get('captureType') as 'woku' | 'nps' | null) ?? undefined,
     wokuId: params.get('wokuId') ?? undefined,
     npsToolId: params.get('npsToolId') ?? undefined,
     lang: params.get('lang') ?? undefined,
@@ -49,6 +54,10 @@ export function mergeConfig(
   return {
     companyId: merged.companyId ?? '',
     publishableKey: merged.publishableKey ?? '',
+    behavior: merged.behavior,
+    email: merged.email,
+    phone: merged.phone,
+    dispatchToken: merged.dispatchToken,
     captureType: merged.captureType ?? 'woku',
     wokuId: merged.wokuId,
     npsToolId: merged.npsToolId,

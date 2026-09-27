@@ -22,7 +22,7 @@ interface FeedbackProps {
   messages: Messages;
 }
 
-const EMAIL_REGEX = /^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export const Feedback = ({ messages }: FeedbackProps) => {
   const {
@@ -37,6 +37,7 @@ export const Feedback = ({ messages }: FeedbackProps) => {
     setAnonymous,
     isInitialEmail,
     wokuData,
+    npsId: existingNpsId,
     setNpsId,
     setStep,
   } = useWidgetContext();
@@ -44,9 +45,13 @@ export const Feedback = ({ messages }: FeedbackProps) => {
   const [showAudioRecorder, setShowAudioRecorder] = useState(false);
   const [showMicTooltip, setShowMicTooltip] = useState(false);
   const [showEmailTooltip, setShowEmailTooltip] = useState(false);
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
+    null,
+  );
   const [recording, setRecording] = useState(false);
-  const [feedbackAudio, setFeedbackAudio] = useState<Blob | undefined>(undefined);
+  const [feedbackAudio, setFeedbackAudio] = useState<Blob | undefined>(
+    undefined,
+  );
   const [isSending, setIsSending] = useState(false);
   const [visible, setVisible] = useState(false);
 
@@ -95,6 +100,13 @@ export const Feedback = ({ messages }: FeedbackProps) => {
   };
 
   const handleSubmit = async () => {
+    if (isSendingRef.current) return;
+    const requiresIdentity =
+      Boolean(config.dispatchToken) || Boolean(wokuData?.anonymousDisabled);
+    if (requiresIdentity && !email && !config.phone) {
+      setShowEmailTooltip(true);
+      return;
+    }
     if (!emailIsValid && !anonymous) {
       setShowEmailTooltip(true);
       setTimeout(() => setShowEmailTooltip(false), 5000);
@@ -103,6 +115,7 @@ export const Feedback = ({ messages }: FeedbackProps) => {
 
     if (!textnote && !feedbackAudio) return;
 
+    isSendingRef.current = true;
     setIsSending(true);
 
     try {
@@ -123,6 +136,7 @@ export const Feedback = ({ messages }: FeedbackProps) => {
     } catch (err) {
       console.error('[WokuWidget] Submit error:', err);
     } finally {
+      isSendingRef.current = false;
       setIsSending(false);
     }
   };
@@ -138,7 +152,13 @@ export const Feedback = ({ messages }: FeedbackProps) => {
         wokuId,
         qualification: q,
         description: textnote,
-        ...(anonymous || !email ? { anonymous: true } : { clientEmail: email }),
+        ...(anonymous || (!email && !config.phone)
+          ? { anonymous: true }
+          : {
+              ...(email ? { clientEmail: email } : {}),
+              ...(config.phone ? { clientPhone: config.phone } : {}),
+            }),
+        dispatchToken: config.dispatchToken,
       });
     }
 
@@ -150,7 +170,13 @@ export const Feedback = ({ messages }: FeedbackProps) => {
         wokuId,
         qualification: q,
         file: feedbackAudio,
-        ...(anonymous || !email ? { anonymous: true } : { clientEmail: email }),
+        ...(anonymous || (!email && !config.phone)
+          ? { anonymous: true }
+          : {
+              ...(email ? { clientEmail: email } : {}),
+              ...(config.phone ? { clientPhone: config.phone } : {}),
+            }),
+        dispatchToken: config.dispatchToken,
       });
     }
   };
@@ -159,13 +185,23 @@ export const Feedback = ({ messages }: FeedbackProps) => {
     const score = npsScore ?? 0;
 
     // POST /v1/nps first to get the npsId
-    const { npsId } = await createNps({
-      apiBaseUrl: config.apiBaseUrl,
-      publishableKey: config.publishableKey,
-      score,
-      npsToolId: config.npsToolId,
-      ...(anonymous || !email ? { anonymous: true } : { clientEmail: email }),
-    });
+    const npsId =
+      existingNpsId ??
+      (
+        await createNps({
+          apiBaseUrl: config.apiBaseUrl,
+          publishableKey: config.publishableKey,
+          score,
+          npsToolId: config.npsToolId,
+          ...(anonymous || (!email && !config.phone)
+            ? { anonymous: true }
+            : {
+                ...(email ? { clientEmail: email } : {}),
+                ...(config.phone ? { clientPhone: config.phone } : {}),
+              }),
+          dispatchToken: config.dispatchToken,
+        })
+      ).npsId;
 
     setNpsId(npsId);
 
@@ -206,7 +242,7 @@ export const Feedback = ({ messages }: FeedbackProps) => {
 
       <div className="h-full w-full flex flex-col gap-1">
         {/* Email / identity row */}
-        {!isInitialEmail && (
+        {!isInitialEmail && !config.phone && (
           <div className="relative">
             <div className="flex items-center gap-2 text-xs py-1">
               <div className="flex items-center gap-1 flex-1 min-w-0">
@@ -219,13 +255,15 @@ export const Feedback = ({ messages }: FeedbackProps) => {
                     value={email ?? ''}
                     onChange={(e) => setEmail(e.target.value)}
                     className={`flex-1 min-w-0 bg-white rounded border px-1.5 py-0.5 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 placeholder:text-neutral-400 ${
-                      email && !emailIsValid ? 'border-red-500 text-red-500' : 'border-neutral-300'
+                      email && !emailIsValid
+                        ? 'border-red-500 text-red-500'
+                        : 'border-neutral-300'
                     }`}
                     placeholder={id.emailPlaceholder}
                   />
                 )}
               </div>
-              {!wokuData?.anonymousDisabled && (
+              {!wokuData?.anonymousDisabled && !config.dispatchToken && (
                 <div className="flex items-center gap-1 shrink-0">
                   <button
                     type="button"
@@ -233,12 +271,20 @@ export const Feedback = ({ messages }: FeedbackProps) => {
                     aria-checked={anonymous}
                     onClick={() => setAnonymous(!anonymous)}
                     className={`rounded-full w-7 h-4 flex items-center px-0.5 transition-colors ${
-                      anonymous ? 'bg-indigo-600 justify-end' : 'bg-neutral-300 justify-start'
+                      anonymous
+                        ? 'bg-indigo-600 justify-end'
+                        : 'bg-neutral-300 justify-start'
                     }`}
                   >
                     <div className="rounded-full h-3 w-3 bg-white shadow" />
                   </button>
-                  <span className={anonymous ? 'font-semibold text-xs' : 'text-xs text-neutral-500'}>
+                  <span
+                    className={
+                      anonymous
+                        ? 'font-semibold text-xs'
+                        : 'text-xs text-neutral-500'
+                    }
+                  >
                     {id.anonymous}
                   </span>
                 </div>
@@ -320,7 +366,9 @@ export const Feedback = ({ messages }: FeedbackProps) => {
               className="text-neutral-600 disabled:opacity-50 hover:text-indigo-700 transition-colors"
               aria-label={f.recordAudio}
             >
-              <Mic className={`h-7 w-7 ${recording ? 'text-indigo-700' : ''}`} />
+              <Mic
+                className={`h-7 w-7 ${recording ? 'text-indigo-700' : ''}`}
+              />
             </button>
             {showMicTooltip && (
               <div className="absolute -right-1 bottom-10 w-28 text-center text-xs">

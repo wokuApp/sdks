@@ -23,6 +23,7 @@ export {
   PermissionDeniedError,
   NotFoundError,
   ConflictError,
+  PayloadTooLargeError,
   UnprocessableEntityError,
   RateLimitError,
   InternalServerError,
@@ -31,3 +32,7 @@ export type { WokuErrorBody } from './core/errors';
 
 export * from './models';
 export type * from './types';
+
+export * from './resources/journeys';
+
+export * from './resources/media';

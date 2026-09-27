@@ -25,7 +25,7 @@ export class Reports {
   ): Promise<WokuRecord> {
     return this.client.request<WokuRecord>(
       'get',
-      `/v1/reports/nps-tool/${npsToolId}`,
+      `/v1/reports/nps-tool/${encodeURIComponent(npsToolId)}`,
       { ...opts, query: { ...params, ...opts?.query } },
     );
   }

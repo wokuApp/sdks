@@ -1,3 +1,4 @@
+import { Media } from './resources/media';
 import { WokuClient, type WokuClientOptions } from './core/client';
 import { Trackers } from './resources/trackers';
 import { CesTools, CsatTools, NpsTools } from './resources/voc-tools';
@@ -10,6 +11,7 @@ import { TicketDestinations, Tickets } from './resources/tickets';
 import { Dispatches } from './resources/dispatches';
 import { Reports } from './resources/reports';
 import { Company } from './resources/company';
+import { Journeys } from './resources/journeys';
 import { Quarantines } from './resources/quarantines';
 
 /**
@@ -27,6 +29,7 @@ export class Woku {
   /** The underlying transport (advanced use). */
   readonly client: WokuClient;
 
+  readonly media: Media;
   readonly trackers: Trackers;
   readonly npsTools: NpsTools;
   readonly csatTools: CsatTools;
@@ -44,6 +47,8 @@ export class Woku {
   readonly dispatches: Dispatches;
   readonly reports: Reports;
   readonly company: Company;
+  /** Customer journeys: moments, their tools and how each one starts. */
+  readonly journeys: Journeys;
   readonly quarantines: Quarantines;
 
   constructor(options?: WokuClientOptions | string) {
@@ -51,6 +56,7 @@ export class Woku {
       typeof options === 'string' ? { apiKey: options } : (options ?? {});
     this.client = new WokuClient(opts);
 
+    this.media = new Media(this.client);
     this.trackers = new Trackers(this.client);
     this.npsTools = new NpsTools(this.client);
     this.csatTools = new CsatTools(this.client);
@@ -68,6 +74,7 @@ export class Woku {
     this.dispatches = new Dispatches(this.client);
     this.reports = new Reports(this.client);
     this.company = new Company(this.client);
+    this.journeys = new Journeys(this.client);
     this.quarantines = new Quarantines(this.client);
   }
 }

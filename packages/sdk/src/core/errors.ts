@@ -8,7 +8,7 @@
 /** Parsed error body shape the API returns (NestJS exception filter). */
 export interface WokuErrorBody {
   statusCode?: number;
-  message?: string | string[];
+  message?: string | string[] | { message?: string | string[] };
   error?: string;
   code?: string;
   [key: string]: unknown;
@@ -18,6 +18,8 @@ export interface WokuErrorBody {
 export class WokuError extends Error {
   /** Stable, machine-readable code (e.g. `not_found`, `rate_limited`). */
   readonly code?: string;
+  /** Retry the same logical operation with this key after inspecting its outcome. */
+  idempotencyKey?: string;
 
   constructor(message: string, options?: { code?: string; cause?: unknown }) {
     super(message);
@@ -31,8 +33,8 @@ export class WokuError extends Error {
 
 /**
  * The request never got a usable HTTP response: DNS/TCP failure, TLS error,
- * timeout or an aborted signal. Safe to retry (the SDK already retries these
- * up to `maxRetries`).
+ * timeout or an aborted signal. The SDK retries only reads and explicitly
+ * protected writes, up to `maxRetries`. Inspect uncertain writes before replay.
  */
 export class WokuConnectionError extends WokuError {
   constructor(message: string, options?: { cause?: unknown; code?: string }) {
@@ -93,23 +95,95 @@ export class WokuAPIError extends WokuError {
     const ra = retryAfterSeconds;
     switch (true) {
       case status === 400:
-        return new BadRequestError(status, body, message, requestId, undefined, ra);
+        return new BadRequestError(
+          status,
+          body,
+          message,
+          requestId,
+          undefined,
+          ra,
+        );
       case status === 401:
-        return new AuthenticationError(status, body, message, requestId, undefined, ra);
+        return new AuthenticationError(
+          status,
+          body,
+          message,
+          requestId,
+          undefined,
+          ra,
+        );
       case status === 403:
-        return new PermissionDeniedError(status, body, message, requestId, undefined, ra);
+        return new PermissionDeniedError(
+          status,
+          body,
+          message,
+          requestId,
+          undefined,
+          ra,
+        );
       case status === 404:
-        return new NotFoundError(status, body, message, requestId, undefined, ra);
+        return new NotFoundError(
+          status,
+          body,
+          message,
+          requestId,
+          undefined,
+          ra,
+        );
       case status === 409:
-        return new ConflictError(status, body, message, requestId, undefined, ra);
+        return new ConflictError(
+          status,
+          body,
+          message,
+          requestId,
+          undefined,
+          ra,
+        );
+      case status === 413:
+        return new PayloadTooLargeError(
+          status,
+          body,
+          message,
+          requestId,
+          undefined,
+          ra,
+        );
       case status === 422:
-        return new UnprocessableEntityError(status, body, message, requestId, undefined, ra);
+        return new UnprocessableEntityError(
+          status,
+          body,
+          message,
+          requestId,
+          undefined,
+          ra,
+        );
       case status === 429:
-        return new RateLimitError(status, body, message, requestId, undefined, ra);
+        return new RateLimitError(
+          status,
+          body,
+          message,
+          requestId,
+          undefined,
+          ra,
+        );
       case status >= 500:
-        return new InternalServerError(status, body, message, requestId, undefined, ra);
+        return new InternalServerError(
+          status,
+          body,
+          message,
+          requestId,
+          undefined,
+          ra,
+        );
       default:
-        return new WokuAPIError(status, body, message, requestId, undefined, ra);
+        return new WokuAPIError(
+          status,
+          body,
+          message,
+          requestId,
+          undefined,
+          ra,
+        );
     }
   }
 }
@@ -154,7 +228,16 @@ export class ConflictError extends WokuAPIError {
   }
 }
 
-/** 422 — semantically invalid request. */
+/** 413: the media or request exceeds the API limit. */
+export class PayloadTooLargeError extends WokuAPIError {
+  constructor(...args: ConstructorParameters<typeof WokuAPIError>) {
+    super(...args);
+    this.name = 'PayloadTooLargeError';
+  }
+}
+
+/** 422: semantically invalid request. */
+
 export class UnprocessableEntityError extends WokuAPIError {
   constructor(...args: ConstructorParameters<typeof WokuAPIError>) {
     super(...args);
@@ -181,7 +264,11 @@ export class InternalServerError extends WokuAPIError {
 const retryAfterFromBody = (
   body: WokuErrorBody | string | undefined,
 ): number | undefined =>
-  body && typeof body === 'object' && typeof body.retryAfter === 'number'
+  body &&
+  typeof body === 'object' &&
+  typeof body.retryAfter === 'number' &&
+  Number.isFinite(body.retryAfter) &&
+  body.retryAfter >= 0
     ? body.retryAfter
     : undefined;
 
@@ -192,6 +279,7 @@ const codeForStatus = (status: number): string => {
     403: 'permission_denied',
     404: 'not_found',
     409: 'conflict',
+    413: 'payload_too_large',
     422: 'unprocessable_entity',
     429: 'rate_limited',
   };
@@ -207,7 +295,12 @@ const messageFrom = (
   if (typeof body === 'string' && body.trim()) {
     detail = body.trim();
   } else if (body && typeof body === 'object') {
-    const { message } = body;
+    const message =
+      body.message &&
+      typeof body.message === 'object' &&
+      !Array.isArray(body.message)
+        ? body.message.message
+        : body.message;
     if (Array.isArray(message)) detail = message.join(', ');
     else if (typeof message === 'string' && message) detail = message;
     else if (typeof body.error === 'string') detail = body.error;

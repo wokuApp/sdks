@@ -8,6 +8,8 @@ import {
 } from './errors';
 import type {
   CaptureSubmission,
+  CsatCaptureInput,
+  CesCaptureInput,
   NpsCaptureInput,
   SubmissionResult,
   WokuCaptureInput,
@@ -16,7 +18,7 @@ import type {
 export interface WokuSdkConfig extends WokuClientConfig {
   /** Storage adapter for the offline queue (MMKV/AsyncStorage in RN). */
   storage?: Storage;
-  /** Drop a queued submission after this many failed attempts. */
+  /** Retain a failed submission for inspection after this many flush attempts. */
   maxQueueAttempts?: number;
 }
 
@@ -60,15 +62,18 @@ export class WokuSdk {
   private readonly queue: OfflineQueue;
   private readonly logger: Logger;
   private readonly companyId: string;
+  private readonly language: 'es' | 'en';
 
   constructor(config: WokuSdkConfig) {
     this.client = new WokuClient(config);
     this.queue = new OfflineQueue({
       storage: config.storage,
+      companyId: config.companyId,
       maxAttempts: config.maxQueueAttempts,
     });
     this.logger = config.logger ?? noopLogger;
     this.companyId = config.companyId;
+    this.language = config.language ?? 'es';
   }
 
   /** Captures a Woku rating (1..5) with optional text/audio comment. */
@@ -84,6 +89,8 @@ export class WokuSdk {
       audio: input.audio,
       respondent: input.respondent,
       metadata: input.metadata,
+      dispatchToken: input.dispatchToken,
+      language: input.language ?? (input.audio ? this.language : undefined),
       createdAt: Date.now(),
     };
     return this.deliver(submission);
@@ -102,9 +109,42 @@ export class WokuSdk {
       audio: input.audio,
       respondent: input.respondent,
       metadata: input.metadata,
+      dispatchToken: input.dispatchToken,
+      language: input.language ?? (input.audio ? this.language : undefined),
       createdAt: Date.now(),
     };
     return this.deliver(submission);
+  }
+
+  async captureCsat(input: CsatCaptureInput): Promise<SubmissionResult> {
+    assertInt(input.score, 1, 5, 'score');
+    return this.deliver({
+      id: generateId(),
+      kind: 'csat',
+      companyId: this.companyId,
+      targetId: input.csatId,
+      score: input.score,
+      comment: input.comment,
+      respondent: input.respondent,
+      metadata: input.metadata,
+      dispatchToken: input.dispatchToken,
+      createdAt: Date.now(),
+    });
+  }
+  async captureCes(input: CesCaptureInput): Promise<SubmissionResult> {
+    assertInt(input.score, 1, 5, 'score');
+    return this.deliver({
+      id: generateId(),
+      kind: 'ces',
+      companyId: this.companyId,
+      targetId: input.cesId,
+      score: input.score,
+      comment: input.comment,
+      respondent: input.respondent,
+      metadata: input.metadata,
+      dispatchToken: input.dispatchToken,
+      createdAt: Date.now(),
+    });
   }
 
   /** Retries every queued submission. Safe to call on app foreground or
@@ -116,6 +156,11 @@ export class WokuSdk {
   /** Number of submissions waiting to be delivered. */
   pendingCount(): Promise<number> {
     return this.queue.size();
+  }
+
+  /** Inspect retained captures whose automatic attempt budget was exhausted. */
+  failedCaptures(): Promise<import('./queue').FailedCapture[]> {
+    return this.queue.failures();
   }
 
   /** Clears the offline queue (e.g. on user logout). */
@@ -130,9 +175,27 @@ export class WokuSdk {
   private async deliver(
     submission: CaptureSubmission,
   ): Promise<SubmissionResult> {
+    submission = JSON.parse(JSON.stringify(submission)) as CaptureSubmission;
+    await this.queue.enqueue(submission);
     try {
       const result = await this.client.send(submission);
-      if (result.status === 'sent') return result;
+      if (result.status === 'sent') {
+        try {
+          await this.queue.acknowledge(submission);
+        } catch {
+          // Delivery is confirmed. Keep its original id for a later deduplicated
+          // flush rather than making callers think they must submit again.
+          this.logger.warn(
+            'Capture accepted; local acknowledgement is pending',
+            { id: submission.id },
+          );
+        }
+        return result;
+      }
+      if (result.retryable === false) {
+        await this.queue.reject(submission, result.error ?? 'Capture rejected');
+        return result;
+      }
       // Server-rejected but transient enough to retry: queue it.
       await this.queue.enqueue(submission);
       return { ...result, status: 'queued' };

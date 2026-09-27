@@ -4,5850 +4,7576 @@
  */
 
 export interface paths {
-  '/v1/health': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * V1 namespace healthcheck
-     * @description Returns { ok: true } when the v1 namespace is reachable. Unauthenticated.
-     */
-    get: operations['V1Controller_health'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/external-trackers': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List external tracker definitions of the caller company */
-    get: operations['ExternalTrackersController_listCompanyTrackers'];
-    put?: never;
-    /**
-     * Create an external tracker definition in the company catalog
-     * @description The company and creator are resolved server-side from the caller key. Tracker names are unique per company.
-     */
-    post: operations['ExternalTrackersController_createTracker'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/external-trackers/wokus/{wokuId}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List tracker values assigned to a Woku */
-    get: operations['ExternalTrackersController_listWokuTrackers'];
-    put?: never;
-    /**
-     * Assign (upsert) a tracker value to a Woku by tracker name
-     * @description Idempotent: if (wokuId, trackerName) already has a value, it is overwritten. Resolves trackerId server-side.
-     */
-    post: operations['ExternalTrackersController_assignByName'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/external-trackers/wokus/{wokuId}/{trackerName}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    /** Remove a tracker value from a Woku by tracker name */
-    delete: operations['ExternalTrackersController_removeByName'];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/external-trackers/search': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Search Woku tracker assignments matching (name, value) within the company. Returns paginated WokuExternalTracker entries — caller can map .wokuId to fetch full Wokus. */
-    get: operations['ExternalTrackersController_search'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/external-trackers/search-entities': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Search VoC entities by tracker filters (AND, partial match)
-     * @description Returns the VoC entities (nps/csat/ces/form/flow) whose tracker assignments match ALL the given filters. Response carries entity ids and the matched (name, value) pairs; map the ids to fetch the entities. Woku is not searchable here; use GET /search for Woku.
-     */
-    post: operations['ExternalTrackersController_searchEntities'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/external-trackers/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get one tracker definition (including inactive) */
-    get: operations['ExternalTrackersController_getTracker'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    /** Update a tracker definition (name, system, description) */
-    patch: operations['ExternalTrackersController_updateTracker'];
-    trace?: never;
-  };
-  '/v1/external-trackers/{id}/activate': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    /** Re-activate a deactivated tracker definition */
-    patch: operations['ExternalTrackersController_activateTracker'];
-    trace?: never;
-  };
-  '/v1/external-trackers/{id}/deactivate': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    /** Deactivate a tracker definition (soft-delete). Existing values stay readable. */
-    patch: operations['ExternalTrackersController_deactivateTracker'];
-    trace?: never;
-  };
-  '/v1/external-trackers/{entityType}/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List tracker values assigned to a VoC entity (tool/form/flow) */
-    get: operations['ExternalTrackersController_listEntityTrackers'];
-    put?: never;
-    /**
-     * Assign (upsert) a tracker value to a VoC entity by tracker name
-     * @description Idempotent: if (entity, trackerName) already has a value, it is overwritten. Resolves trackerId server-side.
-     */
-    post: operations['ExternalTrackersController_assignEntityTrackerByName'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/external-trackers/{entityType}/{id}/{trackerName}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    /** Remove a tracker value from a VoC entity by tracker name */
-    delete: operations['ExternalTrackersController_removeEntityTrackerByName'];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/ticket-destinations': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List the ticket destinations of the caller company */
-    get: operations['V1TicketDestinationsController_list'];
-    put?: never;
-    /**
-     * Create a ticket destination
-     * @description kind: zendesk | salesforce | slack | custom | email. config/credentials are validated per kind. routingConditions support operator "equals" (a value) or "any" (the whole tracker).
-     */
-    post: operations['V1TicketDestinationsController_create'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/ticket-destinations/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get one ticket destination */
-    get: operations['V1TicketDestinationsController_get'];
-    put?: never;
-    post?: never;
-    /** Delete a ticket destination */
-    delete: operations['V1TicketDestinationsController_remove'];
-    options?: never;
-    head?: never;
-    /** Update a ticket destination */
-    patch: operations['V1TicketDestinationsController_update'];
-    trace?: never;
-  };
-  '/v1/ticket-destinations/{id}/test': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Send a real connectivity test to a saved destination
-     * @description Requires confirm:true. Makes one real outbound call: custom webhooks receive a test payload; zendesk/salesforce/slack run a read-only auth probe; email only validates config. Result is sanitized to { ok, status, message }.
-     */
-    post: operations['V1TicketDestinationsController_test'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/action-plan-groups': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List the action plan groups of the caller company */
-    get: operations['V1ActionPlanGroupsController_list'];
-    put?: never;
-    /** Create an action plan group */
-    post: operations['V1ActionPlanGroupsController_create'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/action-plan-groups/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get one action plan group */
-    get: operations['V1ActionPlanGroupsController_get'];
-    put?: never;
-    post?: never;
-    /** Delete an action plan group */
-    delete: operations['V1ActionPlanGroupsController_remove'];
-    options?: never;
-    head?: never;
-    /** Update an action plan group */
-    patch: operations['V1ActionPlanGroupsController_update'];
-    trace?: never;
-  };
-  '/v1/action-plan-groups/{id}/enabled': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    /** Enable or disable an action plan group */
-    patch: operations['V1ActionPlanGroupsController_setEnabled'];
-    trace?: never;
-  };
-  '/v1/action-plans': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List the action plans of the caller company */
-    get: operations['V1ActionPlansController_list'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/action-plans/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get one action plan */
-    get: operations['V1ActionPlansController_get'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/action-plans/{id}/events': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get the plan timeline (events, oldest first) */
-    get: operations['V1ActionPlansController_events'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/action-plans/{id}/conversation': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get the plan AI conversation
-     * @description Read-only. `busy` is true while the AI is composing a reply; `messages` is empty for a plan that has never been replied to.
-     */
-    get: operations['V1ActionPlansController_getConversation'];
-    put?: never;
-    /**
-     * Reply to the plan AI agent (paid AI turn, confirm required)
-     * @description Requires confirm:true. Returns an ack of the human message; the AI reply is composed asynchronously, so poll GET conversation until busy is false. Only a plan in draft accepts replies (409 otherwise).
-     */
-    post: operations['V1ActionPlansController_postReply'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/action-plans/{id}/send': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Send an approved plan to a destination
-     * @description provider: jira | monday | clickup | notion (external, needs target) or internal (managed inside woku, no target).
-     */
-    post: operations['V1ActionPlansController_send'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/action-plans/{id}/tasks': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Add a task (draft or managed plan) */
-    post: operations['V1ActionPlansController_createTask'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/action-plans/{id}/tasks/reorder': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    /** Reorder tasks (draft or managed plan) */
-    patch: operations['V1ActionPlansController_reorderTasks'];
-    trace?: never;
-  };
-  '/v1/action-plans/{id}/tasks/{taskId}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    /** Remove a task (draft or managed plan) */
-    delete: operations['V1ActionPlansController_deleteTask'];
-    options?: never;
-    head?: never;
-    /** Edit a task: text on a draft/managed plan, status & assignee on a managed plan */
-    patch: operations['V1ActionPlansController_updateTask'];
-    trace?: never;
-  };
-  '/v1/action-plans/{id}/approve': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Approve a draft plan */
-    post: operations['V1ActionPlansController_approve'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/action-plans/{id}/reopen': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Reopen an approved/delivery_error plan to draft */
-    post: operations['V1ActionPlansController_reopen'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/action-plans/{id}/cancel': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Cancel a plan */
-    post: operations['V1ActionPlansController_cancel'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/action-plans/{id}/complete': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Close a managed plan */
-    post: operations['V1ActionPlansController_complete'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/action-plans/{id}/resume': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Reopen a completed managed plan */
-    post: operations['V1ActionPlansController_resume'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/wokus': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List the wokus of the caller company (paginated) */
-    get: operations['V1WokusController_listWokus'];
-    put?: never;
-    /** Create a woku (v1 alias of POST /wokus/create-woku) */
-    post: operations['V1WokusController_createWoku'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/wokus/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get a woku with aggregated review stats */
-    get: operations['V1WokusController_getWoku'];
-    put?: never;
-    post?: never;
-    /** Delete a woku and all its reviews */
-    delete: operations['V1WokusController_deleteWoku'];
-    options?: never;
-    head?: never;
-    /** Update a woku definition (only if it has no reviews) */
-    patch: operations['V1WokusController_updateWoku'];
-    trace?: never;
-  };
-  '/v1/wokus/{id}/reviews': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * List the reviews of a woku (text and voice, paginated)
-     * @description Most recent first. Voice reviews expose the transcription; client contact data is never included, only clientId.
-     */
-    get: operations['V1WokusController_listWokuReviews'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/wokus/{id}/settings': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    /**
-     * Update the woku boolean settings (idempotent)
-     * @description Applies only the flags present in the body; a flag equal to the current state is a no-op.
-     */
-    patch: operations['V1WokusController_updateWokuSettings'];
-    trace?: never;
-  };
-  '/v1/wokus/{id}/move': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    /** Move a woku into a folder, or to the root (folderId: null) */
-    patch: operations['V1WokusController_moveWoku'];
-    trace?: never;
-  };
-  '/v1/wokus/form-data': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Create a woku with a file upload (v1 alias of POST /wokus/create-woku-form-data) */
-    post: operations['V1WokusController_createWokuFormData'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/wokus/{wokuId}/review': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get review data for a woku (v1 alias of GET /wokus/review/:wokuId) */
-    get: operations['V1WokusController_getWokuReview'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/wokus/{wokuId}/textnotes': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Create a text review for a woku (v1 alias of POST /wokus/create-textnote) */
-    post: operations['V1WokusController_createTextnote'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/wokus/{wokuId}/voicemails': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Create a voice review for a woku (v1 alias of POST /wokus/create-voicemail) */
-    post: operations['V1WokusController_createVoicemail'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/wokus/{wokuId}/share': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Share a woku review link via email (v1 alias of POST /wokus/share-woku-to-email) */
-    post: operations['V1WokusController_shareWokuToEmail'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/companies/me': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get the caller company (v1 alias of GET /companies)
-     * @description Returns the company resolved from the Bearer key along with its folders and wokus.
-     */
-    get: operations['V1CompaniesController_getCompanyData'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/companies/me/rotate-key': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Rotate the company API key
-     * @description Issues a new secret API key and immediately invalidates the current one. The new key is returned once and is not retrievable again.
-     */
-    post: operations['V1CompaniesController_rotateApiKey'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/companies/me/revoke-key': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Revoke the company API key
-     * @description Disables all API access by unsetting the secret key. A new key must be provisioned from the admin to restore access.
-     */
-    post: operations['V1CompaniesController_revokeApiKey'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/reports/company-nps': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get the company-wide NPS report
-     * @description Returns the aggregated NPS report for the company resolved from the Bearer key.
-     */
-    get: operations['V1ReportsController_getCompanyNps'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/reports/nps-tool/{npsToolId}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get the NPS report for a specific NPS tool
-     * @description Returns the NPS report for the given tool. Fails with 400 if the tool does not belong to the caller company.
-     */
-    get: operations['V1ReportsController_getNpsTool'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/nps-tool/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get an NPS tool definition (to build the survey question) */
-    get: operations['V1NpsController_getNpsTool'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/nps': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * List the NPS responses of the caller company
-     * @description Paginated, most recent first. Filter by tool, date range and whether the response carries feedback (textnote or voicemail). Responses never include client contact data, only clientId.
-     */
-    get: operations['V1NpsDataController_listNps'];
-    put?: never;
-    /** Capture an NPS score (company-level or tool-specific) */
-    post: operations['V1NpsController_createNps'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/nps/{id}/textnotes': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Add an optional text review to an NPS score */
-    post: operations['V1NpsController_addNpsTextnote'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/nps/{id}/voicemails': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Add an optional voice review to an NPS score */
-    post: operations['V1NpsController_addNpsVoicemail'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/csat-tool/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get a CSAT tool definition (to build the survey) */
-    get: operations['V1CsatController_getCsatTool'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/csat': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List the CSAT responses of the caller company */
-    get: operations['V1CsatDataController_listCsat'];
-    put?: never;
-    /** Capture a CSAT score (1-5, tool-specific) */
-    post: operations['V1CsatController_createCsat'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/csat/{id}/textnotes': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Add an optional text comment to a CSAT response */
-    post: operations['V1CsatController_addCsatTextnote'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/csat/{id}/voicemails': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Add an optional voice comment to a CSAT response */
-    post: operations['V1CsatController_addCsatVoicemail'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/ces-tool/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get a CES tool definition (to build the survey) */
-    get: operations['V1CesController_getCesTool'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/ces': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List the CES responses of the caller company */
-    get: operations['V1CesDataController_listCes'];
-    put?: never;
-    /** Capture a CES score (1-5, tool-specific) */
-    post: operations['V1CesController_createCes'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/ces/{id}/textnotes': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Add an optional text comment to a CES response */
-    post: operations['V1CesController_addCesTextnote'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/ces/{id}/voicemails': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Add an optional voice comment to a CES response */
-    post: operations['V1CesController_addCesVoicemail'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/captures': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Capture a woku review or NPS response from the mobile SDK */
-    post: operations['V1CapturesController_capture'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/quarantines/check': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Check whether a respondent is currently quarantined */
-    get: operations['V1QuarantinesController_check'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/nps/invitations': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Send the NPS survey by email or WhatsApp
-     * @description Dispatches the NPS survey (company-level, or tool-specific via npsToolId) to a list of recipients. Sends are asynchronous: the response reports per-recipient acceptance, including quarantine and WhatsApp credit rejections.
-     */
-    post: operations['V1InvitationsController_sendNpsInvitations'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/csat/invitations': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Send the CSAT survey by email or WhatsApp */
-    post: operations['V1InvitationsController_sendCsatInvitations'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/ces/invitations': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Send the CES survey by email or WhatsApp */
-    post: operations['V1InvitationsController_sendCesInvitations'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/forms/{id}/invitations': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Send a form by email or WhatsApp
-     * @description Dispatches the form invitation to a list of recipients. The form must belong to the caller company and be open and active.
-     */
-    post: operations['V1InvitationsController_sendFormInvitations'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/wokus/{id}/invitations': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Send a woku review invitation by email or WhatsApp
-     * @description Dispatches the woku review invitation to a list of recipients. The woku must belong to the caller company, be open and accept reviews. Equivalent to POST /v1/wokus/:wokuId/share for the email channel.
-     */
-    post: operations['V1InvitationsController_sendWokuInvitations'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/forms': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List the forms of the caller company (paginated) */
-    get: operations['V1FormsController_listForms'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/forms/{id}/responses': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * List the responses of a form (paginated)
-     * @description Most recent first. Responses expose answers keyed by field id; client contact data is never included, only clientId.
-     */
-    get: operations['V1FormsController_listFormResponses'];
-    put?: never;
-    /**
-     * Submit a form response
-     * @description Records a response for the form. Answers are validated against the form definition before being stored; quarantined respondents are rejected with 429.
-     */
-    post: operations['V1FormsController_createFormResponse'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/forms/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get a form definition (to render the form)
-     * @description Returns the active form (fields, settings, localized content) plus company branding. Inactive forms return 404.
-     */
-    get: operations['V1FormsController_getForm'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/flows': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List the flows of the caller company (paginated) */
-    get: operations['V1FlowsController_listFlows'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/flows/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get the data of a flow (wokus in order, branding, linked NPS) */
-    get: operations['V1FlowsController_getFlow'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/nps-tools': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * List the NPS tools of the caller company
-     * @description Canonical plural form; GET /v1/nps-tool/:id remains as the single-tool fetch.
-     */
-    get: operations['V1NpsDataController_listNpsTools'];
-    put?: never;
-    /** Create an NPS tool definition */
-    post: operations['V1NpsToolsController_createNpsTool'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/nps/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get a single NPS response */
-    get: operations['V1NpsDataController_getNps'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/csat-tools': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List the CSAT tools of the caller company */
-    get: operations['V1CsatDataController_listCsatTools'];
-    put?: never;
-    /** Create a CSAT tool definition */
-    post: operations['V1CsatToolsController_createCsatTool'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/csat/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get a single CSAT response */
-    get: operations['V1CsatDataController_getCsat'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/ces-tools': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List the CES tools of the caller company */
-    get: operations['V1CesDataController_listCesTools'];
-    put?: never;
-    /** Create a CES tool definition */
-    post: operations['V1CesToolsController_createCesTool'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/ces/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get a single CES response */
-    get: operations['V1CesDataController_getCes'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/nps-tools/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    /** Delete an NPS tool definition and all its responses */
-    delete: operations['V1NpsToolsController_deleteNpsTool'];
-    options?: never;
-    head?: never;
-    /** Update an NPS tool definition (only if it has no responses) */
-    patch: operations['V1NpsToolsController_updateNpsTool'];
-    trace?: never;
-  };
-  '/v1/csat-tools/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    /** Delete a CSAT tool definition and all its responses */
-    delete: operations['V1CsatToolsController_deleteCsatTool'];
-    options?: never;
-    head?: never;
-    /** Update a CSAT tool definition (only if it has no responses) */
-    patch: operations['V1CsatToolsController_updateCsatTool'];
-    trace?: never;
-  };
-  '/v1/ces-tools/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    /** Delete a CES tool definition and all its responses */
-    delete: operations['V1CesToolsController_deleteCesTool'];
-    options?: never;
-    head?: never;
-    /** Update a CES tool definition (only if it has no responses) */
-    patch: operations['V1CesToolsController_updateCesTool'];
-    trace?: never;
-  };
-  '/v1/tickets': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List the support tickets of the caller company */
-    get: operations['V1TicketsController_listTickets'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/tickets/stats': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Ticket counts by tool and by SAC destination
-     * @description byTool has every tool key (defaulting to 0). byDestination counts Wokus, NPS, CSAT and CES routed to a destination (forms excluded).
-     */
-    get: operations['V1TicketsController_getStats'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/tickets/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get one support ticket */
-    get: operations['V1TicketsController_getTicket'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    /** Update a ticket (title, severity, AI summary or category) */
-    patch: operations['V1TicketsController_updateTicket'];
-    trace?: never;
-  };
-  '/v1/dispatches': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * List the invitation dispatches of the caller company
-     * @description Delivery status per send. Recipient PII is never included; use the targets to correlate a dispatch to a tool/woku/form.
-     */
-    get: operations['V1DispatchesController_list'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/v1/dispatches/stats': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Response-rate metrics over the invitation dispatches
-     * @description responseRate = (responded + partially_responded) / total, or null when there are no dispatches in scope.
-     */
-    get: operations['V1DispatchesController_stats'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
+    "/v1/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * V1 namespace healthcheck
+         * @description Returns { ok: true } when the v1 namespace is reachable. Unauthenticated.
+         */
+        get: operations["V1Controller_health"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/external-trackers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List external tracker definitions of the caller company */
+        get: operations["ExternalTrackersController_listCompanyTrackers"];
+        put?: never;
+        /**
+         * Create an external tracker definition in the company catalog
+         * @description The company and creator are resolved server-side from the caller key. Tracker names are unique per company.
+         */
+        post: operations["ExternalTrackersController_createTracker"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/external-trackers/wokus/{wokuId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List tracker values assigned to a Woku */
+        get: operations["ExternalTrackersController_listWokuTrackers"];
+        put?: never;
+        /**
+         * Assign (upsert) a tracker value to a Woku by tracker name
+         * @description Idempotent: if (wokuId, trackerName) already has a value, it is overwritten. Resolves trackerId server-side.
+         */
+        post: operations["ExternalTrackersController_assignByName"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/external-trackers/wokus/{wokuId}/{trackerName}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove a tracker value from a Woku by tracker name */
+        delete: operations["ExternalTrackersController_removeByName"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/external-trackers/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Search Woku tracker assignments matching (name, value) within the company. Returns paginated WokuExternalTracker entries — caller can map .wokuId to fetch full Wokus. */
+        get: operations["ExternalTrackersController_search"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/external-trackers/search-entities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Search VoC entities by tracker filters (AND, partial match)
+         * @description Returns the VoC entities (nps/csat/ces/form/flow) whose tracker assignments match ALL the given filters. Response carries entity ids and the matched (name, value) pairs; map the ids to fetch the entities. Woku is not searchable here; use GET /search for Woku.
+         */
+        post: operations["ExternalTrackersController_searchEntities"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/external-trackers/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get one tracker definition (including inactive) */
+        get: operations["ExternalTrackersController_getTracker"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update a tracker definition (name, system, description) */
+        patch: operations["ExternalTrackersController_updateTracker"];
+        trace?: never;
+    };
+    "/v1/external-trackers/{id}/activate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Re-activate a deactivated tracker definition */
+        patch: operations["ExternalTrackersController_activateTracker"];
+        trace?: never;
+    };
+    "/v1/external-trackers/{id}/deactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Deactivate a tracker definition (soft-delete). Existing values stay readable. */
+        patch: operations["ExternalTrackersController_deactivateTracker"];
+        trace?: never;
+    };
+    "/v1/external-trackers/{entityType}/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List tracker values assigned to a VoC entity (tool/form/flow) */
+        get: operations["ExternalTrackersController_listEntityTrackers"];
+        put?: never;
+        /**
+         * Assign (upsert) a tracker value to a VoC entity by tracker name
+         * @description Idempotent: if (entity, trackerName) already has a value, it is overwritten. Resolves trackerId server-side.
+         */
+        post: operations["ExternalTrackersController_assignEntityTrackerByName"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/external-trackers/{entityType}/{id}/{trackerName}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove a tracker value from a VoC entity by tracker name */
+        delete: operations["ExternalTrackersController_removeEntityTrackerByName"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/ticket-destinations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List the ticket destinations of the caller company */
+        get: operations["V1TicketDestinationsController_list"];
+        put?: never;
+        /**
+         * Create a ticket destination
+         * @description kind: zendesk | custom | email. config/credentials are validated per kind. routingConditions support operator "equals" (a value) or "any" (the whole tracker).
+         */
+        post: operations["V1TicketDestinationsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/ticket-destinations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get one ticket destination */
+        get: operations["V1TicketDestinationsController_get"];
+        put?: never;
+        post?: never;
+        /** Delete a ticket destination */
+        delete: operations["V1TicketDestinationsController_remove"];
+        options?: never;
+        head?: never;
+        /** Update a ticket destination */
+        patch: operations["V1TicketDestinationsController_update"];
+        trace?: never;
+    };
+    "/v1/ticket-destinations/{id}/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send a real connectivity test to a saved destination
+         * @description Requires confirm:true. Makes one real outbound call: custom webhooks receive a test payload; zendesk runs a read-only auth probe; email only validates config. Result is sanitized to { ok, status, message }.
+         */
+        post: operations["V1TicketDestinationsController_test"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/action-plan-groups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List the action plan groups of the caller company */
+        get: operations["V1ActionPlanGroupsController_list"];
+        put?: never;
+        /** Create an action plan group */
+        post: operations["V1ActionPlanGroupsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/action-plan-groups/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get one action plan group */
+        get: operations["V1ActionPlanGroupsController_get"];
+        put?: never;
+        post?: never;
+        /** Delete an action plan group */
+        delete: operations["V1ActionPlanGroupsController_remove"];
+        options?: never;
+        head?: never;
+        /** Update an action plan group */
+        patch: operations["V1ActionPlanGroupsController_update"];
+        trace?: never;
+    };
+    "/v1/action-plan-groups/{id}/enabled": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Enable or disable an action plan group */
+        patch: operations["V1ActionPlanGroupsController_setEnabled"];
+        trace?: never;
+    };
+    "/v1/action-plans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List the action plans of the caller company */
+        get: operations["V1ActionPlansController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/action-plans/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get one action plan */
+        get: operations["V1ActionPlansController_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/action-plans/{id}/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the plan timeline (events, oldest first) */
+        get: operations["V1ActionPlansController_events"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/action-plans/{id}/conversation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the plan AI conversation
+         * @description Read-only. `busy` is true while the AI is composing a reply; `messages` is empty for a plan that has never been replied to.
+         */
+        get: operations["V1ActionPlansController_getConversation"];
+        put?: never;
+        /**
+         * Reply to the plan AI agent (paid AI turn, confirm required)
+         * @description Requires confirm:true. Returns an ack of the human message; the AI reply is composed asynchronously, so poll GET conversation until busy is false. Only a plan in draft accepts replies (409 otherwise).
+         */
+        post: operations["V1ActionPlansController_postReply"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/action-plans/{id}/send": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Manage an approved plan inside woku
+         * @description provider: internal (manage the plan inside woku). External destinations are not available on the public API.
+         */
+        post: operations["V1ActionPlansController_send"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/action-plans/{id}/tasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add a task (draft or managed plan) */
+        post: operations["V1ActionPlansController_createTask"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/action-plans/{id}/tasks/reorder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Reorder tasks (draft or managed plan) */
+        patch: operations["V1ActionPlansController_reorderTasks"];
+        trace?: never;
+    };
+    "/v1/action-plans/{id}/tasks/{taskId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove a task (draft or managed plan) */
+        delete: operations["V1ActionPlansController_deleteTask"];
+        options?: never;
+        head?: never;
+        /** Edit a task: text on a draft/managed plan, status & assignee on a managed plan */
+        patch: operations["V1ActionPlansController_updateTask"];
+        trace?: never;
+    };
+    "/v1/action-plans/{id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Approve a draft plan */
+        post: operations["V1ActionPlansController_approve"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/action-plans/{id}/reopen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reopen an approved/delivery_error plan to draft */
+        post: operations["V1ActionPlansController_reopen"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/action-plans/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel a plan */
+        post: operations["V1ActionPlansController_cancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/action-plans/{id}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Close a managed plan */
+        post: operations["V1ActionPlansController_complete"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/action-plans/{id}/resume": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reopen a completed managed plan */
+        post: operations["V1ActionPlansController_resume"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/wokus": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List the wokus of the caller company (paginated) */
+        get: operations["V1WokusController_listWokus"];
+        put?: never;
+        /** Create a woku (v1 alias of POST /wokus/create-woku) */
+        post: operations["V1WokusController_createWoku"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/wokus/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a woku with aggregated review stats */
+        get: operations["V1WokusController_getWoku"];
+        put?: never;
+        post?: never;
+        /** Delete a woku and all its reviews */
+        delete: operations["V1WokusController_deleteWoku"];
+        options?: never;
+        head?: never;
+        /** Update a woku definition (only if it has no reviews) */
+        patch: operations["V1WokusController_updateWoku"];
+        trace?: never;
+    };
+    "/v1/wokus/{id}/reviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the reviews of a woku (text and voice, paginated)
+         * @description Most recent first. Voice reviews expose the transcription; client contact data is never included, only clientId.
+         */
+        get: operations["V1WokusController_listWokuReviews"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/wokus/{id}/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update the woku boolean settings (idempotent)
+         * @description Applies only the flags present in the body; a flag equal to the current state is a no-op.
+         */
+        patch: operations["V1WokusController_updateWokuSettings"];
+        trace?: never;
+    };
+    "/v1/wokus/{id}/move": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Move a woku into a folder, or to the root (folderId: null) */
+        patch: operations["V1WokusController_moveWoku"];
+        trace?: never;
+    };
+    "/v1/wokus/form-data": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create a woku with a file upload (v1 alias of POST /wokus/create-woku-form-data) */
+        post: operations["V1WokusController_createWokuFormData"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/wokus/{wokuId}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get review data for a woku (v1 alias of GET /wokus/review/:wokuId) */
+        get: operations["V1WokusController_getWokuReview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/wokus/{wokuId}/textnotes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create a text review for a woku (v1 alias of POST /wokus/create-textnote) */
+        post: operations["V1WokusController_createTextnote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/wokus/{wokuId}/voicemails": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create a voice review for a woku (v1 alias of POST /wokus/create-voicemail) */
+        post: operations["V1WokusController_createVoicemail"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/wokus/{wokuId}/share": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Share a woku review link via email (v1 alias of POST /wokus/share-woku-to-email) */
+        post: operations["V1WokusController_shareWokuToEmail"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/woku-media": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Upload a Woku image or MP4 video
+         * @description Send one local file with a company secret key. Images up to 10 MB are optimized to WebP; MP4 videos can be up to 25 MB. Returns a Woku fileId for standalone Wokus or journey moments.
+         */
+        post: operations["V1WokuMediaController_upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/companies/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the caller company (v1 alias of GET /companies)
+         * @description Returns the company resolved from the Bearer key along with its folders and wokus.
+         */
+        get: operations["V1CompaniesController_getCompanyData"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/companies/me/rotate-key": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Rotate the company API key
+         * @description Issues a new secret API key and immediately invalidates the current one. The new key is returned once and is not retrievable again.
+         */
+        post: operations["V1CompaniesController_rotateApiKey"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/companies/me/revoke-key": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Revoke the company API key
+         * @description Disables all API access by unsetting the secret key. A new key must be provisioned from the admin to restore access.
+         */
+        post: operations["V1CompaniesController_revokeApiKey"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/reports/company-nps": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the company-wide NPS report
+         * @description Returns the aggregated NPS report for the company resolved from the Bearer key.
+         */
+        get: operations["V1ReportsController_getCompanyNps"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/reports/nps-tool/{npsToolId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the NPS report for a specific NPS tool
+         * @description Returns the NPS report for the given tool. Fails with 400 if the tool does not belong to the caller company.
+         */
+        get: operations["V1ReportsController_getNpsTool"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/nps-tool/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get an NPS tool definition (to build the survey question) */
+        get: operations["V1NpsController_getNpsTool"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/nps": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the NPS responses of the caller company
+         * @description Paginated, most recent first. Filter by tool, date range and whether the response carries feedback (textnote or voicemail). Responses never include client contact data, only clientId.
+         */
+        get: operations["V1NpsDataController_listNps"];
+        put?: never;
+        /** Capture an NPS score (company-level or tool-specific) */
+        post: operations["V1NpsController_createNps"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/nps/{id}/textnotes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add an optional text review to an NPS score */
+        post: operations["V1NpsController_addNpsTextnote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/nps/{id}/voicemails": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add an optional voice review to an NPS score */
+        post: operations["V1NpsController_addNpsVoicemail"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/csat-tool/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a CSAT tool definition (to build the survey) */
+        get: operations["V1CsatController_getCsatTool"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/csat": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List the CSAT responses of the caller company */
+        get: operations["V1CsatDataController_listCsat"];
+        put?: never;
+        /** Capture a CSAT score (1-5, tool-specific) */
+        post: operations["V1CsatController_createCsat"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/csat/{id}/textnotes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add an optional text comment to a CSAT response */
+        post: operations["V1CsatController_addCsatTextnote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/csat/{id}/voicemails": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add an optional voice comment to a CSAT response */
+        post: operations["V1CsatController_addCsatVoicemail"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/ces-tool/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a CES tool definition (to build the survey) */
+        get: operations["V1CesController_getCesTool"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/ces": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List the CES responses of the caller company */
+        get: operations["V1CesDataController_listCes"];
+        put?: never;
+        /** Capture a CES score (1-5, tool-specific) */
+        post: operations["V1CesController_createCes"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/ces/{id}/textnotes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add an optional text comment to a CES response */
+        post: operations["V1CesController_addCesTextnote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/ces/{id}/voicemails": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add an optional voice comment to a CES response */
+        post: operations["V1CesController_addCesVoicemail"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/captures": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Capture a woku review or NPS response from the mobile SDK */
+        post: operations["V1CapturesController_capture"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/quarantines/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Check whether a respondent is currently quarantined */
+        get: operations["V1QuarantinesController_check"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/nps/invitations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send the NPS survey by email or WhatsApp
+         * @description Dispatches the NPS survey (company-level, or tool-specific via npsToolId) to a list of recipients. Sends are asynchronous: the response reports per-recipient acceptance, including quarantine and WhatsApp credit rejections.
+         */
+        post: operations["V1InvitationsController_sendNpsInvitations"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/csat/invitations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Send the CSAT survey by email or WhatsApp */
+        post: operations["V1InvitationsController_sendCsatInvitations"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/ces/invitations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Send the CES survey by email or WhatsApp */
+        post: operations["V1InvitationsController_sendCesInvitations"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/forms/{id}/invitations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send a form by email or WhatsApp
+         * @description Dispatches the form invitation to a list of recipients. The form must belong to the caller company and be open and active.
+         */
+        post: operations["V1InvitationsController_sendFormInvitations"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/wokus/{id}/invitations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send a woku review invitation by email or WhatsApp
+         * @description Dispatches the woku review invitation to a list of recipients. The woku must belong to the caller company, be open and accept reviews. Equivalent to POST /v1/wokus/:wokuId/share for the email channel.
+         */
+        post: operations["V1InvitationsController_sendWokuInvitations"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/forms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List the forms of the caller company (paginated) */
+        get: operations["V1FormsController_listForms"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/forms/{id}/responses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the responses of a form (paginated)
+         * @description Most recent first. Responses expose answers keyed by field id; client contact data is never included, only clientId.
+         */
+        get: operations["V1FormsController_listFormResponses"];
+        put?: never;
+        /**
+         * Submit a form response
+         * @description Records a response for the form. Answers are validated against the form definition before being stored; quarantined respondents are rejected with 429.
+         */
+        post: operations["V1FormsController_createFormResponse"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/forms/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a form definition (to render the form)
+         * @description Returns the active form (fields, settings, localized content) plus company branding. Inactive forms return 404.
+         */
+        get: operations["V1FormsController_getForm"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/flows": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List the flows of the caller company (paginated) */
+        get: operations["V1FlowsController_listFlows"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/flows/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the data of a flow (wokus in order, branding, linked NPS) */
+        get: operations["V1FlowsController_getFlow"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/nps-tools": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the NPS tools of the caller company
+         * @description Canonical plural form; GET /v1/nps-tool/:id remains as the single-tool fetch.
+         */
+        get: operations["V1NpsDataController_listNpsTools"];
+        put?: never;
+        /** Create an NPS tool definition */
+        post: operations["V1NpsToolsController_createNpsTool"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/nps/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a single NPS response */
+        get: operations["V1NpsDataController_getNps"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/csat-tools": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List the CSAT tools of the caller company */
+        get: operations["V1CsatDataController_listCsatTools"];
+        put?: never;
+        /** Create a CSAT tool definition */
+        post: operations["V1CsatToolsController_createCsatTool"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/csat/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a single CSAT response */
+        get: operations["V1CsatDataController_getCsat"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/ces-tools": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List the CES tools of the caller company */
+        get: operations["V1CesDataController_listCesTools"];
+        put?: never;
+        /** Create a CES tool definition */
+        post: operations["V1CesToolsController_createCesTool"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/ces/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a single CES response */
+        get: operations["V1CesDataController_getCes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/nps-tools/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete an NPS tool definition and all its responses */
+        delete: operations["V1NpsToolsController_deleteNpsTool"];
+        options?: never;
+        head?: never;
+        /** Update an NPS tool definition (only if it has no responses) */
+        patch: operations["V1NpsToolsController_updateNpsTool"];
+        trace?: never;
+    };
+    "/v1/csat-tools/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete a CSAT tool definition and all its responses */
+        delete: operations["V1CsatToolsController_deleteCsatTool"];
+        options?: never;
+        head?: never;
+        /** Update a CSAT tool definition (only if it has no responses) */
+        patch: operations["V1CsatToolsController_updateCsatTool"];
+        trace?: never;
+    };
+    "/v1/ces-tools/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete a CES tool definition and all its responses */
+        delete: operations["V1CesToolsController_deleteCesTool"];
+        options?: never;
+        head?: never;
+        /** Update a CES tool definition (only if it has no responses) */
+        patch: operations["V1CesToolsController_updateCesTool"];
+        trace?: never;
+    };
+    "/v1/tickets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List the support tickets of the caller company */
+        get: operations["V1TicketsController_listTickets"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/tickets/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Ticket counts by tool and by SAC destination
+         * @description byTool has every tool key (defaulting to 0). byDestination counts Wokus, NPS, CSAT and CES routed to a destination (forms excluded).
+         */
+        get: operations["V1TicketsController_getStats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/tickets/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get one support ticket */
+        get: operations["V1TicketsController_getTicket"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update a ticket (title, severity, AI summary or category) */
+        patch: operations["V1TicketsController_updateTicket"];
+        trace?: never;
+    };
+    "/v1/dispatches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the invitation dispatches of the caller company
+         * @description Delivery status per send. Recipient PII is never included; use the targets to correlate a dispatch to a tool/woku/form.
+         */
+        get: operations["V1DispatchesController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/dispatches/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Response-rate metrics over the invitation dispatches
+         * @description responseRate = (responded + partially_responded) / total, or null when there are no dispatches in scope.
+         */
+        get: operations["V1DispatchesController_stats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/journeys/{id}/enrollments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List evaluations of one journey, newest first */
+        get: operations["V1JourneysController_listParticipations"];
+        put?: never;
+        /**
+         * Enroll a subject in this journey
+         * @description Starts an operator-led v2 participation without requiring its first answer. A v2 contact can have one unfinished participation per journey. The same subjectKey can start a new cycle after completion or stopping finishes; each cycle has a distinct enrollment id. Legacy definitions retain their enrollment behavior.
+         */
+        post: operations["V1JourneysController_enroll"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/journeys/{id}/enrollments/{enrollmentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read one customer evaluation and its moment history */
+        get: operations["V1JourneysController_getParticipation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/journeys/{id}/enrollments/{enrollmentId}/stop": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Stop this evaluation, retaining answers, tickets, plans and other participations */
+        post: operations["V1JourneysController_stopParticipation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/journeys/{id}/connections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read per-moment credential readiness without exposing secrets */
+        get: operations["V1JourneysController_connections"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/journeys/{id}/moments/{stageKey}/url-token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Generate a moment URL, replacing its previous URL credential */
+        post: operations["V1JourneysController_mintMomentUrl"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/journeys/{id}/moments/{stageKey}/sender-secret": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Store the sender signing secret encrypted for one moment */
+        post: operations["V1JourneysController_setSenderSecret"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/journeys/{id}/moments/{stageKey}/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Test payload mapping without creating or sending an evaluation
+         * @description Uses the saved moment. Does not verify sender signatures or change enrollments.
+         */
+        post: operations["V1JourneysController_previewMoment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/journeys": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List your journeys */
+        get: operations["V1JourneysController_list"];
+        put?: never;
+        /**
+         * Create a journey
+         * @description The response carries `webhookSecret` once and only here: it is what signs legacy woku_signature calls. V2 url_token and sender_hmac credentials are configured separately per moment. Store the secret securely.
+         */
+        post: operations["V1JourneysController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/journeys/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read one journey with its moments */
+        get: operations["V1JourneysController_get"];
+        put?: never;
+        post?: never;
+        /** Delete a journey */
+        delete: operations["V1JourneysController_remove"];
+        options?: never;
+        head?: never;
+        /**
+         * Rename a journey, switch it on or off, or replace its moments
+         * @description Replacing the moments mints a new version. The enrollments already running keep executing the version they started with.
+         */
+        patch: operations["V1JourneysController_update"];
+        trace?: never;
+    };
+    "/v1/journeys/{id}/webhook-secret": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Rotate the legacy journey-wide woku_signature secret
+         * @description The previous secret keeps being accepted until the next rotation, so your senders can be updated without a gap.
+         */
+        post: operations["V1JourneysController_rotateSecret"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/journey-events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Emit one of your own events
+         * @description Eligible journeys whose moments listen for that name react. Operator-led v2 journeys require an open enrollment for that subject. Names starting with `journey.` are reserved.
+         */
+        post: operations["V1JourneyEventsController_emit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/journey-entries/{journeyId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read the public evaluation entry for a journey
+         * @description Public customer endpoint; reading it does not start an evaluation.
+         */
+        get: operations["CustomJourneyEntryController_info"];
+        put?: never;
+        /**
+         * Prepare the first evaluation tool for a customer
+         * @description Public customer endpoint. Returns the tool and an opaque response token; does not start the journey or send invitations.
+         */
+        post: operations["CustomJourneyEntryController_prepare"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-  schemas: {
-    ValidationErrorResponseDto: {
-      /**
-       * @description HTTP status code
-       * @example 400
-       */
-      statusCode: number;
-      /**
-       * @description Array of validation error messages
-       * @example [
-       *       "email must be a valid email",
-       *       "password must be at least 8 characters"
-       *     ]
-       */
-      message: string[];
-      /**
-       * @description Error type
-       * @example Bad Request
-       */
-      error: string;
+    schemas: {
+        ValidationErrorResponseDto: {
+            /**
+             * @description HTTP status code
+             * @example 400
+             */
+            statusCode: number;
+            /**
+             * @description Array of validation error messages
+             * @example [
+             *       "email must be a valid email",
+             *       "password must be at least 8 characters"
+             *     ]
+             */
+            message: string[];
+            /**
+             * @description Error type
+             * @example Bad Request
+             */
+            error: string;
+        };
+        CreateWokuApiDto: {
+            /** @description The subject evaluated by this Woku */
+            description: string;
+            /** @description Public image or MP4 URL */
+            fileUrl: string;
+            folderSecondaryKey?: string;
+            parentFolderSecondaryKey?: string;
+            /** Format: email */
+            clientEmail?: string;
+            clientPhone?: number;
+        };
+        CreateWokuFormDataApiDto: {
+            /** @description The subject evaluated by this Woku */
+            description: string;
+            folderSecondaryKey?: string;
+            parentFolderSecondaryKey?: string;
+            /** Format: email */
+            clientEmail?: string;
+            clientPhone?: string;
+        };
+        CreateExternalTrackerDefinitionDTO: {
+            /**
+             * @description Tracker name. Identifies the tracker within the company catalog. Unique per company.
+             * @example trr
+             */
+            name: string;
+            /**
+             * @description External system this tracker maps to.
+             * @example crm interno
+             */
+            system: string;
+            /**
+             * @description Human-readable description of the tracker.
+             * @example transaction id of a lease or sale
+             */
+            description?: string;
+        };
+        AssignWokuExternalTrackerByNameDTO: {
+            /**
+             * @description Name of the company-level external tracker definition this value belongs to.
+             * @example trr
+             */
+            name: string;
+            /**
+             * @description External identifier value (always stored as string).
+             * @example dasdj123kdak32
+             */
+            value: string;
+        };
+        ExternalTrackerFilterDTO: {
+            /**
+             * @description Tracker name (resolved to its definition server-side).
+             * @example trr
+             */
+            name: string;
+            /**
+             * @description Value to match (partial, case-insensitive).
+             * @example ABC
+             */
+            value: string;
+        };
+        SearchEntitiesByTrackersDTO: {
+            /**
+             * @description VoC entity type to search.
+             * @example nps
+             * @enum {string}
+             */
+            entityType: "nps" | "csat" | "ces" | "form" | "flow";
+            /** @description Tracker filters combined with AND. Each entity must match every filter to be returned. */
+            filters: components["schemas"]["ExternalTrackerFilterDTO"][];
+        };
+        UpdateExternalTrackerDefinitionDTO: {
+            /** @description New name (must remain unique within the company). */
+            name?: string;
+            /** @description New external system identifier. */
+            system?: string;
+            /** @description New description. */
+            description?: string;
+        };
+        AssignExternalTrackerByNameDTO: {
+            /**
+             * @description Name of the company-level external tracker definition this value belongs to.
+             * @example trr
+             */
+            name: string;
+            /**
+             * @description External identifier value (always stored as string).
+             * @example dasdj123kdak32
+             */
+            value: string;
+        };
+        TicketRoutingConditionDto: {
+            /** @enum {string} */
+            relationToPrevious?: "AND" | "OR";
+            /** @description CompanyExternalTracker id. */
+            trackerId: string;
+            /**
+             * @default equals
+             * @enum {string}
+             */
+            operator: "equals" | "any";
+            /** @description The value the tracker must equal. Required unless operator is "any". */
+            value?: string;
+        };
+        TicketDestinationTemplateDto: {
+            /** @example custom */
+            preset: string;
+            /** @description Custom JSON body with {{path}} placeholders. */
+            body?: string;
+        };
+        V1CreateTicketDestinationDto: {
+            /** @example Zendesk Soporte Chile */
+            name: string;
+            /** @description Non-secret provider config (validated per kind). */
+            config: {
+                [key: string]: unknown;
+            };
+            /** @description Provider credentials (write-only, encrypted). */
+            credentials: {
+                [key: string]: string;
+            };
+            /** @description Per-destination AI triage context. */
+            aiContext?: string;
+            routingConditions?: components["schemas"]["TicketRoutingConditionDto"][];
+            template?: components["schemas"]["TicketDestinationTemplateDto"];
+            /** @enum {string} */
+            kind: "zendesk" | "custom" | "email";
+        };
+        V1UpdateTicketDestinationDto: {
+            name?: string;
+            config?: {
+                [key: string]: unknown;
+            };
+            /** @description Present = credential rotation. */
+            credentials?: {
+                [key: string]: string;
+            };
+            /** @description Per-destination AI triage context. */
+            aiContext?: string;
+            routingConditions?: components["schemas"]["TicketRoutingConditionDto"][];
+            template?: components["schemas"]["TicketDestinationTemplateDto"];
+            enabled?: boolean;
+            /** @enum {string} */
+            kind?: "zendesk" | "custom" | "email";
+        };
+        TestTicketDestinationBodyDTO: {
+            /** @description Must be true. The test sends a real request to the destination (custom webhooks receive a test payload; other kinds run a read-only auth probe). */
+            confirm: boolean;
+        };
+        ActionPlanGroupConditionDto: {
+            /** @enum {string} */
+            relationToPrevious?: "AND" | "OR";
+            /** @description CompanyExternalTracker id. */
+            trackerId: string;
+            /**
+             * @default equals
+             * @enum {string}
+             */
+            operator: "equals" | "any";
+            /** @description The value the tracker must equal. Required unless operator is "any". */
+            value?: string;
+        };
+        ActionPlanGroupMemberDto: {
+            /** @description Company member user id. */
+            userId: string;
+            /** @enum {string} */
+            role: "admin" | "assignee";
+        };
+        CreateActionPlanGroupDto: {
+            /** @description Additional email recipients; grants no membership. */
+            notificationEmails?: string[];
+            /** @example Atención en tienda */
+            name: string;
+            description?: string;
+            /** @description Tracker conditions; at least one row is required. */
+            conditions: components["schemas"]["ActionPlanGroupConditionDto"][];
+            /** @description Group team; at least one admin (assignees optional). */
+            members: components["schemas"]["ActionPlanGroupMemberDto"][];
+            /**
+             * @description New improvement comments that trigger a plan draft (default 300).
+             * @default 300
+             */
+            threshold: number;
+        };
+        UpdateActionPlanGroupDto: {
+            /** @description Additional email recipients; grants no membership. */
+            notificationEmails?: string[];
+            name?: string;
+            /** @description Empty string clears. */
+            description?: string;
+            conditions?: components["schemas"]["ActionPlanGroupConditionDto"][];
+            members?: components["schemas"]["ActionPlanGroupMemberDto"][];
+            threshold?: number;
+        };
+        SetActionPlanGroupEnabledDto: {
+            enabled: boolean;
+        };
+        PostPlanReplyBodyDTO: {
+            /** @description Message to send to the plan AI agent. */
+            text: string;
+            /** @description Must be true. Each reply triggers a paid AI turn; the reply is composed asynchronously and delivered over the plan channel. */
+            confirm: boolean;
+        };
+        V1SendActionPlanDto: {
+            /**
+             * @description Only `internal` (manage the plan inside woku) is available.
+             * @enum {string}
+             */
+            provider: "internal";
+            /** @description Optional human-readable label for the destination. */
+            resourceLabel?: string;
+        };
+        CreateActionPlanTaskDto: {
+            /** @description Task text. */
+            text: string;
+        };
+        ReorderActionPlanTasksDto: {
+            /** @description All task ids in the desired order. */
+            orderedTaskIds: string[];
+        };
+        UpdateActionPlanTaskDto: {
+            /** @description New task text. */
+            text?: string;
+            /** @enum {string} */
+            status?: "todo" | "in_progress" | "done";
+            /** @description Group member responsible; null/"" clears the assignee. */
+            assigneeId?: string;
+        };
+        V1WokuLocalizedContentDTO: {
+            /**
+             * @example en
+             * @enum {string}
+             */
+            locale: "es" | "en";
+            description: string;
+        };
+        UpdateWokuBodyDTO: {
+            /** @description Woku description/title. */
+            description?: string;
+            /**
+             * @description Locales the survey is available in (subset of es/en).
+             * @example [
+             *       "es",
+             *       "en"
+             *     ]
+             */
+            availableLocales?: string[];
+            /** @enum {string} */
+            defaultLocale?: "es" | "en";
+            localizedContent?: components["schemas"]["V1WokuLocalizedContentDTO"][];
+        };
+        UpdateWokuSettingsBodyDTO: {
+            /** @description Whether the woku is closed to new reviews. */
+            closed?: boolean;
+            /** @description Whether new reviews are disabled. */
+            reviewsDisabled?: boolean;
+            /** @description Whether anonymous reviews are disabled. */
+            anonymousDisabled?: boolean;
+            /** @description Whether each client may leave only one review. */
+            onlyOneReviewPerClient?: boolean;
+        };
+        MoveWokuBodyDTO: {
+            /**
+             * Format: ObjectId
+             * @description Target folder id, or null to move the woku to the root.
+             */
+            folderId: string | null;
+        };
+        V1CreateTextnoteBodyDto: {
+            /** @description Opaque invitation or prepared journey-entry response token. Consumed after saving feedback; never stored on the review. */
+            dispatchToken?: string;
+            /**
+             * @description Star rating (1-5)
+             * @example 5
+             */
+            qualification: number;
+            /** @description Text content of the review (max 3000 chars) */
+            description: string;
+            /** @description Reviewer email */
+            clientEmail?: string;
+            /** @description Reviewer phone */
+            clientPhone?: string;
+            /** @description Whether the review is anonymous */
+            anonymous?: boolean;
+            /**
+             * @description Inbound response channel. Defaults to 'api'; a value provided here REPLACES 'api' (user-defined channel).
+             * @example my-crm
+             */
+            responseChannel?: string;
+        };
+        V1CreateVoicemailBodyDto: {
+            /** @description Opaque invitation or prepared journey-entry response token. Consumed after saving feedback; never stored on the review. */
+            dispatchToken?: string;
+            /**
+             * Format: binary
+             * @description Audio file for the voicemail
+             */
+            file: string;
+            /**
+             * @description Star rating (1-5)
+             * @example 5
+             * @enum {string}
+             */
+            qualification: "1" | "2" | "3" | "4" | "5";
+            /**
+             * @description Spoken language used to improve audio transcription
+             * @example es
+             * @enum {string}
+             */
+            language: "es" | "en";
+            /** @description Reviewer email */
+            clientEmail?: string;
+            /** @description Reviewer phone */
+            clientPhone?: string;
+            /**
+             * @description Whether the review is anonymous
+             * @enum {string}
+             */
+            anonymous?: "true" | "false";
+            /**
+             * @description Inbound response channel. Defaults to 'api'; a value provided here REPLACES 'api' (user-defined channel).
+             * @example my-crm
+             */
+            responseChannel?: string;
+        };
+        V1ShareWokuBodyDto: {
+            /** @description Single email address */
+            clientEmail?: string;
+            /** @description Array of email addresses */
+            clientEmails?: string[];
+        };
+        WokuMediaUploadResultDto: {
+            /** Format: ObjectId */
+            fileId: string;
+            filename: string;
+            /** @enum {string} */
+            type: "image" | "video";
+        };
+        V1ApiKeyResultDto: {
+            /** @description The new company secret API key. The previous key is now invalid; store this value, it is not retrievable again. */
+            apiKey: string;
+        };
+        V1RevokeApiKeyResultDto: {
+            /**
+             * @description Always true once the key has been revoked.
+             * @example true
+             */
+            revoked: boolean;
+        };
+        V1CreateNpsBodyDto: {
+            /**
+             * @description NPS score 0-10 (0-6 detractor, 7-8 passive, 9-10 promoter)
+             * @example 9
+             */
+            score: number;
+            /**
+             * Format: ObjectId
+             * @description Optional NPS tool id. With it the capture is tool-specific; without it, company-level.
+             */
+            npsToolId?: string;
+            /**
+             * Format: email
+             * @description Respondent email. Omit for an anonymous capture.
+             */
+            clientEmail?: string;
+            /** @description Respondent phone when email is not supplied. */
+            clientPhone?: string;
+            /** @description Whether the submission is anonymous (no client email stored). */
+            anonymous?: boolean;
+            /**
+             * @description Inbound response channel. Defaults to 'api'; a value provided here REPLACES 'api' (user-defined channel). Stored on the NPS.
+             * @example my-crm
+             */
+            responseChannel?: string;
+            /**
+             * @description Opaque invitation dispatch token echoed from the link (?dtoken=). Consumed to mark the outbound invitation responded; never persisted.
+             * @example a1b2c3d4-...
+             */
+            dispatchToken?: string;
+        };
+        V1CreateNpsTextnoteBodyDto: {
+            /**
+             * @description Text feedback content
+             * @example El producto cumple mis expectativas.
+             */
+            description: string;
+        };
+        V1CreateCsatBodyDto: {
+            /**
+             * @description CSAT satisfaction score 1-5
+             * @example 4
+             */
+            score: number;
+            /**
+             * Format: ObjectId
+             * @description CSAT tool id (always required: CSAT tools are always custom)
+             */
+            csatToolId: string;
+            /**
+             * Format: email
+             * @description Respondent email. Omit for an anonymous capture.
+             */
+            clientEmail?: string;
+            /** @description Whether the submission is anonymous (no client email stored). */
+            anonymous?: boolean;
+            /**
+             * @description Inbound response channel. Defaults to 'api'; a value provided here REPLACES 'api' (user-defined channel). Stored on the response.
+             * @example my-crm
+             */
+            responseChannel?: string;
+            /** @description Opaque invitation dispatch token echoed from the link (?dtoken=). Consumed to mark the outbound invitation responded; never persisted. */
+            dispatchToken?: string;
+        };
+        V1CreateCsatTextnoteBodyDto: {
+            /**
+             * @description Text feedback content
+             * @example El proceso fue muy facil.
+             */
+            description: string;
+        };
+        V1CreateCesBodyDto: {
+            /**
+             * @description CES effort score 1-5
+             * @example 4
+             */
+            score: number;
+            /**
+             * Format: ObjectId
+             * @description CES tool id (always required: CES tools are always custom)
+             */
+            cesToolId: string;
+            /**
+             * Format: email
+             * @description Respondent email. Omit for an anonymous capture.
+             */
+            clientEmail?: string;
+            /** @description Whether the submission is anonymous (no client email stored). */
+            anonymous?: boolean;
+            /**
+             * @description Inbound response channel. Defaults to 'api'; a value provided here REPLACES 'api' (user-defined channel). Stored on the response.
+             * @example my-crm
+             */
+            responseChannel?: string;
+            /** @description Opaque invitation dispatch token echoed from the link (?dtoken=). Consumed to mark the outbound invitation responded; never persisted. */
+            dispatchToken?: string;
+        };
+        V1CreateCesTextnoteBodyDto: {
+            /**
+             * @description Text feedback content
+             * @example Resolver fue muy facil.
+             */
+            description: string;
+        };
+        V1CaptureAudioDto: {
+            /** @description Device-local URI of the recorded audio */
+            uri?: string;
+            /** @description Audio MIME type, e.g. audio/m4a */
+            mimeType?: string;
+            /** @description Duration in milliseconds */
+            durationMs?: number;
+        };
+        V1CaptureRespondentDto: {
+            /** @description Respondent email */
+            email?: string;
+            /** @description Respondent phone */
+            phone?: string;
+            /** @description Host-app external id (e.g. CRM id) */
+            externalId?: string;
+        };
+        V1CaptureBodyDto: {
+            /** @description Opaque invitation or prepared journey-entry response token. Consumed after saving feedback; never stored on the review. */
+            dispatchToken?: string;
+            /** @description Client-generated idempotency id */
+            id?: string;
+            /**
+             * @example woku
+             * @enum {string}
+             */
+            kind: "woku" | "nps" | "csat" | "ces";
+            /**
+             * @description Spoken language. Required when the capture includes an audio file.
+             * @enum {string}
+             */
+            language?: "es" | "en";
+            /** @description Target id: the wokuId for a woku capture, the (optional) npsToolId for an NPS capture, or the (required) csatToolId/cesToolId for a CSAT/CES capture (those tools are always custom). */
+            targetId?: string;
+            /**
+             * @description Woku star rating 1-5
+             * @example 5
+             */
+            rating?: number;
+            /**
+             * @description NPS score 0-10
+             * @example 9
+             */
+            score?: number;
+            /** @description Free-text comment */
+            comment?: string;
+            audio?: components["schemas"]["V1CaptureAudioDto"];
+            respondent?: components["schemas"]["V1CaptureRespondentDto"];
+        };
+        V1CaptureResultDto: {
+            /** @description Client submission id, echoed without replacing the server id. */
+            id?: string;
+            /** @enum {string} */
+            kind: "woku" | "nps" | "csat" | "ces";
+            /** @description Server id of the created feedback resource. */
+            remoteId?: string;
+            /** @enum {string} */
+            status: "accepted";
+        };
+        V1CreateNpsInvitationsBodyDto: {
+            /**
+             * @description Delivery channel for the invitations
+             * @example whatsapp
+             * @enum {string}
+             */
+            channel: "email" | "whatsapp";
+            /**
+             * @description Recipients: email addresses for the email channel, phone numbers (digits, country code included, e.g. 56912345678) for whatsapp
+             * @example [
+             *       "56912345678"
+             *     ]
+             */
+            recipients: string[];
+            /**
+             * @description Language of the invitation template
+             * @example es
+             * @enum {string}
+             */
+            language?: "es" | "en";
+            /**
+             * Format: ObjectId
+             * @description NPS tool to survey for. Omit to send the company-level NPS survey.
+             */
+            npsToolId?: string;
+        };
+        V1RejectedInvitationDto: {
+            /** @description Recipient as received in the request */
+            recipient: string;
+            /**
+             * @description Why the invitation was not dispatched
+             * @enum {string}
+             */
+            reason: "invalid_recipient" | "quarantined" | "insufficient_credits_or_blocked" | "send_failed";
+        };
+        V1InvitationsResultDto: {
+            /** @enum {string} */
+            channel: "email" | "whatsapp";
+            /** @description Recipients whose invitation was dispatched (or queued) */
+            accepted: string[];
+            /** @description Recipients whose invitation was not dispatched, with reason */
+            rejected: components["schemas"]["V1RejectedInvitationDto"][];
+        };
+        V1CreateCsatInvitationsBodyDto: {
+            /**
+             * @description Delivery channel for the invitations
+             * @example whatsapp
+             * @enum {string}
+             */
+            channel: "email" | "whatsapp";
+            /**
+             * @description Recipients: email addresses for the email channel, phone numbers (digits, country code included, e.g. 56912345678) for whatsapp
+             * @example [
+             *       "56912345678"
+             *     ]
+             */
+            recipients: string[];
+            /**
+             * @description Language of the invitation template
+             * @example es
+             * @enum {string}
+             */
+            language?: "es" | "en";
+            /**
+             * Format: ObjectId
+             * @description CSAT tool to survey for (always required: always custom).
+             */
+            csatToolId: string;
+        };
+        V1CreateCesInvitationsBodyDto: {
+            /**
+             * @description Delivery channel for the invitations
+             * @example whatsapp
+             * @enum {string}
+             */
+            channel: "email" | "whatsapp";
+            /**
+             * @description Recipients: email addresses for the email channel, phone numbers (digits, country code included, e.g. 56912345678) for whatsapp
+             * @example [
+             *       "56912345678"
+             *     ]
+             */
+            recipients: string[];
+            /**
+             * @description Language of the invitation template
+             * @example es
+             * @enum {string}
+             */
+            language?: "es" | "en";
+            /**
+             * Format: ObjectId
+             * @description CES tool to survey for (always required: always custom).
+             */
+            cesToolId: string;
+        };
+        V1CreateInvitationsBodyDto: {
+            /**
+             * @description Delivery channel for the invitations
+             * @example whatsapp
+             * @enum {string}
+             */
+            channel: "email" | "whatsapp";
+            /**
+             * @description Recipients: email addresses for the email channel, phone numbers (digits, country code included, e.g. 56912345678) for whatsapp
+             * @example [
+             *       "56912345678"
+             *     ]
+             */
+            recipients: string[];
+            /**
+             * @description Language of the invitation template
+             * @example es
+             * @enum {string}
+             */
+            language?: "es" | "en";
+        };
+        V1CreateFormResponseBodyDto: {
+            /**
+             * @description Whether this response is anonymous
+             * @example false
+             */
+            anonymous: boolean;
+            /**
+             * @description Email of the respondent (required when the form identifies clients by email and the response is not anonymous)
+             * @example respondent@example.com
+             */
+            email?: string;
+            /**
+             * @description Phone of the respondent (required when the form identifies clients by phone and the response is not anonymous)
+             * @example +56912345678
+             */
+            phone?: string;
+            /**
+             * @description Answers keyed by field id
+             * @example {
+             *       "field-uuid-1": "John Doe",
+             *       "field-uuid-2": 5
+             *     }
+             */
+            answers: {
+                [key: string]: unknown;
+            };
+            /**
+             * @description Inbound response channel. Defaults to 'api'; a value provided here REPLACES 'api' (user-defined channel). Stored on the response.
+             * @example my-crm
+             */
+            responseChannel?: string;
+            /**
+             * @description Opaque invitation dispatch token echoed from the link (?dtoken=). Consumed to mark the outbound invitation responded; never persisted.
+             * @example a1b2c3d4-...
+             */
+            dispatchToken?: string;
+        };
+        NpsToolLocalizedContentBodyDTO: {
+            /**
+             * @example en
+             * @enum {string}
+             */
+            locale: "es" | "en";
+            /**
+             * @description Recommended company/product/service fragment for this locale (e.g. "our company"), NOT the full question.
+             * @example our company
+             */
+            npsMessage: string;
+            /**
+             * @description Audience fragment for this locale, NOT the full question.
+             * @example a friend or colleague
+             */
+            audienceType?: string;
+        };
+        CreateNpsToolBodyDTO: {
+            /**
+             * @description Tool name for identification.
+             * @example Post-Purchase Survey
+             */
+            name: string;
+            /**
+             * @description Only the company, product or service recommended (e.g. "our company"), NOT the full question. The public question is composed as "On a scale of 0 to 10, how likely are you to recommend {npsMessage} to {audienceType}?".
+             * @example our company
+             */
+            npsMessage: string;
+            /**
+             * @description Only who the survey targets (e.g. "a friend or colleague"), NOT the full question.
+             * @example a friend or colleague
+             */
+            audienceType?: string;
+            /**
+             * @description Locales the tool is available in (subset of es/en).
+             * @example [
+             *       "es",
+             *       "en"
+             *     ]
+             */
+            availableLocales?: string[];
+            /**
+             * @description Default locale used when none is requested.
+             * @example es
+             * @enum {string}
+             */
+            defaultLocale?: "es" | "en";
+            localizedContent?: components["schemas"]["NpsToolLocalizedContentBodyDTO"][];
+        };
+        UpdateNpsToolBodyDTO: {
+            name?: string;
+            /**
+             * @description Recommended company/product/service fragment (e.g. "our company"), NOT the full question.
+             * @example our company
+             */
+            npsMessage?: string;
+            /**
+             * @description Audience fragment (e.g. "partners"), NOT the full question.
+             * @example a friend or colleague
+             */
+            audienceType?: string;
+            /**
+             * @example [
+             *       "es",
+             *       "en"
+             *     ]
+             */
+            availableLocales?: string[];
+            /** @enum {string} */
+            defaultLocale?: "es" | "en";
+            localizedContent?: components["schemas"]["NpsToolLocalizedContentBodyDTO"][];
+        };
+        CsatToolLocalizedContentBodyDTO: {
+            /**
+             * @example en
+             * @enum {string}
+             */
+            locale: "es" | "en";
+            /**
+             * @description Translated CSAT question for this locale.
+             * @example How satisfied are you with your purchase?
+             */
+            question: string;
+            /**
+             * @description Translated subject for this locale.
+             * @example your purchase
+             */
+            subject?: string;
+        };
+        CreateCsatToolBodyDTO: {
+            /**
+             * @description Tool name for identification.
+             * @example Post-Purchase CSAT
+             */
+            name: string;
+            /**
+             * @description Public CSAT question shown to respondents.
+             * @example How satisfied are you with your purchase?
+             */
+            question: string;
+            /**
+             * @description Static variable filling 'how satisfied are you with [subject]?'.
+             * @example your purchase
+             */
+            subject?: string;
+            /**
+             * @description Locales the tool is available in (subset of es/en).
+             * @example [
+             *       "es",
+             *       "en"
+             *     ]
+             */
+            availableLocales?: string[];
+            /**
+             * @description Default locale used when none is requested.
+             * @example es
+             * @enum {string}
+             */
+            defaultLocale?: "es" | "en";
+            localizedContent?: components["schemas"]["CsatToolLocalizedContentBodyDTO"][];
+        };
+        UpdateCsatToolBodyDTO: {
+            name?: string;
+            question?: string;
+            subject?: string;
+            /**
+             * @example [
+             *       "es",
+             *       "en"
+             *     ]
+             */
+            availableLocales?: string[];
+            /** @enum {string} */
+            defaultLocale?: "es" | "en";
+            localizedContent?: components["schemas"]["CsatToolLocalizedContentBodyDTO"][];
+        };
+        CesToolLocalizedContentBodyDTO: {
+            /**
+             * @example en
+             * @enum {string}
+             */
+            locale: "es" | "en";
+            /**
+             * @description Translated CES question for this locale.
+             * @example How easy was it to complete your purchase?
+             */
+            question: string;
+            /**
+             * @description Translated action for this locale.
+             * @example complete your purchase
+             */
+            action?: string;
+        };
+        CreateCesToolBodyDTO: {
+            /**
+             * @description Tool name for identification.
+             * @example Post-Purchase Effort
+             */
+            name: string;
+            /**
+             * @description Public effort question shown to respondents.
+             * @example How easy was it to complete your purchase?
+             */
+            question: string;
+            /**
+             * @description Static variable filling 'how easy was it to [action]?'.
+             * @example complete your purchase
+             */
+            action?: string;
+            /**
+             * @description Locales the tool is available in (subset of es/en).
+             * @example [
+             *       "es",
+             *       "en"
+             *     ]
+             */
+            availableLocales?: string[];
+            /**
+             * @description Default locale used when none is requested.
+             * @example es
+             * @enum {string}
+             */
+            defaultLocale?: "es" | "en";
+            localizedContent?: components["schemas"]["CesToolLocalizedContentBodyDTO"][];
+        };
+        UpdateCesToolBodyDTO: {
+            name?: string;
+            question?: string;
+            action?: string;
+            /**
+             * @example [
+             *       "es",
+             *       "en"
+             *     ]
+             */
+            availableLocales?: string[];
+            /** @enum {string} */
+            defaultLocale?: "es" | "en";
+            localizedContent?: components["schemas"]["CesToolLocalizedContentBodyDTO"][];
+        };
+        UpdateTicketBodyDTO: {
+            title?: string;
+            /** @enum {string} */
+            severity?: "high" | "medium" | "low";
+            aiSummary?: string;
+            aiCategory?: string;
+        };
+        V1JourneyContactDto: {
+            /**
+             * Format: email
+             * @example cliente@example.com
+             */
+            email?: string;
+            /**
+             * @description Phone with country code, digits only
+             * @example 56911111111
+             */
+            phone?: string;
+        };
+        V1JourneyPendingMomentDto: {
+            key: string;
+            name?: string;
+        };
+        V1JourneyMomentProgressDto: {
+            key: string;
+            name: string;
+            /** @enum {string} */
+            status: "pending" | "active" | "sent" | "responded" | "done" | "skipped";
+            toolId?: string;
+            /** @enum {string} */
+            toolType?: "woku" | "csat" | "ces" | "nps" | "flow" | "form";
+            /** @enum {string} */
+            toolScope?: "shared" | "per_enrollment";
+            /** Format: date-time */
+            sentAt?: string;
+            /** Format: date-time */
+            respondedAt?: string;
+            /** @enum {string} */
+            activationSource?: "operator" | "response" | "webhook" | "timer" | "fallback";
+            /** Format: date-time */
+            hookReceivedAt?: string;
+        };
+        V1JourneyParticipationDto: {
+            id: string;
+            subjectKey: string;
+            contact: components["schemas"]["V1JourneyContactDto"];
+            /** @enum {string} */
+            lifecycle: "pending" | "running" | "stopping" | "stopped" | "completed";
+            definitionVersion?: number;
+            /** Format: date-time */
+            startedAt?: string;
+            /** @enum {string} */
+            startSource?: "operator" | "response" | "webhook";
+            /** Format: date-time */
+            stoppedAt?: string;
+            /** Format: date-time */
+            completedAt?: string;
+            /** Format: date-time */
+            stopRequestedAt?: string;
+            stoppedBy?: string;
+            stopReason?: string;
+            dispatchOutcomeUncertain: boolean;
+            /** Format: date-time */
+            createdAt?: string;
+            pendingMoments: components["schemas"]["V1JourneyPendingMomentDto"][];
+            moments: components["schemas"]["V1JourneyMomentProgressDto"][];
+            next: {
+                stageKey: string;
+                name: string;
+                /** @enum {string} */
+                source: "operator" | "response" | "webhook" | "timer" | "fallback";
+                /** Format: date-time */
+                scheduledFor?: string;
+            } | null;
+        };
+        V1JourneyParticipationPageDto: {
+            items: components["schemas"]["V1JourneyParticipationDto"][];
+            /** @description Present only when another page exists; omit cursor for the first page. */
+            nextCursor?: string;
+        };
+        StopJourneyParticipationDto: {
+            reason?: string;
+        };
+        V1JourneyConnectionDto: {
+            stageKey: string;
+            /** @enum {string} */
+            mode: "woku_signature" | "url_token" | "sender_hmac";
+            /** @description Credential readiness, not proof of webhook delivery. */
+            configured: boolean;
+            /** @description Credential-free inbound endpoint. Minting a URL token returns the credential URL separately. */
+            url: string;
+        };
+        V1JourneyMomentUrlDto: {
+            /** @description Returned only by this operation; store securely. */
+            token: string;
+            /** @description Credential URL. Minting replaces the prior token, including for existing participations. */
+            url: string;
+        };
+        SetSenderSecretDto: {
+            /** @description The signing secret the external system gave you. Stored encrypted; never returned. */
+            senderSecret: string;
+        };
+        V1PreviewJourneyMomentDto: {
+            /** @description Sample payload. Does not verify signatures, enroll clients or send invitations. */
+            payload: {
+                [key: string]: unknown;
+            };
+        };
+        V1JourneyTrackerDto: {
+            /** @example campaign */
+            name: string;
+            /** @example black-friday */
+            value: string;
+        };
+        V1JourneyLocaleDto: {
+            es?: string;
+            en?: string;
+        };
+        V1JourneyPreviewFolderDto: {
+            secondaryKey: string;
+            name: string;
+            parentSecondaryKey?: string;
+            parentName?: string;
+        };
+        V1JourneyPreviewContentDto: {
+            title: string;
+            imageUrl?: string;
+            trackers?: components["schemas"]["V1JourneyTrackerDto"][];
+            question?: components["schemas"]["V1JourneyLocaleDto"];
+            folder?: components["schemas"]["V1JourneyPreviewFolderDto"];
+            /** @description Resolved additional client fields. */
+            clientFields: {
+                [key: string]: string | number | boolean;
+            };
+        };
+        V1JourneyPreviewResponseDto: {
+            matches: boolean;
+            subjectKey: string;
+            contact: components["schemas"]["V1JourneyContactDto"];
+            /** @description Present for matching dynamic webhook content. */
+            preview?: components["schemas"]["V1JourneyPreviewContentDto"];
+        };
+        JourneyPlanMemberDto: {
+            /** @description Company member user id. */
+            userId: string;
+            /** @enum {string} */
+            role: "admin" | "assignee";
+        };
+        JourneyRecipientsDto: {
+            /** @description Omit to keep ticket creation enabled. */
+            ticketsEnabled?: boolean;
+            /** @description Omit to keep plan creation enabled. */
+            plansEnabled?: boolean;
+            /** @description Ticket email recipients, including the creator by default. */
+            ticketEmails: string[];
+            /** @description Platform users who belong to the journey action-plan group. */
+            planMembers: components["schemas"]["JourneyPlanMemberDto"][];
+        };
+        V1JourneyRoutingDto: {
+            ticketsReady: boolean;
+            plansReady: boolean;
+            ticketDestinationId?: string;
+            actionPlanGroupId?: string;
+        };
+        V1JourneyToolSpecDto: {
+            /** @description Woku uploaded public media ID belonging to this company. */
+            fileId?: string;
+            /** @description Derived media URL. Saving with fileId resolves its authoritative URL. */
+            imageUrl?: string;
+            descriptionEn?: string;
+            /** @description Variable in the fixed CSAT, CES or NPS question, not the complete question. */
+            subject?: components["schemas"]["V1JourneyLocaleDto"];
+            /** @description NPS recommendation audience. */
+            audience?: components["schemas"]["V1JourneyLocaleDto"];
+        };
+        V1JourneySendWindowDto: {
+            startHour: number;
+            endHour: number;
+            /** @example America/Santiago */
+            timeZone: string;
+        };
+        V1JourneyVerificationDto: {
+            /**
+             * @description Verification configuration only. Set secret material through the credential endpoints.
+             * @enum {string}
+             */
+            mode: "woku_signature" | "url_token" | "sender_hmac";
+            header?: string;
+            /** @enum {string} */
+            encoding?: "hex" | "base64";
+            prefix?: string;
+            /** @enum {string} */
+            signedPayload?: "body" | "timestamp_dot_body";
+            timestampHeader?: string;
+        };
+        V1JourneyPayloadRuleDto: {
+            /** @example order.status */
+            path: string;
+            /** @example delivered */
+            equals: string;
+        };
+        V1JourneyClientFieldDto: {
+            /** @description Unique Client.customFields key; at most 20 mappings. */
+            key: string;
+            /** @example customer.tier */
+            path: string;
+        };
+        V1JourneyPayloadMapDto: {
+            /** @description Dotted path to the stable case reference. */
+            subjectKey?: string;
+            /** @example customer.email */
+            email?: string;
+            /** @example customer.phone */
+            phone?: string;
+            match?: components["schemas"]["V1JourneyPayloadRuleDto"][];
+            clientFields?: components["schemas"]["V1JourneyClientFieldDto"][];
+        };
+        V1JourneyTriggerDto: {
+            /** @enum {string} */
+            type: "manual" | "event" | "webhook" | "afterStage";
+            /** @description Legacy event trigger name. Reserved journey events cannot be emitted. */
+            event?: string;
+            /** @description afterStage: key of the earlier moment. */
+            stage?: string;
+            /** @enum {string} */
+            anchor?: "sent" | "response" | "event";
+            /** @description afterStage wait in milliseconds. A v2 zero delay means one hour. */
+            delayMs?: number;
+            window?: components["schemas"]["V1JourneySendWindowDto"];
+            /** @description Legacy webhook verification; use webhook.verification in v2. */
+            verification?: components["schemas"]["V1JourneyVerificationDto"];
+            /** @description Legacy webhook mapping; use webhook.payload in v2. */
+            payload?: components["schemas"]["V1JourneyPayloadMapDto"];
+        };
+        V1JourneyTextValueDto: {
+            /** @enum {string} */
+            mode: "literal" | "javascript";
+            /** @description Literal (up to 200 characters) or bounded JavaScript function body (up to 2000). JavaScript receives payload and must return a string; no IO or imports. */
+            value: string;
+        };
+        V1JourneyDynamicLocaleDto: {
+            es?: components["schemas"]["V1JourneyTextValueDto"];
+            en?: components["schemas"]["V1JourneyTextValueDto"];
+        };
+        V1JourneyTrackerMappingDto: {
+            /** @description Tracker name, at most 60 characters. Journey system trackers are reserved. */
+            name: string;
+            /** @example order.id */
+            path: string;
+        };
+        V1JourneyWebhookContentDto: {
+            description?: components["schemas"]["V1JourneyTextValueDto"];
+            descriptionEn?: components["schemas"]["V1JourneyTextValueDto"];
+            folderSecondaryKey?: components["schemas"]["V1JourneyTextValueDto"];
+            folderName?: components["schemas"]["V1JourneyTextValueDto"];
+            parentFolderSecondaryKey?: components["schemas"]["V1JourneyTextValueDto"];
+            parentFolderName?: components["schemas"]["V1JourneyTextValueDto"];
+            subject?: components["schemas"]["V1JourneyDynamicLocaleDto"];
+            audience?: components["schemas"]["V1JourneyDynamicLocaleDto"];
+            /** @description Woku only: dotted path to a public HTTPS image URL. */
+            imageUrlPath?: string;
+            trackers?: components["schemas"]["V1JourneyTrackerMappingDto"][];
+        };
+        V1JourneyWebhookDto: {
+            verification?: components["schemas"]["V1JourneyVerificationDto"];
+            payload?: components["schemas"]["V1JourneyPayloadMapDto"];
+            /**
+             * @description Content source, independent from trigger. Webhook content requires per_enrollment scope.
+             * @enum {string}
+             */
+            contentMode?: "manual" | "webhook";
+            /** @description Bounded JSON Schema: object root, at most 20000 characters, depth 8, 200 nodes and 50 properties per node. Supports type, properties, required, additionalProperties, items, enum, minLength, maxLength, minimum, maximum, minItems, maxItems, title and description. No references or regex. */
+            schema?: {
+                [key: string]: unknown;
+            };
+            content?: components["schemas"]["V1JourneyWebhookContentDto"];
+        };
+        V1JourneySequenceDto: {
+            /** @description Initial invitation and reminder offsets from activation. [0, 86400000] sends one reminder the next day. */
+            attemptOffsetsMs: number[];
+            deadlineMs: number;
+            cooldownAfterResponseMs: number;
+            sendWindow?: components["schemas"]["V1JourneySendWindowDto"];
+        };
+        V1JourneyPresentationDto: {
+            imageUrl?: string;
+            copy?: components["schemas"]["V1JourneyLocaleDto"];
+        };
+        V1JourneyLegacyToolRefDto: {
+            /** @enum {string} */
+            type: "csat" | "ces" | "woku" | "nps" | "flow" | "form";
+            id: string;
+        };
+        V1JourneyMomentReadDto: {
+            key: string;
+            name?: string;
+            description?: string;
+            /** @description Display order. Execution follows the trigger graph. */
+            order?: number;
+            /** @enum {string} */
+            tool: "woku" | "csat" | "ces" | "nps";
+            /**
+             * @description V2 defaults to shared within this moment. Dynamic webhook content requires per_enrollment.
+             * @enum {string}
+             */
+            toolScope?: "shared" | "per_enrollment";
+            toolSpec?: components["schemas"]["V1JourneyToolSpecDto"];
+            enabled: boolean;
+            trigger: components["schemas"]["V1JourneyTriggerDto"];
+            webhook?: components["schemas"]["V1JourneyWebhookDto"];
+            /** @enum {string} */
+            channel: "email" | "whatsapp_first";
+            sequence: components["schemas"]["V1JourneySequenceDto"];
+            presentation?: components["schemas"]["V1JourneyPresentationDto"];
+            /** @description Secondary wait for a webhook-primary moment. */
+            fallbackAfterMs?: number;
+            /** @description Key of the enabled moment that arms the secondary wait. */
+            fallbackFromStage?: string;
+            /** @description Legacy snapshots only. New assignments of existing tools are rejected. */
+            readonly toolRef?: components["schemas"]["V1JourneyLegacyToolRefDto"];
+        };
+        V1JourneyResponseDto: {
+            id: string;
+            key?: string;
+            name?: string;
+            enabled: boolean;
+            version: number;
+            /** @enum {number} */
+            authoringVersion?: 1 | 2;
+            /** @enum {string} */
+            startMode?: "operator" | "response" | "webhook";
+            recipients?: components["schemas"]["JourneyRecipientsDto"];
+            routing?: components["schemas"]["V1JourneyRoutingDto"];
+            moments: components["schemas"]["V1JourneyMomentReadDto"][];
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: string;
+        };
+        V1JourneyMomentDto: {
+            key: string;
+            name?: string;
+            description?: string;
+            /** @description Display order. Execution follows the trigger graph. */
+            order?: number;
+            /** @enum {string} */
+            tool: "woku" | "csat" | "ces" | "nps";
+            /**
+             * @description V2 defaults to shared within this moment. Dynamic webhook content requires per_enrollment.
+             * @enum {string}
+             */
+            toolScope?: "shared" | "per_enrollment";
+            toolSpec?: components["schemas"]["V1JourneyToolSpecDto"];
+            enabled: boolean;
+            trigger: components["schemas"]["V1JourneyTriggerDto"];
+            webhook?: components["schemas"]["V1JourneyWebhookDto"];
+            /** @enum {string} */
+            channel: "email" | "whatsapp_first";
+            sequence: components["schemas"]["V1JourneySequenceDto"];
+            presentation?: components["schemas"]["V1JourneyPresentationDto"];
+            /** @description Secondary wait for a webhook-primary moment. */
+            fallbackAfterMs?: number;
+            /** @description Key of the enabled moment that arms the secondary wait. */
+            fallbackFromStage?: string;
+        };
+        V1CreateJourneyBodyDto: {
+            /**
+             * @deprecated
+             * @description Legacy body API key. Prefer Authorization: Bearer. Consumed by authentication and never forwarded to journey commands.
+             */
+            authHeader?: string;
+            /**
+             * @description Use 2 for the business-form contract. Existing v1 definitions keep their execution rules.
+             * @enum {number}
+             */
+            authoringVersion?: 1 | 2;
+            /**
+             * @description Who starts the first moment. Response means a saved first answer, not opening its link.
+             * @enum {string}
+             */
+            startMode?: "operator" | "response" | "webhook";
+            recipients?: components["schemas"]["JourneyRecipientsDto"];
+            /** @example Viaje de ventas */
+            name: string;
+            /**
+             * @description A journey is born switched off. Turn it on when it is ready.
+             * @default false
+             */
+            enabled: boolean;
+            /** @description The moments of the journey. Each creates a woku, CSAT, CES, or NPS from toolSpec. New v2 moments default to shared within that moment; per_enrollment creates one tool per participation. Existing toolRef assignments are rejected. A zero-day afterStage delay means one hour. In v2 only the first moment can be manual. Later moments use webhook or afterStage; independent webhook settings also let a webhook advance a timed moment. fallbackAfterMs is the optional secondary wait for a webhook-primary moment, anchored to fallbackFromStage. Legacy definitions retain their triggers. */
+            moments?: components["schemas"]["V1JourneyMomentDto"][];
+        };
+        V1CreatedJourneyResponseDto: {
+            id: string;
+            key?: string;
+            name?: string;
+            enabled: boolean;
+            version: number;
+            /** @enum {number} */
+            authoringVersion?: 1 | 2;
+            /** @enum {string} */
+            startMode?: "operator" | "response" | "webhook";
+            recipients?: components["schemas"]["JourneyRecipientsDto"];
+            routing?: components["schemas"]["V1JourneyRoutingDto"];
+            moments: components["schemas"]["V1JourneyMomentReadDto"][];
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: string;
+            /** @description Legacy journey-wide signature secret, returned once. It is not the per-moment URL token or sender secret. */
+            webhookSecret: string;
+        };
+        V1UpdateJourneyBodyDto: {
+            /**
+             * @deprecated
+             * @description Legacy body API key. Prefer Authorization: Bearer. Consumed by authentication and never forwarded to journey commands.
+             */
+            authHeader?: string;
+            /**
+             * @description Use 2 for the business-form contract. Existing v1 definitions keep their execution rules.
+             * @enum {number}
+             */
+            authoringVersion?: 1 | 2;
+            /**
+             * @description Who starts the first moment. Response means a saved first answer, not opening its link.
+             * @enum {string}
+             */
+            startMode?: "operator" | "response" | "webhook";
+            recipients?: components["schemas"]["JourneyRecipientsDto"];
+            /** @example Viaje de ventas */
+            name?: string;
+            enabled?: boolean;
+            moments?: components["schemas"]["V1JourneyMomentDto"][];
+        };
+        V1JourneySecretResponseDto: {
+            /** @description Legacy journey-wide signature secret, returned only by create or rotate. V2 url_token and sender_hmac use separate per-moment credentials. */
+            webhookSecret: string;
+        };
+        V1EnrollSubjectBodyDto: {
+            /**
+             * @deprecated
+             * @description Legacy body API key. Prefer Authorization: Bearer. Consumed by authentication and never forwarded to journey commands.
+             */
+            authHeader?: string;
+            /**
+             * @description Your own key for who is enrolled: a customer id, an order, a ticket.
+             * @example cliente-123
+             */
+            subjectKey: string;
+            /** @description Where to reach the subject. At least one of email or phone. */
+            contact: components["schemas"]["V1JourneyContactDto"];
+            trackers?: components["schemas"]["V1JourneyTrackerDto"][];
+            /** @description Anything you want kept with it */
+            metadata?: {
+                [key: string]: unknown;
+            };
+        };
+        V1JourneyEnrollmentResponseDto: {
+            subjectKey: string;
+            journeyId: string;
+        };
+        V1EmitJourneyEventBodyDto: {
+            /**
+             * @deprecated
+             * @description Legacy body API key. Prefer Authorization: Bearer. Consumed by authentication and never forwarded to journey commands.
+             */
+            authHeader?: string;
+            /** @example crm.deal.won */
+            event: string;
+            /** @example cliente-123 */
+            subjectKey: string;
+            contact?: components["schemas"]["V1JourneyContactDto"];
+            trackers?: components["schemas"]["V1JourneyTrackerDto"][];
+            metadata?: {
+                [key: string]: unknown;
+            };
+        };
+        V1JourneyEventResponseDto: {
+            journeys: number;
+        };
+        JourneyEntryInfoDto: {
+            name?: string;
+            momentName?: string;
+            /** @enum {string} */
+            tool: "woku" | "csat" | "ces" | "nps";
+            /** @description A case reference is required when later moments start on webhooks. */
+            requiresReference: boolean;
+        };
+        PrepareJourneyEntryDto: {
+            /**
+             * Format: uuid
+             * @description Stable random request ID for retrying this preparation.
+             */
+            requestId: string;
+            /** Format: email */
+            email?: string;
+            /** @example 56912345678 */
+            phone?: string;
+            reference?: string;
+        };
+        PreparedJourneyEntryDto: {
+            companyId: string;
+            /** @enum {string} */
+            tool: "woku" | "csat" | "ces" | "nps";
+            toolId: string;
+            /** @description Opaque response capability for this prepared first tool. Keep private; preparing alone does not start the journey. */
+            token: string;
+            subjectKey: string;
+        };
     };
-    CreateWokuApiDto: Record<string, never>;
-    CreateWokuFormDataApiDto: Record<string, never>;
-    CreateExternalTrackerDefinitionDTO: {
-      /**
-       * @description Tracker name. Identifies the tracker within the company catalog. Unique per company.
-       * @example trr
-       */
-      name: string;
-      /**
-       * @description External system this tracker maps to.
-       * @example crm interno
-       */
-      system: string;
-      /**
-       * @description Human-readable description of the tracker.
-       * @example transaction id of a lease or sale
-       */
-      description?: string;
-    };
-    AssignWokuExternalTrackerByNameDTO: {
-      /**
-       * @description Name of the company-level external tracker definition this value belongs to.
-       * @example trr
-       */
-      name: string;
-      /**
-       * @description External identifier value (always stored as string).
-       * @example dasdj123kdak32
-       */
-      value: string;
-    };
-    ExternalTrackerFilterDTO: {
-      /**
-       * @description Tracker name (resolved to its definition server-side).
-       * @example trr
-       */
-      name: string;
-      /**
-       * @description Value to match (partial, case-insensitive).
-       * @example ABC
-       */
-      value: string;
-    };
-    SearchEntitiesByTrackersDTO: {
-      /**
-       * @description VoC entity type to search.
-       * @example nps
-       * @enum {string}
-       */
-      entityType: 'nps' | 'csat' | 'ces' | 'form' | 'flow';
-      /** @description Tracker filters combined with AND. Each entity must match every filter to be returned. */
-      filters: components['schemas']['ExternalTrackerFilterDTO'][];
-    };
-    UpdateExternalTrackerDefinitionDTO: {
-      /** @description New name (must remain unique within the company). */
-      name?: string;
-      /** @description New external system identifier. */
-      system?: string;
-      /** @description New description. */
-      description?: string;
-    };
-    AssignExternalTrackerByNameDTO: {
-      /**
-       * @description Name of the company-level external tracker definition this value belongs to.
-       * @example trr
-       */
-      name: string;
-      /**
-       * @description External identifier value (always stored as string).
-       * @example dasdj123kdak32
-       */
-      value: string;
-    };
-    TicketRoutingConditionDto: {
-      /** @enum {string} */
-      relationToPrevious?: 'AND' | 'OR';
-      /** @description CompanyExternalTracker id. */
-      trackerId: string;
-      /**
-       * @default equals
-       * @enum {string}
-       */
-      operator: 'equals' | 'any';
-      /** @description The value the tracker must equal. Required unless operator is "any". */
-      value?: string;
-    };
-    TicketDestinationTemplateDto: {
-      /** @example custom */
-      preset: string;
-      /** @description Custom JSON body with {{path}} placeholders. */
-      body?: string;
-    };
-    CreateTicketDestinationDto: {
-      /** @example Zendesk Soporte Chile */
-      name: string;
-      /** @enum {string} */
-      kind: 'zendesk' | 'salesforce' | 'slack' | 'custom' | 'email';
-      /** @description Non-secret provider config (validated per kind). */
-      config: Record<string, never>;
-      /** @description Provider credentials (write-only, encrypted). */
-      credentials: Record<string, never>;
-      /** @description Per-destination AI triage context. */
-      aiContext?: string;
-      routingConditions?: components['schemas']['TicketRoutingConditionDto'][];
-      template?: components['schemas']['TicketDestinationTemplateDto'];
-    };
-    UpdateTicketDestinationDto: {
-      name?: string;
-      /** @enum {string} */
-      kind?: 'zendesk' | 'salesforce' | 'slack' | 'custom' | 'email';
-      config?: Record<string, never>;
-      /** @description Present = credential rotation. */
-      credentials?: Record<string, never>;
-      /** @description Per-destination AI triage context. */
-      aiContext?: string;
-      routingConditions?: components['schemas']['TicketRoutingConditionDto'][];
-      template?: components['schemas']['TicketDestinationTemplateDto'];
-      enabled?: boolean;
-    };
-    TestTicketDestinationBodyDTO: {
-      /** @description Must be true. The test sends a real request to the destination (custom webhooks receive a test payload; other kinds run a read-only auth probe). */
-      confirm: boolean;
-    };
-    ActionPlanGroupConditionDto: {
-      /** @enum {string} */
-      relationToPrevious?: 'AND' | 'OR';
-      /** @description CompanyExternalTracker id. */
-      trackerId: string;
-      /**
-       * @default equals
-       * @enum {string}
-       */
-      operator: 'equals' | 'any';
-      /** @description The value the tracker must equal. Required unless operator is "any". */
-      value?: string;
-    };
-    ActionPlanGroupMemberDto: {
-      /** @description Company member user id. */
-      userId: string;
-      /** @enum {string} */
-      role: 'admin' | 'assignee';
-    };
-    CreateActionPlanGroupDto: {
-      /** @example Atención en tienda */
-      name: string;
-      description?: string;
-      /** @description Tracker conditions; at least one row is required. */
-      conditions: components['schemas']['ActionPlanGroupConditionDto'][];
-      /** @description Group team; at least one admin and one assignee. */
-      members: components['schemas']['ActionPlanGroupMemberDto'][];
-      /**
-       * @description New improvement comments that trigger a plan draft (default 300).
-       * @default 300
-       */
-      threshold: number;
-    };
-    UpdateActionPlanGroupDto: {
-      name?: string;
-      /** @description Empty string clears. */
-      description?: string;
-      conditions?: components['schemas']['ActionPlanGroupConditionDto'][];
-      members?: components['schemas']['ActionPlanGroupMemberDto'][];
-      threshold?: number;
-    };
-    SetActionPlanGroupEnabledDto: {
-      enabled: boolean;
-    };
-    PostPlanReplyBodyDTO: {
-      /** @description Message to send to the plan AI agent. */
-      text: string;
-      /** @description Must be true. Each reply triggers a paid AI turn; the reply is composed asynchronously and delivered over the plan channel. */
-      confirm: boolean;
-    };
-    SendActionPlanDto: {
-      /** @enum {string} */
-      provider: 'jira' | 'monday' | 'clickup' | 'notion' | 'internal';
-      /** @description Provider-specific resource ids (external providers): jira {siteId?, projectId, issueTypeId} · monday {boardId, groupId} · clickup {listId} · notion {databaseId}. Omitted for the managed provider. */
-      target?: Record<string, never>;
-      /** @description Human destination summary the drawer built ("Operaciones CX · Backlog"); persisted as delivery.resourceLabel. Omitted for the managed provider. */
-      resourceLabel?: string;
-    };
-    CreateActionPlanTaskDto: {
-      /** @description Task text. */
-      text: string;
-    };
-    ReorderActionPlanTasksDto: {
-      /** @description All task ids in the desired order. */
-      orderedTaskIds: string[];
-    };
-    UpdateActionPlanTaskDto: {
-      /** @description New task text. */
-      text?: string;
-      /** @enum {string} */
-      status?: 'todo' | 'in_progress' | 'done';
-      /** @description Group member responsible; null/"" clears the assignee. */
-      assigneeId?: string;
-    };
-    V1WokuLocalizedContentDTO: {
-      /**
-       * @example en
-       * @enum {string}
-       */
-      locale: 'es' | 'en';
-      description: string;
-    };
-    UpdateWokuBodyDTO: {
-      /** @description Woku description/title. */
-      description?: string;
-      /**
-       * @description Locales the survey is available in (subset of es/en).
-       * @example [
-       *       "es",
-       *       "en"
-       *     ]
-       */
-      availableLocales?: string[];
-      /** @enum {string} */
-      defaultLocale?: 'es' | 'en';
-      localizedContent?: components['schemas']['V1WokuLocalizedContentDTO'][];
-    };
-    UpdateWokuSettingsBodyDTO: {
-      /** @description Whether the woku is closed to new reviews. */
-      closed?: boolean;
-      /** @description Whether new reviews are disabled. */
-      reviewsDisabled?: boolean;
-      /** @description Whether anonymous reviews are disabled. */
-      anonymousDisabled?: boolean;
-      /** @description Whether each client may leave only one review. */
-      onlyOneReviewPerClient?: boolean;
-    };
-    MoveWokuBodyDTO: {
-      /**
-       * Format: ObjectId
-       * @description Target folder id, or null to move the woku to the root.
-       */
-      folderId: string | null;
-    };
-    V1CreateTextnoteBodyDto: {
-      /**
-       * @description Star rating (1-5)
-       * @example 5
-       */
-      qualification: number;
-      /** @description Text content of the review (max 3000 chars) */
-      description: string;
-      /** @description Reviewer email */
-      clientEmail?: string;
-      /** @description Reviewer phone */
-      clientPhone?: string;
-      /** @description Whether the review is anonymous */
-      anonymous?: boolean;
-      /**
-       * @description Inbound response channel. Defaults to 'api'; a value provided here REPLACES 'api' (user-defined channel).
-       * @example my-crm
-       */
-      responseChannel?: string;
-    };
-    V1CreateVoicemailBodyDto: {
-      /**
-       * Format: binary
-       * @description Audio file for the voicemail
-       */
-      file: string;
-      /**
-       * @description Star rating (1-5)
-       * @example 5
-       * @enum {string}
-       */
-      qualification: '1' | '2' | '3' | '4' | '5';
-      /**
-       * @description Spoken language used to improve audio transcription
-       * @example es
-       * @enum {string}
-       */
-      language: 'es' | 'en';
-      /** @description Reviewer email */
-      clientEmail?: string;
-      /** @description Reviewer phone */
-      clientPhone?: string;
-      /**
-       * @description Whether the review is anonymous
-       * @enum {string}
-       */
-      anonymous?: 'true' | 'false';
-      /**
-       * @description Inbound response channel. Defaults to 'api'; a value provided here REPLACES 'api' (user-defined channel).
-       * @example my-crm
-       */
-      responseChannel?: string;
-    };
-    V1ShareWokuBodyDto: {
-      /** @description Single email address */
-      clientEmail?: string;
-      /** @description Array of email addresses */
-      clientEmails?: string[];
-    };
-    V1ApiKeyResultDto: {
-      /** @description The new company secret API key. The previous key is now invalid; store this value, it is not retrievable again. */
-      apiKey: string;
-    };
-    V1RevokeApiKeyResultDto: {
-      /**
-       * @description Always true once the key has been revoked.
-       * @example true
-       */
-      revoked: boolean;
-    };
-    V1CreateNpsBodyDto: {
-      /**
-       * @description NPS score 0-10 (0-6 detractor, 7-8 passive, 9-10 promoter)
-       * @example 9
-       */
-      score: number;
-      /**
-       * Format: ObjectId
-       * @description Optional NPS tool id. With it the capture is tool-specific; without it, company-level.
-       */
-      npsToolId?: string;
-      /**
-       * Format: email
-       * @description Respondent email. Omit for an anonymous capture.
-       */
-      clientEmail?: string;
-      /** @description Whether the submission is anonymous (no client email stored). */
-      anonymous?: boolean;
-      /**
-       * @description Inbound response channel. Defaults to 'api'; a value provided here REPLACES 'api' (user-defined channel). Stored on the NPS.
-       * @example my-crm
-       */
-      responseChannel?: string;
-      /**
-       * @description Opaque invitation dispatch token echoed from the link (?dtoken=). Consumed to mark the outbound invitation responded; never persisted.
-       * @example a1b2c3d4-...
-       */
-      dispatchToken?: string;
-    };
-    V1CreateNpsTextnoteBodyDto: {
-      /**
-       * @description Text feedback content
-       * @example El producto cumple mis expectativas.
-       */
-      description: string;
-    };
-    V1CreateCsatBodyDto: {
-      /**
-       * @description CSAT satisfaction score 1-5
-       * @example 4
-       */
-      score: number;
-      /**
-       * Format: ObjectId
-       * @description CSAT tool id (always required: CSAT tools are always custom)
-       */
-      csatToolId: string;
-      /**
-       * Format: email
-       * @description Respondent email. Omit for an anonymous capture.
-       */
-      clientEmail?: string;
-      /** @description Whether the submission is anonymous (no client email stored). */
-      anonymous?: boolean;
-      /**
-       * @description Inbound response channel. Defaults to 'api'; a value provided here REPLACES 'api' (user-defined channel). Stored on the response.
-       * @example my-crm
-       */
-      responseChannel?: string;
-      /** @description Opaque invitation dispatch token echoed from the link (?dtoken=). Consumed to mark the outbound invitation responded; never persisted. */
-      dispatchToken?: string;
-    };
-    V1CreateCsatTextnoteBodyDto: {
-      /**
-       * @description Text feedback content
-       * @example El proceso fue muy facil.
-       */
-      description: string;
-    };
-    V1CreateCesBodyDto: {
-      /**
-       * @description CES effort score 1-5
-       * @example 4
-       */
-      score: number;
-      /**
-       * Format: ObjectId
-       * @description CES tool id (always required: CES tools are always custom)
-       */
-      cesToolId: string;
-      /**
-       * Format: email
-       * @description Respondent email. Omit for an anonymous capture.
-       */
-      clientEmail?: string;
-      /** @description Whether the submission is anonymous (no client email stored). */
-      anonymous?: boolean;
-      /**
-       * @description Inbound response channel. Defaults to 'api'; a value provided here REPLACES 'api' (user-defined channel). Stored on the response.
-       * @example my-crm
-       */
-      responseChannel?: string;
-      /** @description Opaque invitation dispatch token echoed from the link (?dtoken=). Consumed to mark the outbound invitation responded; never persisted. */
-      dispatchToken?: string;
-    };
-    V1CreateCesTextnoteBodyDto: {
-      /**
-       * @description Text feedback content
-       * @example Resolver fue muy facil.
-       */
-      description: string;
-    };
-    V1CaptureAudioDto: {
-      /** @description Device-local URI of the recorded audio */
-      uri?: string;
-      /** @description Audio MIME type, e.g. audio/m4a */
-      mimeType?: string;
-      /** @description Duration in milliseconds */
-      durationMs?: number;
-    };
-    V1CaptureRespondentDto: {
-      /** @description Respondent email */
-      email?: string;
-      /** @description Respondent phone */
-      phone?: string;
-      /** @description Host-app external id (e.g. CRM id) */
-      externalId?: string;
-    };
-    V1CaptureBodyDto: {
-      /** @description Client-generated idempotency id */
-      id?: string;
-      /**
-       * @example woku
-       * @enum {string}
-       */
-      kind: 'woku' | 'nps' | 'csat' | 'ces';
-      /**
-       * @description Spoken language. Required when the capture includes an audio file.
-       * @enum {string}
-       */
-      language?: 'es' | 'en';
-      /** @description Target id: the wokuId for a woku capture, the (optional) npsToolId for an NPS capture, or the (required) csatToolId/cesToolId for a CSAT/CES capture (those tools are always custom). */
-      targetId?: string;
-      /**
-       * @description Woku star rating 1-5
-       * @example 5
-       */
-      rating?: number;
-      /**
-       * @description NPS score 0-10
-       * @example 9
-       */
-      score?: number;
-      /** @description Free-text comment */
-      comment?: string;
-      audio?: components['schemas']['V1CaptureAudioDto'];
-      respondent?: components['schemas']['V1CaptureRespondentDto'];
-    };
-    V1CreateNpsInvitationsBodyDto: {
-      /**
-       * @description Delivery channel for the invitations
-       * @example whatsapp
-       * @enum {string}
-       */
-      channel: 'email' | 'whatsapp';
-      /**
-       * @description Recipients: email addresses for the email channel, phone numbers (digits, country code included, e.g. 56912345678) for whatsapp
-       * @example [
-       *       "56912345678"
-       *     ]
-       */
-      recipients: string[];
-      /**
-       * @description Language of the invitation template
-       * @example es
-       * @enum {string}
-       */
-      language?: 'es' | 'en';
-      /**
-       * Format: ObjectId
-       * @description NPS tool to survey for. Omit to send the company-level NPS survey.
-       */
-      npsToolId?: string;
-    };
-    V1RejectedInvitationDto: {
-      /** @description Recipient as received in the request */
-      recipient: string;
-      /**
-       * @description Why the invitation was not dispatched
-       * @enum {string}
-       */
-      reason:
-        | 'invalid_recipient'
-        | 'quarantined'
-        | 'insufficient_credits_or_blocked'
-        | 'send_failed';
-    };
-    V1InvitationsResultDto: {
-      /** @enum {string} */
-      channel: 'email' | 'whatsapp';
-      /** @description Recipients whose invitation was dispatched (or queued) */
-      accepted: string[];
-      /** @description Recipients whose invitation was not dispatched, with reason */
-      rejected: components['schemas']['V1RejectedInvitationDto'][];
-    };
-    V1CreateCsatInvitationsBodyDto: {
-      /**
-       * @description Delivery channel for the invitations
-       * @example whatsapp
-       * @enum {string}
-       */
-      channel: 'email' | 'whatsapp';
-      /**
-       * @description Recipients: email addresses for the email channel, phone numbers (digits, country code included, e.g. 56912345678) for whatsapp
-       * @example [
-       *       "56912345678"
-       *     ]
-       */
-      recipients: string[];
-      /**
-       * @description Language of the invitation template
-       * @example es
-       * @enum {string}
-       */
-      language?: 'es' | 'en';
-      /**
-       * Format: ObjectId
-       * @description CSAT tool to survey for (always required: always custom).
-       */
-      csatToolId: string;
-    };
-    V1CreateCesInvitationsBodyDto: {
-      /**
-       * @description Delivery channel for the invitations
-       * @example whatsapp
-       * @enum {string}
-       */
-      channel: 'email' | 'whatsapp';
-      /**
-       * @description Recipients: email addresses for the email channel, phone numbers (digits, country code included, e.g. 56912345678) for whatsapp
-       * @example [
-       *       "56912345678"
-       *     ]
-       */
-      recipients: string[];
-      /**
-       * @description Language of the invitation template
-       * @example es
-       * @enum {string}
-       */
-      language?: 'es' | 'en';
-      /**
-       * Format: ObjectId
-       * @description CES tool to survey for (always required: always custom).
-       */
-      cesToolId: string;
-    };
-    V1CreateInvitationsBodyDto: {
-      /**
-       * @description Delivery channel for the invitations
-       * @example whatsapp
-       * @enum {string}
-       */
-      channel: 'email' | 'whatsapp';
-      /**
-       * @description Recipients: email addresses for the email channel, phone numbers (digits, country code included, e.g. 56912345678) for whatsapp
-       * @example [
-       *       "56912345678"
-       *     ]
-       */
-      recipients: string[];
-      /**
-       * @description Language of the invitation template
-       * @example es
-       * @enum {string}
-       */
-      language?: 'es' | 'en';
-    };
-    V1CreateFormResponseBodyDto: {
-      /**
-       * @description Whether this response is anonymous
-       * @example false
-       */
-      anonymous: boolean;
-      /**
-       * @description Email of the respondent (required when the form identifies clients by email and the response is not anonymous)
-       * @example respondent@example.com
-       */
-      email?: string;
-      /**
-       * @description Phone of the respondent (required when the form identifies clients by phone and the response is not anonymous)
-       * @example +56912345678
-       */
-      phone?: string;
-      /**
-       * @description Answers keyed by field id
-       * @example {
-       *       "field-uuid-1": "John Doe",
-       *       "field-uuid-2": 5
-       *     }
-       */
-      answers: Record<string, never>;
-      /**
-       * @description Inbound response channel. Defaults to 'api'; a value provided here REPLACES 'api' (user-defined channel). Stored on the response.
-       * @example my-crm
-       */
-      responseChannel?: string;
-      /**
-       * @description Opaque invitation dispatch token echoed from the link (?dtoken=). Consumed to mark the outbound invitation responded; never persisted.
-       * @example a1b2c3d4-...
-       */
-      dispatchToken?: string;
-    };
-    NpsToolLocalizedContentBodyDTO: {
-      /**
-       * @example en
-       * @enum {string}
-       */
-      locale: 'es' | 'en';
-      /**
-       * @description Translated NPS question for this locale.
-       * @example How likely are you to recommend us?
-       */
-      npsMessage: string;
-      /**
-       * @description Translated audience for this locale.
-       * @example customers
-       */
-      audienceType?: string;
-    };
-    CreateNpsToolBodyDTO: {
-      /**
-       * @description Tool name for identification.
-       * @example Post-Purchase Survey
-       */
-      name: string;
-      /**
-       * @description Public NPS question shown to respondents.
-       * @example How likely are you to recommend our service to a friend?
-       */
-      npsMessage: string;
-      /**
-       * @description Audience the survey targets.
-       * @example customers
-       */
-      audienceType?: string;
-      /**
-       * @description Locales the tool is available in (subset of es/en).
-       * @example [
-       *       "es",
-       *       "en"
-       *     ]
-       */
-      availableLocales?: string[];
-      /**
-       * @description Default locale used when none is requested.
-       * @example es
-       * @enum {string}
-       */
-      defaultLocale?: 'es' | 'en';
-      localizedContent?: components['schemas']['NpsToolLocalizedContentBodyDTO'][];
-    };
-    UpdateNpsToolBodyDTO: {
-      name?: string;
-      npsMessage?: string;
-      audienceType?: string;
-      /**
-       * @example [
-       *       "es",
-       *       "en"
-       *     ]
-       */
-      availableLocales?: string[];
-      /** @enum {string} */
-      defaultLocale?: 'es' | 'en';
-      localizedContent?: components['schemas']['NpsToolLocalizedContentBodyDTO'][];
-    };
-    CsatToolLocalizedContentBodyDTO: {
-      /**
-       * @example en
-       * @enum {string}
-       */
-      locale: 'es' | 'en';
-      /**
-       * @description Translated CSAT question for this locale.
-       * @example How satisfied are you with your purchase?
-       */
-      question: string;
-      /**
-       * @description Translated subject for this locale.
-       * @example your purchase
-       */
-      subject?: string;
-    };
-    CreateCsatToolBodyDTO: {
-      /**
-       * @description Tool name for identification.
-       * @example Post-Purchase CSAT
-       */
-      name: string;
-      /**
-       * @description Public CSAT question shown to respondents.
-       * @example How satisfied are you with your purchase?
-       */
-      question: string;
-      /**
-       * @description Static variable filling 'how satisfied are you with [subject]?'.
-       * @example your purchase
-       */
-      subject?: string;
-      /**
-       * @description Locales the tool is available in (subset of es/en).
-       * @example [
-       *       "es",
-       *       "en"
-       *     ]
-       */
-      availableLocales?: string[];
-      /**
-       * @description Default locale used when none is requested.
-       * @example es
-       * @enum {string}
-       */
-      defaultLocale?: 'es' | 'en';
-      localizedContent?: components['schemas']['CsatToolLocalizedContentBodyDTO'][];
-    };
-    UpdateCsatToolBodyDTO: {
-      name?: string;
-      question?: string;
-      subject?: string;
-      /**
-       * @example [
-       *       "es",
-       *       "en"
-       *     ]
-       */
-      availableLocales?: string[];
-      /** @enum {string} */
-      defaultLocale?: 'es' | 'en';
-      localizedContent?: components['schemas']['CsatToolLocalizedContentBodyDTO'][];
-    };
-    CesToolLocalizedContentBodyDTO: {
-      /**
-       * @example en
-       * @enum {string}
-       */
-      locale: 'es' | 'en';
-      /**
-       * @description Translated CES question for this locale.
-       * @example How easy was it to complete your purchase?
-       */
-      question: string;
-      /**
-       * @description Translated action for this locale.
-       * @example complete your purchase
-       */
-      action?: string;
-    };
-    CreateCesToolBodyDTO: {
-      /**
-       * @description Tool name for identification.
-       * @example Post-Purchase Effort
-       */
-      name: string;
-      /**
-       * @description Public effort question shown to respondents.
-       * @example How easy was it to complete your purchase?
-       */
-      question: string;
-      /**
-       * @description Static variable filling 'how easy was it to [action]?'.
-       * @example complete your purchase
-       */
-      action?: string;
-      /**
-       * @description Locales the tool is available in (subset of es/en).
-       * @example [
-       *       "es",
-       *       "en"
-       *     ]
-       */
-      availableLocales?: string[];
-      /**
-       * @description Default locale used when none is requested.
-       * @example es
-       * @enum {string}
-       */
-      defaultLocale?: 'es' | 'en';
-      localizedContent?: components['schemas']['CesToolLocalizedContentBodyDTO'][];
-    };
-    UpdateCesToolBodyDTO: {
-      name?: string;
-      question?: string;
-      action?: string;
-      /**
-       * @example [
-       *       "es",
-       *       "en"
-       *     ]
-       */
-      availableLocales?: string[];
-      /** @enum {string} */
-      defaultLocale?: 'es' | 'en';
-      localizedContent?: components['schemas']['CesToolLocalizedContentBodyDTO'][];
-    };
-    UpdateTicketBodyDTO: {
-      title?: string;
-      /** @enum {string} */
-      severity?: 'high' | 'medium' | 'low';
-      aiSummary?: string;
-      aiCategory?: string;
-    };
-  };
-  responses: never;
-  parameters: never;
-  requestBodies: never;
-  headers: never;
-  pathItems: never;
+    responses: never;
+    parameters: never;
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-  V1Controller_health: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description v1 is reachable */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  ExternalTrackersController_listCompanyTrackers: {
-    parameters: {
-      query?: {
-        /** @description Include deactivated tracker definitions in the list. */
-        includeInactive?: boolean;
-        /** @description When true, each item includes a `usageCount` field (number of Woku assignments that reference the definition). */
-        includeUsage?: boolean;
-        /** @description Page (1-based). */
-        page?: number;
-        /** @description Page size. */
-        limit?: number;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Paginated list of tracker definitions */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  ExternalTrackersController_createTracker: {
-    parameters: {
-      query?: never;
-      header?: {
-        /** @description Client-generated key to make the create safe to retry. A retry with the same key returns the original result instead of creating again. */
-        'X-Woku-Idempotency-Key'?: string;
-      };
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateExternalTrackerDefinitionDTO'];
-      };
-    };
-    responses: {
-      /** @description Tracker definition created */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Invalid or missing API key */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Tracker name already in use */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  ExternalTrackersController_listWokuTrackers: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        wokuId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  ExternalTrackersController_assignByName: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        wokuId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['AssignWokuExternalTrackerByNameDTO'];
-      };
-    };
-    responses: {
-      /** @description Value assigned or updated */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Tracker is inactive or validation error */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Woku belongs to another company */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Woku or tracker name not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  ExternalTrackersController_removeByName: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        wokuId: string;
-        trackerName: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Value removed */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Tracker name or assignment not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  ExternalTrackersController_search: {
-    parameters: {
-      query: {
-        /** @description External tracker name (e.g. "trr") to look up. */
-        name: string;
-        /** @description Exact value to match against the tracker. */
-        value: string;
-        /** @description Page (1-based). */
-        page?: number;
-        /** @description Page size. */
-        limit?: number;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  ExternalTrackersController_searchEntities: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['SearchEntitiesByTrackersDTO'];
-      };
-    };
-    responses: {
-      /** @description Matching entities */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description A filter names an unknown tracker */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  ExternalTrackersController_getTracker: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Tracker definition */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Tracker not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  ExternalTrackersController_updateTracker: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateExternalTrackerDefinitionDTO'];
-      };
-    };
-    responses: {
-      /** @description Tracker definition updated */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Tracker not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Tracker name already in use */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  ExternalTrackersController_activateTracker: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Tracker activated */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Tracker not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  ExternalTrackersController_deactivateTracker: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Tracker deactivated */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Tracker not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  ExternalTrackersController_listEntityTrackers: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        entityType: 'nps' | 'csat' | 'ces' | 'form' | 'flow';
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Trackers assigned to the entity */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Unsupported entity type */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  ExternalTrackersController_assignEntityTrackerByName: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        entityType: 'nps' | 'csat' | 'ces' | 'form' | 'flow';
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['AssignExternalTrackerByNameDTO'];
-      };
-    };
-    responses: {
-      /** @description Value assigned or updated */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Unsupported entity type, inactive tracker or validation error */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Entity belongs to another company */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Entity or tracker name not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  ExternalTrackersController_removeEntityTrackerByName: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        entityType: 'nps' | 'csat' | 'ces' | 'form' | 'flow';
-        id: string;
-        trackerName: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Value removed */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Tracker name or assignment not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1TicketDestinationsController_list: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Destinations (no credentials) */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1TicketDestinationsController_create: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateTicketDestinationDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Validation error */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1TicketDestinationsController_get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Destination not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1TicketDestinationsController_remove: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Destination not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1TicketDestinationsController_update: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateTicketDestinationDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Validation error */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Destination not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1TicketDestinationsController_test: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TestTicketDestinationBodyDTO'];
-      };
-    };
-    responses: {
-      /** @description Sanitized test result */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Not confirmed */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Destination not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1ActionPlanGroupsController_list: {
-    parameters: {
-      query?: {
-        /** @description Free-text search over name, description and condition values. */
-        search?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1ActionPlanGroupsController_create: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateActionPlanGroupDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Validation error */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1ActionPlanGroupsController_get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Group not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1ActionPlanGroupsController_remove: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Group not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1ActionPlanGroupsController_update: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateActionPlanGroupDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Validation error */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Group not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1ActionPlanGroupsController_setEnabled: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['SetActionPlanGroupEnabledDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Group not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1ActionPlansController_list: {
-    parameters: {
-      query?: {
-        /** @description Filter by group id. */
-        groupId?: string;
-        status?:
-          | 'draft'
-          | 'approved'
-          | 'sent'
-          | 'canceled'
-          | 'delivery_error'
-          | 'in_progress'
-          | 'completed';
-        /** @description Plans whose sources include this VoC source. */
-        source?: 'woku' | 'nps' | 'csat' | 'ces';
-        priority?: 'high' | 'medium' | 'low';
-        /** @description ISO start of the createdAt range. */
-        from?: string;
-        /** @description ISO end of the createdAt range (exclusive). */
-        to?: string;
-        /** @description Search over title and summary. */
-        search?: string;
-        page?: number;
-        limit?: number;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1ActionPlansController_get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Plan not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1ActionPlansController_events: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Plan not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1ActionPlansController_getConversation: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Plan not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1ActionPlansController_postReply: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['PostPlanReplyBodyDTO'];
-      };
-    };
-    responses: {
-      /** @description Human message accepted */
-      202: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Not confirmed or invalid body */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Plan not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Plan is not in draft or is busy */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1ActionPlansController_send: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['SendActionPlanDto'];
-      };
-    };
-    responses: {
-      202: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Invalid status transition */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1ActionPlansController_createTask: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateActionPlanTaskDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Plan is not a draft or managed */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1ActionPlansController_reorderTasks: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['ReorderActionPlanTasksDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1ActionPlansController_deleteTask: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-        taskId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1ActionPlansController_updateTask: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-        taskId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateActionPlanTaskDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Plan is not a draft or managed */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1ActionPlansController_approve: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1ActionPlansController_reopen: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1ActionPlansController_cancel: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1ActionPlansController_complete: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1ActionPlansController_resume: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1WokusController_listWokus: {
-    parameters: {
-      query?: {
-        page?: number;
-        limit?: number;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Paginated wokus */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1WokusController_createWoku: {
-    parameters: {
-      query?: never;
-      header: {
-        authorization: string;
-      };
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateWokuApiDto'];
-      };
-    };
-    responses: {
-      /** @description Woku created */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Validation error */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ValidationErrorResponseDto'];
-        };
-      };
-    };
-  };
-  V1WokusController_getWoku: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Woku with stats */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Woku does not belong to the caller company */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Woku not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1WokusController_deleteWoku: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Woku deleted */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Woku does not belong to the caller company */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Woku not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1WokusController_updateWoku: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateWokuBodyDTO'];
-      };
-    };
-    responses: {
-      /** @description Woku updated */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Validation error, or the woku already has reviews */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ValidationErrorResponseDto'];
-        };
-      };
-      /** @description Woku does not belong to the caller company */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Woku not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1WokusController_listWokuReviews: {
-    parameters: {
-      query?: {
-        page?: number;
-        limit?: number;
-      };
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Paginated reviews */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Woku does not belong to the caller company */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Woku not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1WokusController_updateWokuSettings: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateWokuSettingsBodyDTO'];
-      };
-    };
-    responses: {
-      /** @description Woku settings applied */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Validation error */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ValidationErrorResponseDto'];
-        };
-      };
-      /** @description Woku does not belong to the caller company */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Woku not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1WokusController_moveWoku: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['MoveWokuBodyDTO'];
-      };
-    };
-    responses: {
-      /** @description Woku moved */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Validation error */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ValidationErrorResponseDto'];
-        };
-      };
-      /** @description Woku does not belong to the caller company */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Woku not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1WokusController_createWokuFormData: {
-    parameters: {
-      query?: never;
-      header: {
-        authorization: string;
-      };
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'multipart/form-data': components['schemas']['CreateWokuFormDataApiDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1WokusController_getWokuReview: {
-    parameters: {
-      query?: never;
-      header: {
-        authorization: string;
-      };
-      path: {
-        wokuId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1WokusController_createTextnote: {
-    parameters: {
-      query?: never;
-      header: {
-        authorization: string;
-      };
-      path: {
-        wokuId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['V1CreateTextnoteBodyDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1WokusController_createVoicemail: {
-    parameters: {
-      query?: never;
-      header: {
-        authorization: string;
-      };
-      path: {
-        wokuId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'multipart/form-data': components['schemas']['V1CreateVoicemailBodyDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1WokusController_shareWokuToEmail: {
-    parameters: {
-      query?: never;
-      header: {
-        authorization: string;
-      };
-      path: {
-        wokuId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['V1ShareWokuBodyDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1CompaniesController_getCompanyData: {
-    parameters: {
-      query?: never;
-      header: {
-        authorization: string;
-      };
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Company data retrieved */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Invalid or missing API key */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1CompaniesController_rotateApiKey: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description New API key issued */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['V1ApiKeyResultDto'];
-        };
-      };
-      /** @description Invalid or missing API key */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1CompaniesController_revokeApiKey: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description API key revoked */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['V1RevokeApiKeyResultDto'];
-        };
-      };
-      /** @description Invalid or missing API key */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1ReportsController_getCompanyNps: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Company NPS report */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1ReportsController_getNpsTool: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        npsToolId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description NPS tool report */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description NPS tool does not belong to the caller company */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1NpsController_getNpsTool: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description NPS tool definition */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Tool does not belong to caller */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1NpsDataController_listNps: {
-    parameters: {
-      query?: {
-        page?: number;
-        limit?: number;
-        npsToolId?: string;
-        /** @description ISO date, inclusive lower bound on createdAt */
-        from?: string;
-        /** @description ISO date, inclusive upper bound on createdAt */
-        to?: string;
-        /** @description true returns only responses with a text or voice comment */
-        withFeedback?: boolean;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Paginated NPS responses */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description NPS tool filter does not belong to the caller company */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1NpsController_createNps: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['V1CreateNpsBodyDto'];
-      };
-    };
-    responses: {
-      /** @description NPS created */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Validation error */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ValidationErrorResponseDto'];
-        };
-      };
-      /** @description Tool does not belong to caller */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1NpsController_addNpsTextnote: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['V1CreateNpsTextnoteBodyDto'];
-      };
-    };
-    responses: {
-      /** @description Text review added */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Validation error */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ValidationErrorResponseDto'];
-        };
-      };
-      /** @description NPS does not belong to caller */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description NPS not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1NpsController_addNpsVoicemail: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'multipart/form-data': {
-          /**
-           * Format: binary
-           * @description Audio file (m4a/aac/mp4). Transcribed server-side.
-           */
-          file: string;
-          /**
-           * @description Spoken language used for transcription
-           * @enum {string}
-           */
-          language: 'es' | 'en';
-        };
-      };
-    };
-    responses: {
-      /** @description Voice review added */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description NPS does not belong to caller */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description NPS not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1CsatController_getCsatTool: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description CSAT tool definition */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Tool does not belong to caller */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1CsatDataController_listCsat: {
-    parameters: {
-      query?: {
-        page?: number;
-        limit?: number;
-        csatToolId?: string;
-        /** @description ISO date lower bound */
-        from?: string;
-        /** @description ISO date upper bound */
-        to?: string;
-        withFeedback?: boolean;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Paginated CSAT responses */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1CsatController_createCsat: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['V1CreateCsatBodyDto'];
-      };
-    };
-    responses: {
-      /** @description CSAT response created */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Validation error */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ValidationErrorResponseDto'];
-        };
-      };
-      /** @description Tool does not belong to caller */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1CsatController_addCsatTextnote: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['V1CreateCsatTextnoteBodyDto'];
-      };
-    };
-    responses: {
-      /** @description Text comment accepted */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Validation error */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ValidationErrorResponseDto'];
-        };
-      };
-      /** @description Response does not belong to caller */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description CSAT response not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1CsatController_addCsatVoicemail: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'multipart/form-data': {
-          /**
-           * Format: binary
-           * @description Audio file (m4a/aac/mp4). Transcribed server-side.
-           */
-          file: string;
-          /**
-           * @description Spoken language used for transcription
-           * @enum {string}
-           */
-          language: 'es' | 'en';
-        };
-      };
-    };
-    responses: {
-      /** @description Voice comment accepted */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Response does not belong to caller */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description CSAT response not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1CesController_getCesTool: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description CES tool definition */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Tool does not belong to caller */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1CesDataController_listCes: {
-    parameters: {
-      query?: {
-        page?: number;
-        limit?: number;
-        cesToolId?: string;
-        /** @description ISO date lower bound */
-        from?: string;
-        /** @description ISO date upper bound */
-        to?: string;
-        withFeedback?: boolean;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Paginated CES responses */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1CesController_createCes: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['V1CreateCesBodyDto'];
-      };
-    };
-    responses: {
-      /** @description CES response created */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Validation error */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ValidationErrorResponseDto'];
-        };
-      };
-      /** @description Tool does not belong to caller */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1CesController_addCesTextnote: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['V1CreateCesTextnoteBodyDto'];
-      };
-    };
-    responses: {
-      /** @description Text comment accepted */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Validation error */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ValidationErrorResponseDto'];
-        };
-      };
-      /** @description Response does not belong to caller */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description CES response not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1CesController_addCesVoicemail: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'multipart/form-data': {
-          /**
-           * Format: binary
-           * @description Audio file (m4a/aac/mp4). Transcribed server-side.
-           */
-          file: string;
-          /**
-           * @description Spoken language used for transcription
-           * @enum {string}
-           */
-          language: 'es' | 'en';
-        };
-      };
-    };
-    responses: {
-      /** @description Voice comment accepted */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Response does not belong to caller */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description CES response not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1CapturesController_capture: {
-    parameters: {
-      query?: never;
-      header: {
-        authorization: string;
-        'x-woku-idempotency-key': string;
-      };
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['V1CaptureBodyDto'];
-        'multipart/form-data': components['schemas']['V1CaptureBodyDto'];
-      };
-    };
-    responses: {
-      /** @description Capture accepted */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Validation error */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ValidationErrorResponseDto'];
-        };
-      };
-    };
-  };
-  V1QuarantinesController_check: {
-    parameters: {
-      query?: {
-        email?: string;
-        phone?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Quarantine status for the respondent */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description email or phone is required */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1InvitationsController_sendNpsInvitations: {
-    parameters: {
-      query?: never;
-      header?: {
-        /** @description Client-generated key to make a send safe to retry. A retry with the same key returns the original result instead of dispatching again. */
-        'X-Woku-Idempotency-Key'?: string;
-      };
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['V1CreateNpsInvitationsBodyDto'];
-      };
-    };
-    responses: {
-      /** @description Per-recipient dispatch summary */
-      202: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['V1InvitationsResultDto'];
-        };
-      };
-      /** @description Validation error */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ValidationErrorResponseDto'];
-        };
-      };
-      /** @description NPS tool does not belong to the caller company */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1InvitationsController_sendCsatInvitations: {
-    parameters: {
-      query?: never;
-      header?: {
-        /** @description Client-generated key to make a send safe to retry. A retry with the same key returns the original result instead of dispatching again. */
-        'X-Woku-Idempotency-Key'?: string;
-      };
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['V1CreateCsatInvitationsBodyDto'];
-      };
-    };
-    responses: {
-      /** @description Per-recipient dispatch summary */
-      202: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['V1InvitationsResultDto'];
-        };
-      };
-      /** @description Validation error */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ValidationErrorResponseDto'];
-        };
-      };
-      /** @description Tool does not belong to caller */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1InvitationsController_sendCesInvitations: {
-    parameters: {
-      query?: never;
-      header?: {
-        /** @description Client-generated key to make a send safe to retry. A retry with the same key returns the original result instead of dispatching again. */
-        'X-Woku-Idempotency-Key'?: string;
-      };
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['V1CreateCesInvitationsBodyDto'];
-      };
-    };
-    responses: {
-      /** @description Per-recipient dispatch summary */
-      202: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['V1InvitationsResultDto'];
-        };
-      };
-      /** @description Validation error */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ValidationErrorResponseDto'];
-        };
-      };
-      /** @description Tool does not belong to caller */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1InvitationsController_sendFormInvitations: {
-    parameters: {
-      query?: never;
-      header?: {
-        /** @description Client-generated key to make a send safe to retry. A retry with the same key returns the original result instead of dispatching again. */
-        'X-Woku-Idempotency-Key'?: string;
-      };
-      path: {
-        /** @description Form id */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['V1CreateInvitationsBodyDto'];
-      };
-    };
-    responses: {
-      /** @description Per-recipient dispatch summary */
-      202: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['V1InvitationsResultDto'];
-        };
-      };
-      /** @description Validation error, or the form is closed or inactive */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ValidationErrorResponseDto'];
-        };
-      };
-      /** @description Form does not belong to the caller company */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Form not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1InvitationsController_sendWokuInvitations: {
-    parameters: {
-      query?: never;
-      header?: {
-        /** @description Client-generated key to make a send safe to retry. A retry with the same key returns the original result instead of dispatching again. */
-        'X-Woku-Idempotency-Key'?: string;
-      };
-      path: {
-        /** @description Woku id */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['V1CreateInvitationsBodyDto'];
-      };
-    };
-    responses: {
-      /** @description Per-recipient dispatch summary */
-      202: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['V1InvitationsResultDto'];
-        };
-      };
-      /** @description Validation error, or the woku is closed or has reviews disabled */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ValidationErrorResponseDto'];
-        };
-      };
-      /** @description Woku does not belong to the caller company */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Woku not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1FormsController_listForms: {
-    parameters: {
-      query?: {
-        page?: number;
-        limit?: number;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Paginated forms */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1FormsController_listFormResponses: {
-    parameters: {
-      query?: {
-        page?: number;
-        limit?: number;
-      };
-      header?: never;
-      path: {
-        /** @description Form id */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Paginated form responses */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Form does not belong to the caller company */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Form not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1FormsController_createFormResponse: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description Form id */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['V1CreateFormResponseBodyDto'];
-      };
-    };
-    responses: {
-      /** @description Form response created */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Validation error, or the form is closed */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ValidationErrorResponseDto'];
-        };
-      };
-      /** @description Form does not belong to the caller company */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Form not found or inactive */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Respondent is quarantined */
-      429: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1FormsController_getForm: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description Form id */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Form definition */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Form does not belong to the caller company */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Form not found or inactive */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1FlowsController_listFlows: {
-    parameters: {
-      query?: {
-        page?: number;
-        limit?: number;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Paginated flows */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1FlowsController_getFlow: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description Flow id */
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Flow data */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Flow does not belong to the caller company */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Flow not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1NpsDataController_listNpsTools: {
-    parameters: {
-      query?: {
-        page?: number;
-        limit?: number;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Paginated NPS tools */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1NpsToolsController_createNpsTool: {
-    parameters: {
-      query?: never;
-      header?: {
-        /** @description Client-generated key to make the create safe to retry. A retry with the same key returns the original result instead of creating again. */
-        'X-Woku-Idempotency-Key'?: string;
-      };
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateNpsToolBodyDTO'];
-      };
-    };
-    responses: {
-      /** @description NPS tool created */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Validation error */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ValidationErrorResponseDto'];
-        };
-      };
-      /** @description Invalid or missing API key */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1NpsDataController_getNps: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description NPS response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description NPS does not belong to the caller company */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description NPS not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1CsatDataController_listCsatTools: {
-    parameters: {
-      query?: {
-        page?: number;
-        limit?: number;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Paginated CSAT tools */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1CsatToolsController_createCsatTool: {
-    parameters: {
-      query?: never;
-      header?: {
-        /** @description Client-generated key to make the create safe to retry. A retry with the same key returns the original result instead of creating again. */
-        'X-Woku-Idempotency-Key'?: string;
-      };
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateCsatToolBodyDTO'];
-      };
-    };
-    responses: {
-      /** @description CSAT tool created */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Validation error */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ValidationErrorResponseDto'];
-        };
-      };
-      /** @description Invalid or missing API key */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1CsatDataController_getCsat: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description CSAT response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description CSAT response not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1CesDataController_listCesTools: {
-    parameters: {
-      query?: {
-        page?: number;
-        limit?: number;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Paginated CES tools */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1CesToolsController_createCesTool: {
-    parameters: {
-      query?: never;
-      header?: {
-        /** @description Client-generated key to make the create safe to retry. A retry with the same key returns the original result instead of creating again. */
-        'X-Woku-Idempotency-Key'?: string;
-      };
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateCesToolBodyDTO'];
-      };
-    };
-    responses: {
-      /** @description CES tool created */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Validation error */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ValidationErrorResponseDto'];
-        };
-      };
-      /** @description Invalid or missing API key */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1CesDataController_getCes: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description CES response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description CES response not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1NpsToolsController_deleteNpsTool: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description NPS tool deleted */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description NPS tool not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1NpsToolsController_updateNpsTool: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateNpsToolBodyDTO'];
-      };
-    };
-    responses: {
-      /** @description NPS tool updated */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Validation error, or the tool already has responses */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ValidationErrorResponseDto'];
-        };
-      };
-      /** @description NPS tool not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1CsatToolsController_deleteCsatTool: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description CSAT tool deleted */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description CSAT tool not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1CsatToolsController_updateCsatTool: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateCsatToolBodyDTO'];
-      };
-    };
-    responses: {
-      /** @description CSAT tool updated */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Validation error, or the tool already has responses */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ValidationErrorResponseDto'];
-        };
-      };
-      /** @description CSAT tool not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1CesToolsController_deleteCesTool: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description CES tool deleted */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description CES tool not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1CesToolsController_updateCesTool: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateCesToolBodyDTO'];
-      };
-    };
-    responses: {
-      /** @description CES tool updated */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Validation error, or the tool already has responses */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ValidationErrorResponseDto'];
-        };
-      };
-      /** @description CES tool not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1TicketsController_listTickets: {
-    parameters: {
-      query?: {
-        /** @description Only tickets originated by this tool. */
-        tool?: 'woku' | 'nps' | 'form' | 'csat' | 'ces';
-        severity?: 'high' | 'medium' | 'low';
-        /** @description Free-text search over title, code, client and comment. */
-        search?: string;
-        /** @description Only tickets routed to this SAC destination. */
-        destinationId?: string;
-        /** @description Lower bound for createdAt (ISO 8601). */
-        createdFrom?: string;
-        /** @description Upper bound for createdAt (ISO 8601). */
-        createdTo?: string;
-        page?: number;
-        limit?: number;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Paginated tickets */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Validation error */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ValidationErrorResponseDto'];
-        };
-      };
-    };
-  };
-  V1TicketsController_getStats: {
-    parameters: {
-      query?: {
-        /** @description Scope the aggregate to a single SAC destination. */
-        destinationId?: string;
-        /** @description Lower bound for createdAt (ISO 8601). */
-        createdFrom?: string;
-        /** @description Upper bound for createdAt (ISO 8601). */
-        createdTo?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Aggregate ticket counts */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1TicketsController_getTicket: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Ticket */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Ticket not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1TicketsController_updateTicket: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateTicketBodyDTO'];
-      };
-    };
-    responses: {
-      /** @description Ticket updated */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Validation error */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ValidationErrorResponseDto'];
-        };
-      };
-      /** @description Ticket not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  V1DispatchesController_list: {
-    parameters: {
-      query?: {
-        /** @description Outbound channel of the send. */
-        channel?: 'email' | 'whatsapp';
-        /** @description Only dispatches targeting this tool kind. */
-        responseType?: 'woku' | 'nps' | 'form' | 'client-form' | 'csat' | 'ces';
-        /** @description Only dispatches targeting this specific tool/woku/form id. */
-        targetId?: string;
-        /** @description Lower bound for createdAt (ISO 8601). */
-        createdFrom?: string;
-        /** @description Upper bound for createdAt (ISO 8601). */
-        createdTo?: string;
-        /** @description Lifecycle status of the whole invitation. */
-        status?: 'invited' | 'partially_responded' | 'responded' | 'failed';
-        page?: number;
-        limit?: number;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Paginated dispatches */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Validation error */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ValidationErrorResponseDto'];
-        };
-      };
-    };
-  };
-  V1DispatchesController_stats: {
-    parameters: {
-      query?: {
-        /** @description Outbound channel of the send. */
-        channel?: 'email' | 'whatsapp';
-        /** @description Only dispatches targeting this tool kind. */
-        responseType?: 'woku' | 'nps' | 'form' | 'client-form' | 'csat' | 'ces';
-        /** @description Only dispatches targeting this specific tool/woku/form id. */
-        targetId?: string;
-        /** @description Lower bound for createdAt (ISO 8601). */
-        createdFrom?: string;
-        /** @description Upper bound for createdAt (ISO 8601). */
-        createdTo?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Aggregate response-rate metrics */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
+    V1Controller_health: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description v1 is reachable */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ExternalTrackersController_listCompanyTrackers: {
+        parameters: {
+            query?: {
+                /** @description Include deactivated tracker definitions in the list. */
+                includeInactive?: boolean;
+                /** @description When true, each item includes a `usageCount` field (number of Woku assignments that reference the definition). */
+                includeUsage?: boolean;
+                /** @description Page (1-based). */
+                page?: number;
+                /** @description Page size. */
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Paginated list of tracker definitions */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ExternalTrackersController_createTracker: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Client-generated key to make the create safe to retry. A retry with the same key returns the original result instead of creating again. */
+                "X-Woku-Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateExternalTrackerDefinitionDTO"];
+            };
+        };
+        responses: {
+            /** @description Tracker definition created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid or missing API key */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Tracker name already in use */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ExternalTrackersController_listWokuTrackers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                wokuId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ExternalTrackersController_assignByName: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                wokuId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssignWokuExternalTrackerByNameDTO"];
+            };
+        };
+        responses: {
+            /** @description Value assigned or updated */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Tracker is inactive or validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Woku belongs to another company */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Woku or tracker name not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ExternalTrackersController_removeByName: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                wokuId: string;
+                trackerName: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Value removed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Tracker name or assignment not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ExternalTrackersController_search: {
+        parameters: {
+            query: {
+                /** @description External tracker name (e.g. "trr") to look up. */
+                name: string;
+                /** @description Exact value to match against the tracker. */
+                value: string;
+                /** @description Page (1-based). */
+                page?: number;
+                /** @description Page size. */
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ExternalTrackersController_searchEntities: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SearchEntitiesByTrackersDTO"];
+            };
+        };
+        responses: {
+            /** @description Matching entities */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description A filter names an unknown tracker */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ExternalTrackersController_getTracker: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Tracker definition */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Tracker not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ExternalTrackersController_updateTracker: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateExternalTrackerDefinitionDTO"];
+            };
+        };
+        responses: {
+            /** @description Tracker definition updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Tracker not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Tracker name already in use */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ExternalTrackersController_activateTracker: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Tracker activated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Tracker not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ExternalTrackersController_deactivateTracker: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Tracker deactivated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Tracker not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ExternalTrackersController_listEntityTrackers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                entityType: "nps" | "csat" | "ces" | "form" | "flow";
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Trackers assigned to the entity */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unsupported entity type */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ExternalTrackersController_assignEntityTrackerByName: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                entityType: "nps" | "csat" | "ces" | "form" | "flow";
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssignExternalTrackerByNameDTO"];
+            };
+        };
+        responses: {
+            /** @description Value assigned or updated */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unsupported entity type, inactive tracker or validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Entity belongs to another company */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Entity or tracker name not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ExternalTrackersController_removeEntityTrackerByName: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                entityType: "nps" | "csat" | "ces" | "form" | "flow";
+                id: string;
+                trackerName: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Value removed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Tracker name or assignment not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1TicketDestinationsController_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Destinations (no credentials) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1TicketDestinationsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["V1CreateTicketDestinationDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1TicketDestinationsController_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Destination not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1TicketDestinationsController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Destination not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1TicketDestinationsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["V1UpdateTicketDestinationDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Destination not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1TicketDestinationsController_test: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TestTicketDestinationBodyDTO"];
+            };
+        };
+        responses: {
+            /** @description Sanitized test result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not confirmed */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Destination not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1ActionPlanGroupsController_list: {
+        parameters: {
+            query?: {
+                /** @description Free-text search over name, description and condition values. */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1ActionPlanGroupsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateActionPlanGroupDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1ActionPlanGroupsController_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Group not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1ActionPlanGroupsController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Group not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1ActionPlanGroupsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateActionPlanGroupDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Group not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1ActionPlanGroupsController_setEnabled: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetActionPlanGroupEnabledDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Group not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1ActionPlansController_list: {
+        parameters: {
+            query?: {
+                /** @description Filter by group id. */
+                groupId?: string;
+                status?: "draft" | "approved" | "sent" | "canceled" | "delivery_error" | "in_progress" | "completed";
+                /** @description Presentation stage; expands to the technical statuses it groups (review=draft; active=approved,in_progress,delivery_error; closed=completed,sent,canceled). Mutually exclusive with status. */
+                stage?: "review" | "active" | "closed";
+                /** @description Plans whose sources include this VoC source. */
+                source?: "woku" | "nps" | "csat" | "ces";
+                /** @description How the source filter maps to plans (AP-0064): "single" matches plans whose sources is EXACTLY the given source (requires source); "mixed" matches cross-source plans with more than one source (forbids source). Omitting it keeps the legacy membership semantics of source alone. */
+                sourceMode?: "single" | "mixed";
+                priority?: "high" | "medium" | "low";
+                /** @description ISO start of the createdAt range. */
+                from?: string;
+                /** @description ISO end of the createdAt range (exclusive). */
+                to?: string;
+                /** @description Search over title and summary. */
+                search?: string;
+                page?: number;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1ActionPlansController_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Plan not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1ActionPlansController_events: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Plan not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1ActionPlansController_getConversation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Plan not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1ActionPlansController_postReply: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PostPlanReplyBodyDTO"];
+            };
+        };
+        responses: {
+            /** @description Human message accepted */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not confirmed or invalid body */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Plan not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Plan is not in draft or is busy */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1ActionPlansController_send: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["V1SendActionPlanDto"];
+            };
+        };
+        responses: {
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid status transition */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1ActionPlansController_createTask: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateActionPlanTaskDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Plan is not a draft or managed */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1ActionPlansController_reorderTasks: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReorderActionPlanTasksDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1ActionPlansController_deleteTask: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                taskId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1ActionPlansController_updateTask: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                taskId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateActionPlanTaskDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Plan is not a draft or managed */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1ActionPlansController_approve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1ActionPlansController_reopen: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1ActionPlansController_cancel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1ActionPlansController_complete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1ActionPlansController_resume: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1WokusController_listWokus: {
+        parameters: {
+            query?: {
+                page?: number;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Paginated wokus */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1WokusController_createWoku: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateWokuApiDto"];
+            };
+        };
+        responses: {
+            /** @description Woku created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+        };
+    };
+    V1WokusController_getWoku: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Woku with stats */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Woku does not belong to the caller company */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Woku not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1WokusController_deleteWoku: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Woku deleted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Woku does not belong to the caller company */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Woku not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1WokusController_updateWoku: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateWokuBodyDTO"];
+            };
+        };
+        responses: {
+            /** @description Woku updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation error, or the woku already has reviews */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Woku does not belong to the caller company */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Woku not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1WokusController_listWokuReviews: {
+        parameters: {
+            query?: {
+                page?: number;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Paginated reviews */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Woku does not belong to the caller company */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Woku not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1WokusController_updateWokuSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateWokuSettingsBodyDTO"];
+            };
+        };
+        responses: {
+            /** @description Woku settings applied */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Woku does not belong to the caller company */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Woku not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1WokusController_moveWoku: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MoveWokuBodyDTO"];
+            };
+        };
+        responses: {
+            /** @description Woku moved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Woku does not belong to the caller company */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Woku not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1WokusController_createWokuFormData: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["CreateWokuFormDataApiDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1WokusController_getWokuReview: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                wokuId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1WokusController_createTextnote: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                wokuId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["V1CreateTextnoteBodyDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1WokusController_createVoicemail: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                wokuId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["V1CreateVoicemailBodyDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1WokusController_shareWokuToEmail: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path: {
+                wokuId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["V1ShareWokuBodyDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1WokuMediaController_upload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Media stored for reuse in Wokus and journey moments */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WokuMediaUploadResultDto"];
+                };
+            };
+            /** @description Missing, invalid media or image over 10 MB */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Invalid company key */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The media upload exceeds 25 MB */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1CompaniesController_getCompanyData: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Company data retrieved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid or missing API key */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1CompaniesController_rotateApiKey: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description New API key issued */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["V1ApiKeyResultDto"];
+                };
+            };
+            /** @description Invalid or missing API key */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1CompaniesController_revokeApiKey: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description API key revoked */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["V1RevokeApiKeyResultDto"];
+                };
+            };
+            /** @description Invalid or missing API key */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1ReportsController_getCompanyNps: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Company NPS report */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1ReportsController_getNpsTool: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                npsToolId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description NPS tool report */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description NPS tool does not belong to the caller company */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1NpsController_getNpsTool: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description NPS tool definition */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Tool does not belong to caller */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1NpsDataController_listNps: {
+        parameters: {
+            query?: {
+                page?: number;
+                limit?: number;
+                npsToolId?: string;
+                /** @description ISO date, inclusive lower bound on createdAt */
+                from?: string;
+                /** @description ISO date, inclusive upper bound on createdAt */
+                to?: string;
+                /** @description true returns only responses with a text or voice comment */
+                withFeedback?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Paginated NPS responses */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description NPS tool filter does not belong to the caller company */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1NpsController_createNps: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["V1CreateNpsBodyDto"];
+            };
+        };
+        responses: {
+            /** @description NPS created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Tool does not belong to caller */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1NpsController_addNpsTextnote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["V1CreateNpsTextnoteBodyDto"];
+            };
+        };
+        responses: {
+            /** @description Text review added */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description NPS does not belong to caller */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description NPS not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1NpsController_addNpsVoicemail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /**
+                     * Format: binary
+                     * @description Audio file (m4a/aac/mp4). Transcribed server-side.
+                     */
+                    file: string;
+                    /**
+                     * @description Spoken language used for transcription
+                     * @enum {string}
+                     */
+                    language: "es" | "en";
+                };
+            };
+        };
+        responses: {
+            /** @description Voice review added */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description NPS does not belong to caller */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description NPS not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1CsatController_getCsatTool: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description CSAT tool definition */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Tool does not belong to caller */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1CsatDataController_listCsat: {
+        parameters: {
+            query?: {
+                page?: number;
+                limit?: number;
+                csatToolId?: string;
+                /** @description ISO date lower bound */
+                from?: string;
+                /** @description ISO date upper bound */
+                to?: string;
+                withFeedback?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Paginated CSAT responses */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1CsatController_createCsat: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["V1CreateCsatBodyDto"];
+            };
+        };
+        responses: {
+            /** @description CSAT response created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Tool does not belong to caller */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1CsatController_addCsatTextnote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["V1CreateCsatTextnoteBodyDto"];
+            };
+        };
+        responses: {
+            /** @description Text comment accepted */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Response does not belong to caller */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description CSAT response not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1CsatController_addCsatVoicemail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /**
+                     * Format: binary
+                     * @description Audio file (m4a/aac/mp4). Transcribed server-side.
+                     */
+                    file: string;
+                    /**
+                     * @description Spoken language used for transcription
+                     * @enum {string}
+                     */
+                    language: "es" | "en";
+                };
+            };
+        };
+        responses: {
+            /** @description Voice comment accepted */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Response does not belong to caller */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description CSAT response not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1CesController_getCesTool: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description CES tool definition */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Tool does not belong to caller */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1CesDataController_listCes: {
+        parameters: {
+            query?: {
+                page?: number;
+                limit?: number;
+                cesToolId?: string;
+                /** @description ISO date lower bound */
+                from?: string;
+                /** @description ISO date upper bound */
+                to?: string;
+                withFeedback?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Paginated CES responses */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1CesController_createCes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["V1CreateCesBodyDto"];
+            };
+        };
+        responses: {
+            /** @description CES response created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Tool does not belong to caller */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1CesController_addCesTextnote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["V1CreateCesTextnoteBodyDto"];
+            };
+        };
+        responses: {
+            /** @description Text comment accepted */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Response does not belong to caller */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description CES response not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1CesController_addCesVoicemail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /**
+                     * Format: binary
+                     * @description Audio file (m4a/aac/mp4). Transcribed server-side.
+                     */
+                    file: string;
+                    /**
+                     * @description Spoken language used for transcription
+                     * @enum {string}
+                     */
+                    language: "es" | "en";
+                };
+            };
+        };
+        responses: {
+            /** @description Voice comment accepted */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Response does not belong to caller */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description CES response not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1CapturesController_capture: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+                "x-woku-idempotency-key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["V1CaptureBodyDto"];
+                "multipart/form-data": components["schemas"]["V1CaptureBodyDto"];
+            };
+        };
+        responses: {
+            /** @description Capture accepted */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["V1CaptureResultDto"];
+                };
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+        };
+    };
+    V1QuarantinesController_check: {
+        parameters: {
+            query?: {
+                email?: string;
+                phone?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Quarantine status for the respondent */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description email or phone is required */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1InvitationsController_sendNpsInvitations: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Client-generated key to make a send safe to retry. A retry with the same key returns the original result instead of dispatching again. */
+                "X-Woku-Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["V1CreateNpsInvitationsBodyDto"];
+            };
+        };
+        responses: {
+            /** @description Per-recipient dispatch summary */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["V1InvitationsResultDto"];
+                };
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description NPS tool does not belong to the caller company */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1InvitationsController_sendCsatInvitations: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Client-generated key to make a send safe to retry. A retry with the same key returns the original result instead of dispatching again. */
+                "X-Woku-Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["V1CreateCsatInvitationsBodyDto"];
+            };
+        };
+        responses: {
+            /** @description Per-recipient dispatch summary */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["V1InvitationsResultDto"];
+                };
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Tool does not belong to caller */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1InvitationsController_sendCesInvitations: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Client-generated key to make a send safe to retry. A retry with the same key returns the original result instead of dispatching again. */
+                "X-Woku-Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["V1CreateCesInvitationsBodyDto"];
+            };
+        };
+        responses: {
+            /** @description Per-recipient dispatch summary */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["V1InvitationsResultDto"];
+                };
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Tool does not belong to caller */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1InvitationsController_sendFormInvitations: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Client-generated key to make a send safe to retry. A retry with the same key returns the original result instead of dispatching again. */
+                "X-Woku-Idempotency-Key"?: string;
+            };
+            path: {
+                /** @description Form id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["V1CreateInvitationsBodyDto"];
+            };
+        };
+        responses: {
+            /** @description Per-recipient dispatch summary */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["V1InvitationsResultDto"];
+                };
+            };
+            /** @description Validation error, or the form is closed or inactive */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Form does not belong to the caller company */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Form not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1InvitationsController_sendWokuInvitations: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Client-generated key to make a send safe to retry. A retry with the same key returns the original result instead of dispatching again. */
+                "X-Woku-Idempotency-Key"?: string;
+            };
+            path: {
+                /** @description Woku id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["V1CreateInvitationsBodyDto"];
+            };
+        };
+        responses: {
+            /** @description Per-recipient dispatch summary */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["V1InvitationsResultDto"];
+                };
+            };
+            /** @description Validation error, or the woku is closed or has reviews disabled */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Woku does not belong to the caller company */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Woku not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1FormsController_listForms: {
+        parameters: {
+            query?: {
+                page?: number;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Paginated forms */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1FormsController_listFormResponses: {
+        parameters: {
+            query?: {
+                page?: number;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                /** @description Form id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Paginated form responses */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Form does not belong to the caller company */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Form not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1FormsController_createFormResponse: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Form id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["V1CreateFormResponseBodyDto"];
+            };
+        };
+        responses: {
+            /** @description Form response created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation error, or the form is closed */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Form does not belong to the caller company */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Form not found or inactive */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Respondent is quarantined */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1FormsController_getForm: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Form id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Form definition */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Form does not belong to the caller company */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Form not found or inactive */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1FlowsController_listFlows: {
+        parameters: {
+            query?: {
+                page?: number;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Paginated flows */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1FlowsController_getFlow: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Flow id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Flow data */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Flow does not belong to the caller company */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Flow not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1NpsDataController_listNpsTools: {
+        parameters: {
+            query?: {
+                page?: number;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Paginated NPS tools */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1NpsToolsController_createNpsTool: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Client-generated key to make the create safe to retry. A retry with the same key returns the original result instead of creating again. */
+                "X-Woku-Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateNpsToolBodyDTO"];
+            };
+        };
+        responses: {
+            /** @description NPS tool created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Invalid or missing API key */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1NpsDataController_getNps: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description NPS response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description NPS does not belong to the caller company */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description NPS not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1CsatDataController_listCsatTools: {
+        parameters: {
+            query?: {
+                page?: number;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Paginated CSAT tools */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1CsatToolsController_createCsatTool: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Client-generated key to make the create safe to retry. A retry with the same key returns the original result instead of creating again. */
+                "X-Woku-Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCsatToolBodyDTO"];
+            };
+        };
+        responses: {
+            /** @description CSAT tool created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Invalid or missing API key */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1CsatDataController_getCsat: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description CSAT response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description CSAT response not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1CesDataController_listCesTools: {
+        parameters: {
+            query?: {
+                page?: number;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Paginated CES tools */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1CesToolsController_createCesTool: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Client-generated key to make the create safe to retry. A retry with the same key returns the original result instead of creating again. */
+                "X-Woku-Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCesToolBodyDTO"];
+            };
+        };
+        responses: {
+            /** @description CES tool created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Invalid or missing API key */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1CesDataController_getCes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description CES response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description CES response not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1NpsToolsController_deleteNpsTool: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description NPS tool deleted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description NPS tool not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1NpsToolsController_updateNpsTool: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateNpsToolBodyDTO"];
+            };
+        };
+        responses: {
+            /** @description NPS tool updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation error, or the tool already has responses */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description NPS tool not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1CsatToolsController_deleteCsatTool: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description CSAT tool deleted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description CSAT tool not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1CsatToolsController_updateCsatTool: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCsatToolBodyDTO"];
+            };
+        };
+        responses: {
+            /** @description CSAT tool updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation error, or the tool already has responses */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description CSAT tool not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1CesToolsController_deleteCesTool: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description CES tool deleted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description CES tool not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1CesToolsController_updateCesTool: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCesToolBodyDTO"];
+            };
+        };
+        responses: {
+            /** @description CES tool updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation error, or the tool already has responses */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description CES tool not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1TicketsController_listTickets: {
+        parameters: {
+            query?: {
+                /** @description Only tickets originated by this tool. */
+                tool?: "woku" | "nps" | "form" | "csat" | "ces";
+                severity?: "high" | "medium" | "low";
+                /** @description Free-text search over title, code, client and comment. */
+                search?: string;
+                /** @description Only tickets routed to this SAC destination. */
+                destinationId?: string;
+                /** @description Lower bound for createdAt (ISO 8601). */
+                createdFrom?: string;
+                /** @description Upper bound for createdAt (ISO 8601). */
+                createdTo?: string;
+                page?: number;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Paginated tickets */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+        };
+    };
+    V1TicketsController_getStats: {
+        parameters: {
+            query?: {
+                /** @description Scope the aggregate to a single SAC destination. */
+                destinationId?: string;
+                /** @description Lower bound for createdAt (ISO 8601). */
+                createdFrom?: string;
+                /** @description Upper bound for createdAt (ISO 8601). */
+                createdTo?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Aggregate ticket counts */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1TicketsController_getTicket: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Ticket */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Ticket not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1TicketsController_updateTicket: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateTicketBodyDTO"];
+            };
+        };
+        responses: {
+            /** @description Ticket updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Ticket not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1DispatchesController_list: {
+        parameters: {
+            query?: {
+                /** @description Outbound channel of the send. */
+                channel?: "email" | "whatsapp";
+                /** @description Only dispatches targeting this tool kind. */
+                responseType?: "woku" | "nps" | "form" | "client-form" | "csat" | "ces";
+                /** @description Only dispatches targeting this specific tool/woku/form id. */
+                targetId?: string;
+                /** @description Lower bound for createdAt (ISO 8601). */
+                createdFrom?: string;
+                /** @description Upper bound for createdAt (ISO 8601). */
+                createdTo?: string;
+                /** @description Lifecycle status of the whole invitation. */
+                status?: "invited" | "partially_responded" | "responded" | "failed";
+                page?: number;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Paginated dispatches */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+        };
+    };
+    V1DispatchesController_stats: {
+        parameters: {
+            query?: {
+                /** @description Outbound channel of the send. */
+                channel?: "email" | "whatsapp";
+                /** @description Only dispatches targeting this tool kind. */
+                responseType?: "woku" | "nps" | "form" | "client-form" | "csat" | "ces";
+                /** @description Only dispatches targeting this specific tool/woku/form id. */
+                targetId?: string;
+                /** @description Lower bound for createdAt (ISO 8601). */
+                createdFrom?: string;
+                /** @description Upper bound for createdAt (ISO 8601). */
+                createdTo?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Aggregate response-rate metrics */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1JourneysController_listParticipations: {
+        parameters: {
+            query?: {
+                limit?: number;
+                cursor?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["V1JourneyParticipationPageDto"];
+                };
+            };
+            /** @description Invalid identifier or journey configuration */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Invalid API key, company access or entitlement */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Journey, moment or evaluation not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1JourneysController_enroll: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Client-generated key to make the call safe to retry. A retry with the same key and operation returns the original result instead of acting again. Do not reuse it for new input: retries replay the original body. A different operation returns 422. */
+                "X-Woku-Idempotency-Key"?: string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["V1EnrollSubjectBodyDto"];
+            };
+        };
+        responses: {
+            /** @description The subject was enrolled */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["V1JourneyEnrollmentResponseDto"];
+                };
+            };
+            /** @description Validation error, or the journey is switched off */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Invalid API key, company access or entitlement */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Journey, moment or evaluation not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The subject is already enrolled */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Idempotency key reused for a different operation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1JourneysController_getParticipation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                enrollmentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["V1JourneyParticipationDto"];
+                };
+            };
+            /** @description Invalid identifier or journey configuration */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Invalid API key, company access or entitlement */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Journey, moment or evaluation not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1JourneysController_stopParticipation: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Client-generated key to make the call safe to retry. A retry with the same key and operation returns the original result instead of acting again. Do not reuse it for new input: retries replay the original body. A different operation returns 422. */
+                "X-Woku-Idempotency-Key"?: string;
+            };
+            path: {
+                id: string;
+                enrollmentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StopJourneyParticipationDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["V1JourneyParticipationDto"];
+                };
+            };
+            /** @description Invalid identifier or journey configuration */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Invalid API key, company access or entitlement */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Journey, moment or evaluation not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Idempotency key reused for a different operation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1JourneysController_connections: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["V1JourneyConnectionDto"][];
+                };
+            };
+            /** @description Invalid identifier or journey configuration */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Invalid API key, company access or entitlement */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Journey, moment or evaluation not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1JourneysController_mintMomentUrl: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Client-generated key to make the call safe to retry. A retry with the same key and operation returns the original result instead of acting again. Do not reuse it for new input: retries replay the original body. A different operation returns 422. */
+                "X-Woku-Idempotency-Key"?: string;
+            };
+            path: {
+                id: string;
+                stageKey: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["V1JourneyMomentUrlDto"];
+                };
+            };
+            /** @description Invalid identifier or journey configuration */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Invalid API key, company access or entitlement */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Journey, moment or evaluation not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Idempotency key reused for a different operation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Secure webhook ingress is not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1JourneysController_setSenderSecret: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                stageKey: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetSenderSecretDto"];
+            };
+        };
+        responses: {
+            /** @description Secret stored encrypted, no response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid identifier or journey configuration */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Invalid API key, company access or entitlement */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Journey, moment or evaluation not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1JourneysController_previewMoment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                stageKey: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["V1PreviewJourneyMomentDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["V1JourneyPreviewResponseDto"];
+                };
+            };
+            /** @description Invalid identifier or journey configuration */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Invalid API key, company access or entitlement */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Journey, moment or evaluation not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1JourneysController_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The journeys of your company */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["V1JourneyResponseDto"][];
+                };
+            };
+            /** @description Invalid identifier or journey configuration */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Invalid or missing API key */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Journey, moment or evaluation not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1JourneysController_create: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Client-generated key to make the call safe to retry. A retry with the same key and operation returns the original result instead of acting again. Do not reuse it for new input: retries replay the original body. A different operation returns 422. */
+                "X-Woku-Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["V1CreateJourneyBodyDto"];
+            };
+        };
+        responses: {
+            /** @description Journey created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["V1CreatedJourneyResponseDto"];
+                };
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Invalid API key, company access or entitlement */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Journey, moment or evaluation not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Journey key conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Idempotency key reused for a different operation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1JourneysController_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["V1JourneyResponseDto"];
+                };
+            };
+            /** @description Invalid identifier or journey configuration */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Invalid API key, company access or entitlement */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Journey not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1JourneysController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Journey deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid identifier or journey configuration */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Invalid API key, company access or entitlement */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Journey not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1JourneysController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["V1UpdateJourneyBodyDto"];
+            };
+        };
+        responses: {
+            /** @description Journey updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["V1JourneyResponseDto"];
+                };
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Invalid API key, company access or entitlement */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Journey not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Journey key conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1JourneysController_rotateSecret: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The new secret, returned once */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["V1JourneySecretResponseDto"];
+                };
+            };
+            /** @description Invalid identifier or journey configuration */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Invalid API key, company access or entitlement */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Journey not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1JourneyEventsController_emit: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Client-generated key to make the call safe to retry. A retry with the same key and operation returns the original result instead of acting again. Do not reuse it for new input: retries replay the original body. A different operation returns 422. */
+                "X-Woku-Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["V1EmitJourneyEventBodyDto"];
+            };
+        };
+        responses: {
+            /** @description How many journeys received it */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["V1JourneyEventResponseDto"];
+                };
+            };
+            /** @description Validation error, or a reserved event name */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Invalid API key, company access or entitlement */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Journey, moment or evaluation not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Idempotency key reused for a different operation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CustomJourneyEntryController_info: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                journeyId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JourneyEntryInfoDto"];
+                };
+            };
+            /** @description Invalid contact, case reference or request ID */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description This evaluation is not available */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CustomJourneyEntryController_prepare: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                journeyId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PrepareJourneyEntryDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PreparedJourneyEntryDto"];
+                };
+            };
+            /** @description Invalid contact, case reference or request ID */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description This evaluation is not available */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Customer or case already has an active evaluation */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Preparation is still in progress; retry with the same requestId */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
 }

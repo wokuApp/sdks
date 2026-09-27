@@ -15,6 +15,10 @@ export class Flows {
   }
 
   get(id: string, opts?: RequestOptions): Promise<WokuRecord> {
-    return this.client.request<WokuRecord>('get', `/v1/flows/${id}`, opts);
+    return this.client.request<WokuRecord>(
+      'get',
+      `/v1/flows/${encodeURIComponent(id)}`,
+      opts,
+    );
   }
 }

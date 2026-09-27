@@ -3,7 +3,7 @@
  *
  * Sends messages to the host loader and listens for commands.
  * All messages are verified for origin on the loader side;
- * the app trusts `parent` (same CDN origin) for incoming messages.
+ * the app accepts configuration only from its embedding parent window.
  */
 
 export type AppToHostType =
@@ -40,6 +40,7 @@ export function onHostMessage(
   callback: (msg: BridgeMessage) => void,
 ): () => void {
   const handler = (event: MessageEvent) => {
+    if (event.source !== window.parent) return;
     const msg = event.data as BridgeMessage;
     if (!msg?.type?.startsWith('woku:')) return;
     callback(msg);

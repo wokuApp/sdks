@@ -1,4 +1,12 @@
-import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  describe,
+  expect,
+  it,
+  vi,
+} from 'vitest';
 import { http, HttpResponse, delay } from 'msw';
 import { setupServer } from 'msw/node';
 
@@ -280,4 +288,192 @@ describe('timeout and abort', () => {
     await expect(p).rejects.toBeInstanceOf(WokuConnectionError);
     expect(calls).toBe(1);
   });
+});
+
+it('keeps exactly one Authorization header regardless of caller header casing', async () => {
+  const fetch = vi.fn(
+    async (_url: string, init: { headers: Record<string, string> }) => {
+      const auth = Object.entries(init.headers).filter(
+        ([name]) => name.toLowerCase() === 'authorization',
+      );
+      expect(auth).toEqual([['Authorization', 'Bearer sk_test']]);
+      return { status: 200, headers: new Headers(), text: async () => '{}' };
+    },
+  );
+  await makeClient({
+    fetch,
+    defaultHeaders: { authorization: 'default' },
+  }).request('get', '/v1/thing', { headers: { AUTHORIZATION: 'caller' } });
+});
+
+it('never issues requests for an absolute or protocol-relative API path', async () => {
+  const fetch = vi.fn();
+  const client = makeClient({ fetch });
+  for (const path of [
+    'https://other.test/v1/journeys',
+    '//other.test/v1/journeys',
+  ]) {
+    await expect(client.request('get', path)).rejects.toMatchObject({
+      code: 'config_error',
+    });
+  }
+  expect(fetch).not.toHaveBeenCalled();
+});
+
+it('cancels promptly while waiting to retry instead of waiting for the backoff timer', async () => {
+  vi.useFakeTimers();
+  try {
+    const controller = new AbortController();
+    const fetch = vi.fn(async () => ({
+      status: 429,
+      headers: new Headers({ 'Retry-After': '8' }),
+      text: async () => '{}',
+    }));
+    let error: unknown;
+    const promise = makeClient({ fetch })
+      .request('get', '/v1/thing', { signal: controller.signal })
+      .catch((value: unknown) => {
+        error = value;
+      });
+    await vi.advanceTimersByTimeAsync(0);
+    controller.abort();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(error).toMatchObject({ code: 'aborted' });
+    await promise;
+    expect(fetch).toHaveBeenCalledTimes(1);
+  } finally {
+    vi.useRealTimers();
+  }
+});
+
+it('honors a Retry-After longer than the jitter cap', async () => {
+  vi.useFakeTimers();
+  try {
+    const fetch = vi
+      .fn()
+      .mockResolvedValueOnce({
+        status: 429,
+        headers: new Headers({ 'Retry-After': '10' }),
+        text: async () => '{}',
+      })
+      .mockResolvedValue({
+        status: 200,
+        headers: new Headers(),
+        text: async () => '{}',
+      });
+    const promise = makeClient({ fetch, maxRetries: 1 }).request(
+      'get',
+      '/v1/thing',
+    );
+    await vi.advanceTimersByTimeAsync(8000);
+    expect(fetch).toHaveBeenCalledTimes(1);
+    await vi.advanceTimersByTimeAsync(2000);
+    await promise;
+  } finally {
+    vi.useRealTimers();
+  }
+});
+
+it('uses exactly one explicit idempotency header despite caller casing', async () => {
+  const transport = vi.fn(
+    async (_url: string, init: { headers: Record<string, string> }) => {
+      const keys = Object.entries(init.headers).filter(
+        ([name]) => name.toLowerCase() === 'x-woku-idempotency-key',
+      );
+      expect(keys).toEqual([['X-Woku-Idempotency-Key', 'operation']]);
+      return {
+        status: 200,
+        headers: { get: () => null },
+        text: async () => '{}',
+      };
+    },
+  );
+  await new WokuClient({ apiKey: 'sk_test', fetch: transport }).request(
+    'post',
+    '/v1/journeys',
+    {
+      body: {},
+      idempotent: true,
+      idempotencyKey: 'operation',
+      headers: { 'x-woku-idempotency-key': 'other' },
+    },
+  );
+});
+
+it('explains the real API nested validation envelope without losing its body', async () => {
+  const body = {
+    statusCode: 400,
+    message: {
+      message: ['trigger anchor is required', 'invalid moment'],
+      statusCode: 400,
+      error: 'Bad Request',
+    },
+  };
+  const fetch = vi.fn(async () => ({
+    status: 400,
+    headers: { get: () => null },
+    text: async () => JSON.stringify(body),
+  }));
+  await expect(
+    new WokuClient({ apiKey: 'sk_test', fetch }).request(
+      'post',
+      '/v1/journeys',
+      { body: {} },
+    ),
+  ).rejects.toMatchObject({
+    message: expect.stringContaining(
+      'trigger anchor is required, invalid moment',
+    ),
+    body,
+  });
+});
+
+it('preserves the operation key when aborting a network-error backoff', async () => {
+  vi.useFakeTimers();
+  const controller = new AbortController();
+  const fetch = vi.fn(async () => {
+    throw new Error('network down');
+  });
+  const request = new WokuClient({ apiKey: 'sk_test', fetch }).request(
+    'post',
+    '/v1/journeys',
+    {
+      idempotent: true,
+      idempotencyKey: 'pending-operation',
+      signal: controller.signal,
+      body: {},
+    },
+  );
+  const assertion = expect(request).rejects.toMatchObject({
+    code: 'aborted',
+    idempotencyKey: 'pending-operation',
+  });
+  await Promise.resolve();
+  await Promise.resolve();
+  controller.abort();
+  await assertion;
+  vi.useRealTimers();
+});
+
+it('does not overflow Node timers into immediate retries for long Retry-After values', async () => {
+  vi.useFakeTimers();
+  const controller = new AbortController();
+  const fetch = vi.fn(async () => ({
+    status: 429,
+    headers: {
+      get: (name: string) => (name === 'retry-after' ? '2147484' : null),
+    },
+    text: async () => '{}',
+  }));
+  const request = new WokuClient({ apiKey: 'sk_test', fetch }).request(
+    'get',
+    '/v1/journeys',
+    { signal: controller.signal },
+  );
+  const assertion = expect(request).rejects.toMatchObject({ code: 'aborted' });
+  await vi.advanceTimersByTimeAsync(10);
+  expect(fetch).toHaveBeenCalledOnce();
+  controller.abort();
+  await assertion;
+  vi.useRealTimers();
 });

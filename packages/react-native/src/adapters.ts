@@ -22,6 +22,7 @@ export interface HttpRequest {
    * `multipart/form-data` Content-Type (with boundary) itself.
    */
   body?: string | FormData;
+  signal?: AbortSignal;
 }
 
 /** HTTP transport. Defaults to global `fetch`. */
@@ -52,6 +53,7 @@ export const fetchHttpClient: HttpClient = {
       method: req.method,
       headers: req.headers,
       body: req.body,
+      signal: req.signal,
     });
     return {
       status: res.status,

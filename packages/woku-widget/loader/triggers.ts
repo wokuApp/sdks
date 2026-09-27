@@ -17,9 +17,9 @@ export function registerTriggers(
     if (fired) return;
     fired = true;
     cleanups.forEach((fn) => fn());
-    fire();
-    // expose behavior for the iframe/overlay logic
+    // Select the presentation before the loader constructs the iframe.
     (window as unknown as Record<string, unknown>).__wokuBehavior = behavior;
+    fire();
   };
 
   for (const trigger of triggers) {
@@ -30,7 +30,10 @@ export function registerTriggers(
   return () => cleanups.forEach((fn) => fn());
 }
 
-function registerOne(trigger: TriggerConfig, fire: FireCallback): (() => void) | null {
+function registerOne(
+  trigger: TriggerConfig,
+  fire: FireCallback,
+): (() => void) | null {
   switch (trigger.type) {
     case 'time': {
       const seconds = typeof trigger.value === 'number' ? trigger.value : 5;
@@ -42,7 +45,9 @@ function registerOne(trigger: TriggerConfig, fire: FireCallback): (() => void) |
       const threshold = typeof trigger.value === 'number' ? trigger.value : 50;
       const handler = () => {
         const scrollPct =
-          (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+          (window.scrollY /
+            (document.documentElement.scrollHeight - window.innerHeight)) *
+          100;
         if (scrollPct >= threshold) fire();
       };
       // Throttle scroll events
@@ -70,7 +75,8 @@ function registerOne(trigger: TriggerConfig, fire: FireCallback): (() => void) |
     }
 
     case 'custom-event': {
-      const eventName = typeof trigger.value === 'string' ? trigger.value : 'woku:trigger';
+      const eventName =
+        typeof trigger.value === 'string' ? trigger.value : 'woku:trigger';
       const handler = () => fire();
       window.addEventListener(eventName, handler);
       return () => window.removeEventListener(eventName, handler);
