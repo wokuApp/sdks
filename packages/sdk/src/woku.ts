@@ -1,4 +1,5 @@
 import { Media } from './resources/media';
+import { FollowUps } from './resources/follow-ups';
 import { WokuClient, type WokuClientOptions } from './core/client';
 import { Trackers } from './resources/trackers';
 import { CesTools, CsatTools, NpsTools } from './resources/voc-tools';
@@ -43,6 +44,7 @@ export class Woku {
   readonly actionPlans: ActionPlans;
   readonly actionPlanGroups: ActionPlanGroups;
   readonly tickets: Tickets;
+  readonly followUps: FollowUps;
   readonly ticketDestinations: TicketDestinations;
   readonly dispatches: Dispatches;
   readonly reports: Reports;
@@ -70,6 +72,7 @@ export class Woku {
     this.actionPlans = new ActionPlans(this.client);
     this.actionPlanGroups = new ActionPlanGroups(this.client);
     this.tickets = new Tickets(this.client);
+    this.followUps = new FollowUps(this.client);
     this.ticketDestinations = new TicketDestinations(this.client);
     this.dispatches = new Dispatches(this.client);
     this.reports = new Reports(this.client);

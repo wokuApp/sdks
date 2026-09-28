@@ -45,6 +45,30 @@ SDK exposes media.upload with a generated response type.
 The upload endpoint returns `400` for invalid media and `413` for multipart
 requests over 25 MB.
 
+## Proposed follow-up release (unreleased)
+
+The management package adds `followUps.get(id)` and typed ticket evidence state,
+content version and conversation origin. Typed custom destination update
+configuration declares upsert or updates by the original remote ID.
+The React Native and web widget
+packages add explicit capture provenance, defaulting new captures to standalone
+and preserving Flow IDs. RN retries retain existing bodies and IDs unchanged,
+including historical offline captures without provenance.
+
+Flow responses never start follow-up. Conversation completion and evidence
+application are separate: check `ticket.followUp.appliedSummaryVersion >= 1`
+for enriched evidence. Historical records may omit follow-up metadata. See each
+package README for the proposed options and examples. Release the API before
+these packages, and deploy the widget's matching CDN assets. Nothing in this
+working branch has been published.
+
+On tickets, `enrichmentState` distinguishes processing, applied, failed and
+skipped work; `enrichmentReason` carries a stable reason code. Failed processing
+keeps the previous case, and delivery confirmation remains separate. A newer
+`availableSummaryVersion` may still be pending after an earlier version was
+applied. Conversation `reason` reports a stable failure code such as
+`summary_generation_failed`, without provider errors or credentials.
+
 ## Repository layout
 
 ```

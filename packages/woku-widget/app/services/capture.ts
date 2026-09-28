@@ -55,7 +55,12 @@ export interface WokuReviewData {
   anonymousDisabled: boolean;
 }
 
-export interface CreateWokuTextnoteParams {
+interface CaptureContext {
+  collectionKind?: 'standalone' | 'flow';
+  flowId?: string;
+}
+
+export interface CreateWokuTextnoteParams extends CaptureContext {
   apiBaseUrl: string;
   publishableKey: string;
   wokuId: string;
@@ -67,7 +72,7 @@ export interface CreateWokuTextnoteParams {
   anonymous?: boolean;
 }
 
-export interface CreateWokuVoicemailParams {
+export interface CreateWokuVoicemailParams extends CaptureContext {
   apiBaseUrl: string;
   publishableKey: string;
   wokuId: string;
@@ -89,7 +94,7 @@ export interface NpsToolData {
   companyId: string;
 }
 
-export interface CreateNpsParams {
+export interface CreateNpsParams extends CaptureContext {
   apiBaseUrl: string;
   publishableKey: string;
   score: number; // 0-10
@@ -104,14 +109,14 @@ export interface NpsSubmitResult {
   npsId: string;
 }
 
-export interface CreateNpsTextnoteParams {
+export interface CreateNpsTextnoteParams extends CaptureContext {
   apiBaseUrl: string;
   publishableKey: string;
   npsId: string;
   description: string;
 }
 
-export interface CreateNpsVoicemailParams {
+export interface CreateNpsVoicemailParams extends CaptureContext {
   apiBaseUrl: string;
   publishableKey: string;
   npsId: string;
@@ -155,6 +160,8 @@ export async function createWokuTextnote(
     qualification,
     description,
     responseChannel: 'widget-web',
+    collectionKind: params.collectionKind ?? 'standalone',
+    ...(params.flowId ? { flowId: params.flowId } : {}),
     ...(anonymous || (!clientEmail && !clientPhone)
       ? { anonymous: true }
       : {
@@ -191,6 +198,8 @@ export async function createWokuVoicemail(
   } = params;
 
   const formData = new FormData();
+  formData.append('collectionKind', params.collectionKind ?? 'standalone');
+  if (params.flowId) formData.append('flowId', params.flowId);
   formData.append('file', file);
   formData.append('filename', `audio-review-${Date.now()}`);
   formData.append('type', 'audio');
@@ -246,6 +255,8 @@ export async function createNps(
   const body: Record<string, unknown> = {
     score,
     responseChannel: 'widget-web',
+    collectionKind: params.collectionKind ?? 'standalone',
+    ...(params.flowId ? { flowId: params.flowId } : {}),
     ...(npsToolId ? { npsToolId } : {}),
     ...(anonymous || (!clientEmail && !clientPhone)
       ? { anonymous: true }
@@ -274,7 +285,11 @@ export async function createNpsTextnote(
     {
       method: 'POST',
       headers: buildHeaders(publishableKey, true),
-      body: JSON.stringify({ description }),
+      body: JSON.stringify({
+        description,
+        collectionKind: params.collectionKind ?? 'standalone',
+        ...(params.flowId ? { flowId: params.flowId } : {}),
+      }),
     },
   );
   return handleResponse(res);
@@ -286,6 +301,8 @@ export async function createNpsVoicemail(
   const { apiBaseUrl, publishableKey, npsId, file } = params;
 
   const formData = new FormData();
+  formData.append('collectionKind', params.collectionKind ?? 'standalone');
+  if (params.flowId) formData.append('flowId', params.flowId);
   formData.append('file', file);
   formData.append('filename', `audio-nps-${Date.now()}`);
   formData.append('type', 'audio');

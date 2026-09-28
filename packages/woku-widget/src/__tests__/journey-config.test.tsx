@@ -32,6 +32,8 @@ it('keeps postMessage credentials and journey context after the URL fallback dea
             captureType: 'woku',
             wokuId: 'w1',
             dispatchToken: 'jent_test',
+            collectionKind: 'flow',
+            flowId: 'f1',
           },
         },
       }),
@@ -43,6 +45,7 @@ it('keeps postMessage credentials and journey context after the URL fallback dea
   const config = JSON.parse(screen.getByTestId('config').textContent ?? '{}');
   expect(config.publishableKey).toBe('pk_test');
   expect(config.dispatchToken).toBe('jent_test');
+  expect(config).toMatchObject({ collectionKind: 'flow', flowId: 'f1' });
 });
 
 it('preserves preidentified contact and the response token when merging config', () => {
@@ -84,4 +87,11 @@ it('ignores configuration messages from a sibling or unrelated window', () => {
   } finally {
     stop();
   }
+});
+
+it('preserves flow provenance when merging host config and defaults new captures to standalone', () => {
+  expect(
+    mergeConfig({}, { collectionKind: 'flow', flowId: 'f1' }),
+  ).toMatchObject({ collectionKind: 'flow', flowId: 'f1' });
+  expect(mergeConfig({}, {})).toHaveProperty('collectionKind', 'standalone');
 });

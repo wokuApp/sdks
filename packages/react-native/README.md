@@ -37,6 +37,36 @@ your own ingestion, retry, or offline logic. The SDK:
 > server-side. Submissions deduplicate by their client-generated `id` for 24h.
 > Older uncertain submissions are retained for inspection instead of replayed.
 
+## Proposed capture provenance (unreleased)
+
+All four capture inputs add `collectionKind?: 'standalone' | 'flow'` and
+`flowId?: string`. New captures default to `standalone`. A response inside a
+Flow must explicitly declare both fields, including a one-step or incomplete
+Flow; the API verifies the Flow belongs to the company and instrument.
+
+```ts
+await woku.captureNps({
+  npsId: 'nps_123',
+  score: 2,
+  comment: 'Delivery took too long.',
+  collectionKind: 'flow',
+  flowId: 'flow_123',
+});
+```
+
+The context is persisted before the first request and survives restart, screen
+changes and concurrent flushes in both JSON and Woku/NPS audio multipart.
+Already queued captures keep their original ID and body, including old captures
+without provenance or audio language. Their missing provenance remains unknown;
+flush never changes it to standalone or assigns a Flow from the current screen.
+If you construct `CaptureSubmission` for `WokuClient.send()` directly, declare
+the context at creation time; the transport never adds or infers it.
+Keep queued audio files at stable URIs with unchanged contents until delivery
+is confirmed; the headless SDK persists file references, not native file copies.
+Flow responses may create normal support tickets but do not activate follow-up.
+CSAT/CES audio support is unchanged. Use this contract after the matching API
+has been deployed and the capture package released.
+
 ## Install
 
 ```bash

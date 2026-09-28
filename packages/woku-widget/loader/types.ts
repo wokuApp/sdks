@@ -29,6 +29,8 @@ export interface WokuWidgetConfig {
   email?: string;
   phone?: string;
   dispatchToken?: string;
+  collectionKind?: 'standalone' | 'flow';
+  flowId?: string;
   captureType: 'woku' | 'nps';
   /** Required when captureType === 'woku' */
   wokuId?: string;

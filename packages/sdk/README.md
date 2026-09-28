@@ -28,6 +28,67 @@ support tickets, delivery tracking and survey sends over the public `/v1` API.
 > **Server-only.** The secret key grants full management access, so the SDK
 > refuses to run in a browser. Never ship it to a client bundle.
 
+## Proposed follow-up support (unreleased)
+
+The next release adds `woku.followUps.get(id)` and typed `Ticket.followUp`,
+`Ticket.contentVersion` and conversation origin. Deploy the matching API before
+using this method. It reads `GET /v1/follow-ups/:id` with your management secret
+and returns the conversation from the API's `data` envelope.
+
+```ts
+const ticket = await woku.tickets.get('ticket_123');
+if (ticket.followUp?.conversationId) {
+  const conversation = await woku.followUps.get(ticket.followUp.conversationId);
+  console.log(conversation.origin, conversation.messages);
+}
+const enriched = (ticket.followUp?.appliedSummaryVersion ?? 0) >= 1;
+```
+
+`completed` means the conversation ended; `appliedSummaryVersion` indicates
+that its evidence reached the ticket. `availableSummaryVersion` may advance
+before it is applied. Historical tickets may omit these fields. The read-only
+conversation includes original feedback, messages and available analysis,
+without response tokens or transport credentials. Ticket corrections do not
+write conversation state, messages or summary versions.
+
+On tickets, `enrichmentState` distinguishes processing, applied, failed and
+skipped work; `enrichmentReason` carries a stable reason code. Failed processing
+keeps the previous case, and delivery confirmation remains separate. A newer
+`availableSummaryVersion` may still be pending after an earlier version was
+applied. Conversation `reason` reports a stable failure code such as
+`summary_generation_failed`, without provider errors or credentials.
+
+### Explicit custom case updates (proposed)
+
+`CustomTicketDestinationConfig` adds `update` for the existing custom HTTP
+destination. Choose `upsert` only if the receiver updates by stable `externalId`
+on the creation endpoint; the rendered body must keep `event: 'ticket.updated'`
+and that identity. A custom template must expose `event` and `externalId`,
+while the canonical envelope keeps the identity in `data.case.externalId`.
+Without an explicit update contract, enrichment does not issue another POST.
+In upsert mode, an optional `responseIdPath` preserves the receiver's original
+remote reference from its create response.
+
+```ts
+import type { CustomTicketDestinationConfig } from '@wokuapp/sdk';
+
+const config: CustomTicketDestinationConfig = {
+  url: 'https://sac.example.com/tickets',
+  method: 'POST',
+  update: {
+    mode: 'remote-id',
+    url: 'https://sac.example.com/tickets/{{remoteId}}',
+    method: 'PATCH',
+    responseIdPath: 'result.id',
+  },
+};
+```
+
+`remote-id` extracts a scalar ID from the create response and requires a URL on
+the same origin containing `{{remoteId}}`; updates use PUT or PATCH (default).
+URLs cannot contain credentials or fragments. A safe dotted `responseIdPath`
+is required. Existing destination authentication stays in `credentials`.
+
 ## Install
 
 ```bash

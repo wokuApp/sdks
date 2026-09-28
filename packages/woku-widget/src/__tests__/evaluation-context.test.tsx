@@ -111,6 +111,8 @@ it('keeps progress for duplicate configuration or presentation-only changes', ()
 it.each([
   { apiBaseUrl: 'https://another-api.test' },
   { publishableKey: 'pk_other' },
+  { collectionKind: 'flow', flowId: 'f1' },
+  { collectionKind: 'flow', flowId: 'f2' },
 ])(
   'resets feedback when the API or authorization context changes: %j',
   (overrides) => {

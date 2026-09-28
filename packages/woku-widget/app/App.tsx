@@ -79,6 +79,8 @@ export default function Root() {
         config.wokuId,
         config.npsToolId,
         config.dispatchToken,
+        config.collectionKind,
+        config.flowId,
         config.email,
         config.phone,
       ])}

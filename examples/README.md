@@ -14,3 +14,7 @@ forwarded to the ingress URL.
 Respond from a mobile app using the public key and the captured `dispatchToken`:
 Woku/NPS/CSAT/CES all support identified journey responses. The React Native SDK
 persists a submission before delivery; awaiting `capture*` returns its outcome.
+
+`follow-up.ts` demonstrates the proposed next-release read-only conversation
+lookup from a support ticket. It requires the matching API deployment; it does
+not send messages or change conversation state.

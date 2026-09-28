@@ -36,3 +36,5 @@ export type * from './types';
 export * from './resources/journeys';
 
 export * from './resources/media';
+
+export { FollowUps } from './resources/follow-ups';

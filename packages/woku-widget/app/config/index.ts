@@ -12,6 +12,8 @@ export interface WidgetAppConfig {
   email?: string;
   phone?: string;
   dispatchToken?: string;
+  collectionKind?: 'standalone' | 'flow';
+  flowId?: string;
   captureType: 'woku' | 'nps';
   wokuId?: string;
   npsToolId?: string;
@@ -58,6 +60,8 @@ export function mergeConfig(
     email: merged.email,
     phone: merged.phone,
     dispatchToken: merged.dispatchToken,
+    collectionKind: merged.collectionKind ?? 'standalone',
+    flowId: merged.flowId,
     captureType: merged.captureType ?? 'woku',
     wokuId: merged.wokuId,
     npsToolId: merged.npsToolId,

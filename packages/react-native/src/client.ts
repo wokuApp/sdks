@@ -23,7 +23,7 @@ export interface WokuClientConfig {
   logger?: Logger;
   /** Ingest path appended to `apiUrl`. Defaults to `/v1/captures`. */
   capturePath?: string;
-  /** Default audio language. */
+  /** Default audio language for WokuSdk builders; send() preserves payloads. */
   language?: 'es' | 'en';
   /** Bound a transport attempt, including injected adapters. Default 30s. */
   timeoutMs?: number;
@@ -69,8 +69,6 @@ export class WokuClient {
       throw new WokuConfigError(
         'Cannot deliver a capture for another company.',
       );
-    if (submission.audio && !submission.language)
-      submission = { ...submission, language: this.config.language ?? 'es' };
     const headers: Record<string, string> = {
       'x-woku-key': this.config.publicKey,
       'X-Woku-Company': this.config.companyId,

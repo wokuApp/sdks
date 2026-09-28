@@ -86,6 +86,80 @@ export interface InvitationsResult {
   [key: string]: unknown;
 }
 
+export type FollowUpState =
+  | 'pending'
+  | 'initial_sent'
+  | 'awaiting_detail'
+  | 'closing'
+  | 'completed'
+  | 'timed_out'
+  | 'cancelled';
+
+export interface FollowUpOrigin {
+  tool: 'woku' | 'nps' | 'csat' | 'ces';
+  refId: string;
+  instrumentId?: string;
+}
+
+/** Lightweight evidence state. Completion alone does not mean evidence was applied. */
+export interface FollowUp {
+  conversationId?: string;
+  state: FollowUpState | 'not_applicable';
+  reason?: string;
+  availableSummaryVersion?: number;
+  appliedSummaryVersion?: number;
+  enrichedAt?: string;
+  /** Ticket processing status; conversation completion does not imply application. */
+  enrichmentState?: 'processing' | 'applied' | 'failed' | 'skipped';
+  enrichmentReason?: string;
+}
+
+export interface FollowUpMessage {
+  role: 'agent' | 'client';
+  content: string;
+  timestamp: string;
+  responseType?: string;
+  selectedOption?: string;
+}
+
+/** Authorized conversation detail, without response tokens or transport credentials. */
+export interface FollowUpConversation {
+  _id: string;
+  companyId: string;
+  origin: FollowUpOrigin;
+  wokuId?: string;
+  reviewId?: string;
+  reviewType: 'textnote' | 'voicemail';
+  originalReview: string;
+  originalQualification?: number;
+  state: FollowUpState;
+  channel: Channel;
+  reason?: string;
+  messages: FollowUpMessage[];
+  executiveSummary?: string;
+  actionItems?: string[];
+  sentiment?: string;
+  topics?: string[];
+  summaryVersion?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface TicketOriginTracker {
+  trackerId?: string;
+  name?: string;
+  value: string;
+}
+
+export interface TicketOrigin {
+  tool: FollowUpOrigin['tool'] | 'form';
+  refId: string;
+  instrumentId?: string;
+  instrumentName?: string;
+  trackers?: TicketOriginTracker[];
+  [key: string]: unknown;
+}
+
 /** Support ticket (curated allow-list). */
 export interface Ticket {
   _id: string;
@@ -93,7 +167,9 @@ export interface Ticket {
   title: string;
   severity: Severity;
   destinationId?: string;
-  origin?: WokuRecord;
+  origin?: TicketOrigin;
+  followUp?: FollowUp;
+  contentVersion?: number;
   score?: WokuRecord;
   aiSummary?: string;
   aiCategory?: string;

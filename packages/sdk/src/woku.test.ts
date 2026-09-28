@@ -3,6 +3,8 @@ import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
 
 import { Woku } from './woku';
+import type { CustomTicketDestinationConfig } from './types';
+import fixtures from './fixtures/follow-up.json';
 
 const BASE = 'http://api.test';
 const server = setupServer();
@@ -227,5 +229,96 @@ describe('Woku facade — request shaping', () => {
     const stats = await woku().dispatches.stats({ channel: 'email' });
     expect(stats.responseRate).toBe(0.4);
     expect(stats.total).toBe(10);
+  });
+});
+
+it('reads a safe follow-up conversation with a management key, encoded id and request options', async () => {
+  const conversation = {
+    _id: 'fu /1',
+    companyId: 'c1',
+    origin: { tool: 'nps', refId: 'n1' },
+    reviewType: 'textnote',
+    originalReview: 'Slow',
+    state: 'completed',
+    reason: 'summary_generation_failed',
+    channel: 'email',
+    messages: [
+      {
+        role: 'client',
+        content: 'Still waiting',
+        timestamp: '2026-09-27T12:00:00Z',
+      },
+    ],
+    summaryVersion: 1,
+  };
+  server.use(
+    http.get(`${BASE}/v1/follow-ups/:id`, ({ request }) => {
+      expect(new URL(request.url).pathname).toBe('/v1/follow-ups/fu%20%2F1');
+      expect(request.headers.get('authorization')).toBe('Bearer sk_test');
+      expect(request.headers.get('x-request-context')).toBe('support');
+      return HttpResponse.json({ data: conversation });
+    }),
+  );
+  const result = await woku().followUps.get('fu /1', {
+    headers: { 'x-request-context': 'support' },
+  });
+  expect(result).toEqual(conversation);
+  expect(result.reason).toBe('summary_generation_failed');
+});
+
+it.each([403, 404])(
+  'propagates follow-up access errors without returning conversation data: %s',
+  async (status) => {
+    server.use(
+      http.get(`${BASE}/v1/follow-ups/:id`, () =>
+        HttpResponse.json({ message: 'Unavailable' }, { status }),
+      ),
+    );
+    await expect(woku().followUps.get('other-company')).rejects.toMatchObject({
+      status,
+    });
+  },
+);
+
+it.each(fixtures)(
+  'preserves ticket evidence semantics for $name on detail and list',
+  async ({ ticket, enriched }) => {
+    server.use(
+      http.get(`${BASE}/v1/tickets/:id`, () => HttpResponse.json(ticket)),
+      http.get(`${BASE}/v1/tickets`, () =>
+        HttpResponse.json({ data: [ticket], page: 1, limit: 10, total: 1 }),
+      ),
+    );
+    const client = woku();
+    const detail = await client.tickets.get(ticket._id);
+    const page = await client.tickets.list();
+    expect(detail).toEqual(ticket);
+    expect(page.data).toEqual([ticket]);
+    expect((detail.followUp?.appliedSummaryVersion ?? 0) >= 1).toBe(enriched);
+  },
+);
+
+it('sends the explicit custom update configuration without losing its contract', async () => {
+  const config: CustomTicketDestinationConfig = {
+    url: 'https://sac.example.com/tickets',
+    method: 'POST',
+    update: {
+      mode: 'remote-id',
+      url: 'https://sac.example.com/tickets/{{remoteId}}',
+      method: 'PATCH',
+      responseIdPath: 'result.id',
+    },
+  };
+  server.use(
+    http.post(`${BASE}/v1/ticket-destinations`, async ({ request }) => {
+      expect(await request.json()).toMatchObject({ kind: 'custom', config });
+      return HttpResponse.json({ _id: 'destination_1' });
+    }),
+  );
+  await woku().ticketDestinations.create({
+    name: 'Support',
+    kind: 'custom',
+    config,
+    credentials: { authType: 'none' },
   });
 });

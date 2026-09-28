@@ -4,6 +4,26 @@
  */
 
 export interface paths {
+    "/v1/follow-ups/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read a company follow-up conversation
+         * @description Management secret key required. Capture publishable keys cannot read conversations.
+         */
+        get: operations["V1FollowUpsController_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/health": {
         parameters: {
             query?: never;
@@ -1822,6 +1842,51 @@ export interface components {
             clientEmail?: string;
             clientPhone?: string;
         };
+        FollowUpOriginDto: {
+            /** @enum {string} */
+            tool: "woku" | "nps" | "csat" | "ces";
+            refId: string;
+            instrumentId?: string;
+        };
+        FollowUpMessageDto: {
+            /** @enum {string} */
+            role: "agent" | "client";
+            content: string;
+            /** Format: date-time */
+            timestamp: string;
+            responseType?: string;
+            selectedOption?: string;
+        };
+        FollowUpConversationDto: {
+            _id: string;
+            companyId: string;
+            origin: components["schemas"]["FollowUpOriginDto"];
+            wokuId?: string;
+            reviewId?: string;
+            /** @enum {string} */
+            reviewType: "textnote" | "voicemail";
+            originalReview: string;
+            originalQualification?: number;
+            /** @enum {string} */
+            state: "pending" | "initial_sent" | "awaiting_detail" | "closing" | "completed" | "timed_out" | "cancelled";
+            /** @enum {string} */
+            channel: "email" | "whatsapp";
+            /** @description Stable reason code for exclusion, failure or uncertain delivery. Provider error details are never exposed. */
+            reason?: string;
+            messages: components["schemas"]["FollowUpMessageDto"][];
+            executiveSummary?: string;
+            actionItems?: string[];
+            sentiment?: string;
+            topics?: string[];
+            summaryVersion: number;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: string;
+        };
+        FollowUpEnvelopeDto: {
+            data: components["schemas"]["FollowUpConversationDto"];
+        };
         CreateExternalTrackerDefinitionDTO: {
             /**
              * @description Tracker name. Identifies the tracker within the company catalog. Unique per company.
@@ -1893,6 +1958,33 @@ export interface components {
              */
             value: string;
         };
+        CustomTicketDestinationUpdateDto: {
+            /**
+             * @description upsert explicitly reuses the creation URL/method with a stable externalId. remote-id updates the previously created remote resource.
+             * @enum {string}
+             */
+            mode: "upsert" | "remote-id";
+            /** @description remote-id only: same-origin URL containing {{remoteId}}; credentials and fragments are forbidden. */
+            url?: string;
+            /**
+             * @description remote-id only.
+             * @default PATCH
+             * @enum {string}
+             */
+            method: "PUT" | "PATCH";
+            /** @description Dot-separated path to the ID in the creation response, required for remote-id. Prototype keys are forbidden. */
+            responseIdPath?: string;
+        };
+        CustomTicketDestinationConfigDto: {
+            /** Format: uri */
+            url: string;
+            /** @enum {string} */
+            method?: "POST" | "PUT";
+            headers?: {
+                [key: string]: string;
+            };
+            update?: components["schemas"]["CustomTicketDestinationUpdateDto"];
+        };
         TicketRoutingConditionDto: {
             /** @enum {string} */
             relationToPrevious?: "AND" | "OR";
@@ -1915,10 +2007,12 @@ export interface components {
         V1CreateTicketDestinationDto: {
             /** @example Zendesk Soporte Chile */
             name: string;
-            /** @description Non-secret provider config (validated per kind). */
+            /** @description Kind-specific destination configuration. Custom update is optional and explicit; omission never causes a second create. */
             config: {
                 [key: string]: unknown;
-            };
+            } & (components["schemas"]["CustomTicketDestinationConfigDto"] | {
+                [key: string]: unknown;
+            });
             /** @description Provider credentials (write-only, encrypted). */
             credentials: {
                 [key: string]: string;
@@ -1932,9 +2026,12 @@ export interface components {
         };
         V1UpdateTicketDestinationDto: {
             name?: string;
+            /** @description Kind-specific configuration including explicit custom update capability. */
             config?: {
                 [key: string]: unknown;
-            };
+            } & (components["schemas"]["CustomTicketDestinationConfigDto"] | {
+                [key: string]: unknown;
+            });
             /** @description Present = credential rotation. */
             credentials?: {
                 [key: string]: string;
@@ -2071,6 +2168,16 @@ export interface components {
             folderId: string | null;
         };
         V1CreateTextnoteBodyDto: {
+            /**
+             * @description Collection provenance. Omitted historical inputs remain unknown and cannot start follow-up.
+             * @enum {string}
+             */
+            collectionKind?: "standalone" | "flow";
+            /**
+             * Format: ObjectId
+             * @description Required for flow captures; validated against the company and instrument.
+             */
+            flowId?: string;
             /** @description Opaque invitation or prepared journey-entry response token. Consumed after saving feedback; never stored on the review. */
             dispatchToken?: string;
             /**
@@ -2093,6 +2200,16 @@ export interface components {
             responseChannel?: string;
         };
         V1CreateVoicemailBodyDto: {
+            /**
+             * @description Collection provenance. Omitted historical inputs remain unknown and cannot start follow-up.
+             * @enum {string}
+             */
+            collectionKind?: "standalone" | "flow";
+            /**
+             * Format: ObjectId
+             * @description Required for flow captures; validated against the company and instrument.
+             */
+            flowId?: string;
             /** @description Opaque invitation or prepared journey-entry response token. Consumed after saving feedback; never stored on the review. */
             dispatchToken?: string;
             /**
@@ -2153,6 +2270,16 @@ export interface components {
         };
         V1CreateNpsBodyDto: {
             /**
+             * @description Collection provenance. Omitted historical inputs remain unknown and cannot start follow-up.
+             * @enum {string}
+             */
+            collectionKind?: "standalone" | "flow";
+            /**
+             * Format: ObjectId
+             * @description Required for flow captures; validated against the company and instrument.
+             */
+            flowId?: string;
+            /**
              * @description NPS score 0-10 (0-6 detractor, 7-8 passive, 9-10 promoter)
              * @example 9
              */
@@ -2191,6 +2318,16 @@ export interface components {
         };
         V1CreateCsatBodyDto: {
             /**
+             * @description Collection provenance. Omitted historical inputs remain unknown and cannot start follow-up.
+             * @enum {string}
+             */
+            collectionKind?: "standalone" | "flow";
+            /**
+             * Format: ObjectId
+             * @description Required for flow captures; validated against the company and instrument.
+             */
+            flowId?: string;
+            /**
              * @description CSAT satisfaction score 1-5
              * @example 4
              */
@@ -2223,6 +2360,16 @@ export interface components {
             description: string;
         };
         V1CreateCesBodyDto: {
+            /**
+             * @description Collection provenance. Omitted historical inputs remain unknown and cannot start follow-up.
+             * @enum {string}
+             */
+            collectionKind?: "standalone" | "flow";
+            /**
+             * Format: ObjectId
+             * @description Required for flow captures; validated against the company and instrument.
+             */
+            flowId?: string;
             /**
              * @description CES effort score 1-5
              * @example 4
@@ -2272,6 +2419,16 @@ export interface components {
             externalId?: string;
         };
         V1CaptureBodyDto: {
+            /**
+             * @description Collection provenance. Omitted historical inputs remain unknown and cannot start follow-up.
+             * @enum {string}
+             */
+            collectionKind?: "standalone" | "flow";
+            /**
+             * Format: ObjectId
+             * @description Required for flow captures; validated against the company and instrument.
+             */
+            flowId?: string;
             /** @description Opaque invitation or prepared journey-entry response token. Consumed after saving feedback; never stored on the review. */
             dispatchToken?: string;
             /** @description Client-generated idempotency id */
@@ -2665,6 +2822,96 @@ export interface components {
             /** @enum {string} */
             defaultLocale?: "es" | "en";
             localizedContent?: components["schemas"]["CesToolLocalizedContentBodyDTO"][];
+        };
+        PublicTicketOriginDto: {
+            /** @enum {string} */
+            tool: "woku" | "nps" | "form" | "csat" | "ces";
+            refId: string;
+            instrumentId?: string;
+            instrumentName?: string;
+            trackers?: {
+                trackerId?: string;
+                name?: string;
+                value?: string;
+            }[];
+        };
+        TicketFollowUpDto: {
+            conversationId?: string;
+            /** @enum {string} */
+            state: "not_applicable" | "pending" | "initial_sent" | "awaiting_detail" | "closing" | "completed" | "timed_out" | "cancelled";
+            reason?: string;
+            availableSummaryVersion?: number;
+            /**
+             * @description Current result of applying follow-up evidence to the ticket.
+             * @enum {string}
+             */
+            enrichmentState?: "processing" | "applied" | "failed" | "skipped";
+            /** @description Machine-readable reason for the enrichment result, without provider details or credentials. */
+            enrichmentReason?: string;
+            /** @description Last summary version successfully applied to this ticket. Conversation completion alone does not imply enrichment. */
+            appliedSummaryVersion?: number;
+            /** Format: date-time */
+            enrichedAt?: string;
+        };
+        PublicTicketDto: {
+            _id: string;
+            code?: string;
+            title: string;
+            /** @enum {string} */
+            severity: "high" | "medium" | "low";
+            destinationId?: string;
+            origin: components["schemas"]["PublicTicketOriginDto"];
+            /**
+             * @description Monotonic version of generated ticket content.
+             * @default 1
+             */
+            contentVersion: number;
+            followUp?: components["schemas"]["TicketFollowUpDto"];
+            score?: {
+                value?: number;
+                max?: number;
+                kind?: string;
+                display?: string;
+            };
+            aiSummary?: string;
+            aiCategory?: string;
+            caseDescription?: string;
+            historyHighlights?: string[];
+            whatCustomerWants?: string;
+            suggestedResolution?: string;
+            language?: string;
+            churnRisk?: string;
+            criteria?: string[];
+            historySnapshot?: {
+                [key: string]: unknown;
+            };
+            sentiment?: string;
+            generatedByAI?: boolean;
+            customerComment?: {
+                text?: string;
+                isAudio?: boolean;
+                audioUrl?: string;
+                transcription?: string;
+            };
+            client?: {
+                clientId?: string;
+                name?: string;
+                email?: string;
+                phone?: string;
+            };
+            timeline?: {
+                [key: string]: unknown;
+            }[];
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: string;
+        };
+        PublicTicketsPageDto: {
+            data: components["schemas"]["PublicTicketDto"][];
+            total: number;
+            page: number;
+            limit: number;
         };
         UpdateTicketBodyDTO: {
             title?: string;
@@ -3184,6 +3431,34 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    V1FollowUpsController_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FollowUpEnvelopeDto"];
+                };
+            };
+            /** @description Follow-up not found in this company */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     V1Controller_health: {
         parameters: {
             query?: never;
@@ -6540,7 +6815,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["PublicTicketsPageDto"];
+                };
             };
             /** @description Validation error */
             400: {
@@ -6594,7 +6871,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["PublicTicketDto"];
+                };
             };
             /** @description Ticket not found */
             404: {
@@ -6625,7 +6904,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["PublicTicketDto"];
+                };
             };
             /** @description Validation error */
             400: {
