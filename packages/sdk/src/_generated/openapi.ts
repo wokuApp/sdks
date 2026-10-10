@@ -1848,14 +1848,54 @@ export interface components {
             refId: string;
             instrumentId?: string;
         };
+        FollowUpAttachmentDto: {
+            /** @description Stable number of the file in the conversation (survey prelude included). */
+            index: number;
+            /** @description Display label in the conversation language, e.g. "Archivo 2" or "File 2". Summaries cite files by this label. */
+            label: string;
+            /** @enum {string} */
+            kind: "image" | "audio" | "document" | "unsupported";
+            /** @description Private original file (evidence). Absent while pending or when nothing was stored (location, contacts, over the limits). */
+            fileId?: string;
+            /** @description Converted copy the model read, when there was a conversion. */
+            readableFileId?: string;
+            filename: string;
+            mimeType: string;
+            /** @enum {string} */
+            status: "pending" | "ready" | "failed" | "unsupported";
+            /** @description Transcript (audio) or description (image, document) generated from the file. Untrusted customer content. */
+            text?: string;
+            /** @description Stable reason code when failed or unsupported (e.g. video, location, message_limit, conversation_limit, read_failed). */
+            failureReason?: string;
+            /** @description Admin page that opens this file after login and a company check (signed, short-lived download). Never a storage URL. */
+            adminUrl?: string;
+        };
         FollowUpMessageDto: {
             /** @enum {string} */
             role: "agent" | "client";
+            /** @description Message text. May be empty when the message only has files. */
             content: string;
             /** Format: date-time */
             timestamp: string;
+            /**
+             * @description survey: the survey exchange that preceded the follow-up in the same WhatsApp thread (prelude). follow_up: the follow-up itself.
+             * @enum {string}
+             */
+            phase: "survey" | "follow_up";
             responseType?: string;
             selectedOption?: string;
+            /** @description Files the customer sent with this message. */
+            attachments?: components["schemas"]["FollowUpAttachmentDto"][];
+        };
+        FollowUpCitationDto: {
+            index: number;
+            /** @description Label of the cited file, e.g. "Archivo 2". */
+            label: string;
+            fileId?: string;
+            /** @description What the file supports in the summary. */
+            supports: string;
+            /** @description Admin page that opens this file after login and a company check (signed, short-lived download). Never a storage URL. */
+            adminUrl?: string;
         };
         FollowUpConversationDto: {
             _id: string;
@@ -1871,6 +1911,11 @@ export interface components {
             state: "pending" | "initial_sent" | "awaiting_detail" | "closing" | "completed" | "timed_out" | "cancelled";
             /** @enum {string} */
             channel: "email" | "whatsapp";
+            /**
+             * @description WhatsApp line. survey_thread: the agent continues the survey conversation on the survey number. follow_up_number: the agent writes from the dedicated follow-up number. Absent for email.
+             * @enum {string}
+             */
+            line?: "survey_thread" | "follow_up_number";
             /** @description Stable reason code for exclusion, failure or uncertain delivery. Provider error details are never exposed. */
             reason?: string;
             messages: components["schemas"]["FollowUpMessageDto"][];
@@ -1878,6 +1923,8 @@ export interface components {
             actionItems?: string[];
             sentiment?: string;
             topics?: string[];
+            /** @description Files the summary cites; the summary text mentions them as "(Archivo N)". */
+            summaryCitations?: components["schemas"]["FollowUpCitationDto"][];
             summaryVersion: number;
             /** Format: date-time */
             createdAt?: string;

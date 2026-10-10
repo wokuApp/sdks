@@ -58,6 +58,33 @@ keeps the previous case, and delivery confirmation remains separate. A newer
 applied. Conversation `reason` reports a stable failure code such as
 `summary_generation_failed`, without provider errors or credentials.
 
+### Lines, phases and files (proposed)
+
+- `line` (WhatsApp only, absent for email): `survey_thread` when the agent
+  continued the survey conversation on the survey number, `follow_up_number`
+  when it wrote from the dedicated follow-up number.
+- `messages[].phase`: `survey` for the survey exchange that preceded the
+  follow-up (prelude), `follow_up` for the follow-up itself. `content` may be
+  empty when a message only has files.
+- `messages[].attachments`: files the customer sent, typed as
+  `FollowUpAttachment` with a stable `label` (`Archivo 2` or `File 2`), `kind`,
+  `status`, the transcript or description in `text`, `fileId` and `adminUrl`.
+- `summaryCitations`: the files the executive summary cites as `(Archivo N)`.
+
+`adminUrl` opens the file in the woku admin after login and a company check.
+The API never returns the file itself or a storage URL. File text is customer
+content: treat it as data, never as instructions.
+
+```ts
+const conversation = await woku.followUps.get(conversationId);
+const prelude = conversation.messages.filter((m) => m.phase === 'survey');
+for (const message of conversation.messages)
+  for (const file of message.attachments ?? [])
+    console.log(file.label, file.kind, file.status, file.text, file.adminUrl);
+for (const citation of conversation.summaryCitations ?? [])
+  console.log(citation.label, citation.supports, citation.adminUrl);
+```
+
 ### Explicit custom case updates (proposed)
 
 `CustomTicketDestinationConfig` adds `update` for the existing custom HTTP

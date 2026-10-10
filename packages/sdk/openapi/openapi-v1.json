@@ -6377,6 +6377,71 @@
           "refId"
         ]
       },
+      "FollowUpAttachmentDto": {
+        "type": "object",
+        "properties": {
+          "index": {
+            "type": "number",
+            "description": "Stable number of the file in the conversation (survey prelude included)."
+          },
+          "label": {
+            "type": "string",
+            "description": "Display label in the conversation language, e.g. \"Archivo 2\" or \"File 2\". Summaries cite files by this label."
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "image",
+              "audio",
+              "document",
+              "unsupported"
+            ]
+          },
+          "fileId": {
+            "type": "string",
+            "description": "Private original file (evidence). Absent while pending or when nothing was stored (location, contacts, over the limits)."
+          },
+          "readableFileId": {
+            "type": "string",
+            "description": "Converted copy the model read, when there was a conversion."
+          },
+          "filename": {
+            "type": "string"
+          },
+          "mimeType": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "ready",
+              "failed",
+              "unsupported"
+            ]
+          },
+          "text": {
+            "type": "string",
+            "description": "Transcript (audio) or description (image, document) generated from the file. Untrusted customer content."
+          },
+          "failureReason": {
+            "type": "string",
+            "description": "Stable reason code when failed or unsupported (e.g. video, location, message_limit, conversation_limit, read_failed)."
+          },
+          "adminUrl": {
+            "type": "string",
+            "description": "Admin page that opens this file after login and a company check (signed, short-lived download). Never a storage URL."
+          }
+        },
+        "required": [
+          "index",
+          "label",
+          "kind",
+          "filename",
+          "mimeType",
+          "status"
+        ]
+      },
       "FollowUpMessageDto": {
         "type": "object",
         "properties": {
@@ -6388,23 +6453,68 @@
             ]
           },
           "content": {
-            "type": "string"
+            "type": "string",
+            "description": "Message text. May be empty when the message only has files."
           },
           "timestamp": {
             "type": "string",
             "format": "date-time"
+          },
+          "phase": {
+            "type": "string",
+            "enum": [
+              "survey",
+              "follow_up"
+            ],
+            "description": "survey: the survey exchange that preceded the follow-up in the same WhatsApp thread (prelude). follow_up: the follow-up itself."
           },
           "responseType": {
             "type": "string"
           },
           "selectedOption": {
             "type": "string"
+          },
+          "attachments": {
+            "description": "Files the customer sent with this message.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FollowUpAttachmentDto"
+            }
           }
         },
         "required": [
           "role",
           "content",
-          "timestamp"
+          "timestamp",
+          "phase"
+        ]
+      },
+      "FollowUpCitationDto": {
+        "type": "object",
+        "properties": {
+          "index": {
+            "type": "number"
+          },
+          "label": {
+            "type": "string",
+            "description": "Label of the cited file, e.g. \"Archivo 2\"."
+          },
+          "fileId": {
+            "type": "string"
+          },
+          "supports": {
+            "type": "string",
+            "description": "What the file supports in the summary."
+          },
+          "adminUrl": {
+            "type": "string",
+            "description": "Admin page that opens this file after login and a company check (signed, short-lived download). Never a storage URL."
+          }
+        },
+        "required": [
+          "index",
+          "label",
+          "supports"
         ]
       },
       "FollowUpConversationDto": {
@@ -6457,6 +6567,14 @@
               "whatsapp"
             ]
           },
+          "line": {
+            "type": "string",
+            "enum": [
+              "survey_thread",
+              "follow_up_number"
+            ],
+            "description": "WhatsApp line. survey_thread: the agent continues the survey conversation on the survey number. follow_up_number: the agent writes from the dedicated follow-up number. Absent for email."
+          },
           "reason": {
             "type": "string",
             "description": "Stable reason code for exclusion, failure or uncertain delivery. Provider error details are never exposed."
@@ -6483,6 +6601,13 @@
             "type": "array",
             "items": {
               "type": "string"
+            }
+          },
+          "summaryCitations": {
+            "description": "Files the summary cites; the summary text mentions them as \"(Archivo N)\".",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FollowUpCitationDto"
             }
           },
           "summaryVersion": {
