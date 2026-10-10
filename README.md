@@ -55,6 +55,12 @@ packages add explicit capture provenance, defaulting new captures to standalone
 and preserving Flow IDs. RN retries retain existing bodies and IDs unchanged,
 including historical offline captures without provenance.
 
+Follow-up conversations also expose the WhatsApp `line`, the `phase` of each
+message (survey prelude or follow-up), the files the customer sent
+(`attachments`) and the files the summary cites (`summaryCitations`). Each file
+carries an `adminUrl` that opens it in the woku admin after login; files and
+storage URLs are never returned.
+
 Flow responses never start follow-up. Conversation completion and evidence
 application are separate: check `ticket.followUp.appliedSummaryVersion >= 1`
 for enriched evidence. Historical records may omit follow-up metadata. See each

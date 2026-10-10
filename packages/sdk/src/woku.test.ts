@@ -4,6 +4,13 @@ import { setupServer } from 'msw/node';
 
 import { Woku } from './woku';
 import type { CustomTicketDestinationConfig } from './types';
+import type {
+  FollowUpAttachment,
+  FollowUpCitation,
+  FollowUpConversation,
+  FollowUpLine,
+  FollowUpMessagePhase,
+} from './models';
 import fixtures from './fixtures/follow-up.json';
 
 const BASE = 'http://api.test';
@@ -247,6 +254,7 @@ it('reads a safe follow-up conversation with a management key, encoded id and re
         role: 'client',
         content: 'Still waiting',
         timestamp: '2026-09-27T12:00:00Z',
+        phase: 'follow_up',
       },
     ],
     summaryVersion: 1,
@@ -264,6 +272,88 @@ it('reads a safe follow-up conversation with a management key, encoded id and re
   });
   expect(result).toEqual(conversation);
   expect(result.reason).toBe('summary_generation_failed');
+});
+
+it('types the hybrid line, message phases, files and summary citations of a follow-up', async () => {
+  const adminUrl =
+    'https://admin.woku.app/companies/c1/follow-ups/fu1/files/f1';
+  const conversation: FollowUpConversation = {
+    _id: 'fu1',
+    companyId: 'c1',
+    origin: { tool: 'csat', refId: 'r1' },
+    reviewType: 'voicemail',
+    originalReview: 'Llegó roto',
+    state: 'completed',
+    channel: 'whatsapp',
+    line: 'survey_thread',
+    messages: [
+      {
+        role: 'client',
+        content: '',
+        timestamp: '2026-10-09T12:00:00Z',
+        phase: 'survey',
+        attachments: [
+          {
+            index: 1,
+            label: 'Archivo 1',
+            kind: 'audio',
+            fileId: 'f1',
+            filename: 'audio',
+            mimeType: 'audio/ogg',
+            status: 'ready',
+            text: 'Llegó roto',
+            adminUrl,
+          },
+        ],
+      },
+      {
+        role: 'client',
+        content: '',
+        timestamp: '2026-10-09T12:01:00Z',
+        phase: 'follow_up',
+        attachments: [
+          {
+            index: 2,
+            label: 'Archivo 2',
+            kind: 'unsupported',
+            filename: 'video',
+            mimeType: 'video/mp4',
+            status: 'unsupported',
+            failureReason: 'video',
+          },
+        ],
+      },
+    ],
+    executiveSummary: 'La caja llegó rota (Archivo 1).',
+    summaryCitations: [
+      {
+        index: 1,
+        label: 'Archivo 1',
+        fileId: 'f1',
+        supports: 'Daño del envío',
+        adminUrl,
+      },
+    ],
+    summaryVersion: 1,
+  };
+  server.use(
+    http.get(`${BASE}/v1/follow-ups/:id`, () =>
+      HttpResponse.json({ data: conversation }),
+    ),
+  );
+  const result = await woku().followUps.get('fu1');
+  expect(result).toEqual(conversation);
+  const line: FollowUpLine | undefined = result.line;
+  const phase: FollowUpMessagePhase = result.messages[0]!.phase;
+  const file: FollowUpAttachment | undefined =
+    result.messages[0]!.attachments?.[0];
+  const citation: FollowUpCitation | undefined = result.summaryCitations?.[0];
+  expect([line, phase, file?.adminUrl, citation?.adminUrl]).toEqual([
+    'survey_thread',
+    'survey',
+    adminUrl,
+    adminUrl,
+  ]);
 });
 
 it.each([403, 404])(
