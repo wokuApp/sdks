@@ -1878,7 +1878,7 @@ export interface components {
             /** Format: date-time */
             timestamp: string;
             /**
-             * @description survey: the survey exchange that preceded the follow-up in the same WhatsApp thread (prelude). follow_up: the follow-up itself.
+             * @description survey: the prelude, what the customer said in the survey before the follow-up. On the survey_thread line it is the WhatsApp survey exchange; on every other line (follow_up_number, email) it is the original comment as a client message. follow_up: the follow-up itself. Every line may start with the prelude, so messages[0] can be a client message; filter phase === 'follow_up' to read only the follow-up.
              * @enum {string}
              */
             phase: "survey" | "follow_up";
@@ -1918,6 +1918,7 @@ export interface components {
             line?: "survey_thread" | "follow_up_number";
             /** @description Stable reason code for exclusion, failure or uncertain delivery. Provider error details are never exposed. */
             reason?: string;
+            /** @description Messages in order: the survey prelude (phase survey) first, then the follow-up (phase follow_up). Filter phase === 'follow_up' for the follow-up messages only. */
             messages: components["schemas"]["FollowUpMessageDto"][];
             executiveSummary?: string;
             actionItems?: string[];

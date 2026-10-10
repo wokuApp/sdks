@@ -63,8 +63,11 @@ applied. Conversation `reason` reports a stable failure code such as
 - `line` (WhatsApp only, absent for email): `survey_thread` when the agent
   continued the survey conversation on the survey number, `follow_up_number`
   when it wrote from the dedicated follow-up number.
-- `messages[].phase`: `survey` for the survey exchange that preceded the
-  follow-up (prelude), `follow_up` for the follow-up itself. `content` may be
+- `messages[].phase`: `survey` for the prelude, `follow_up` for the follow-up
+  itself. Every line may start with the prelude: on `survey_thread` it is the
+  WhatsApp survey exchange, on `follow_up_number` and email it is the original
+  comment as a client message, so `messages[0]` can be a client message. Filter
+  `phase === 'follow_up'` to read only the follow-up. `content` may be
   empty when a message only has files.
 - `messages[].attachments`: files the customer sent, typed as
   `FollowUpAttachment` with a stable `label` (`Archivo 2` or `File 2`), `kind`,
