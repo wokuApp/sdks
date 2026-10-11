@@ -361,6 +361,8 @@ export interface WhatsappAlertRecipient {
   /** E.164 phone number without the leading +. */
   whatsappId: string;
   name: string;
+  /** Kinds of comment that alert this number (numbers created before this feature only get `woku`). */
+  sources: ToolType[];
 }
 
 /** A folder with its breadcrumb path and subtree stats. */

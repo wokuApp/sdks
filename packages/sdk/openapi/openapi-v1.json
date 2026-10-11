@@ -6871,6 +6871,26 @@
             }
           },
           {
+            "name": "foldersLimit",
+            "required": false,
+            "in": "query",
+            "description": "Folders per page (\"see more\"). Omitted returns every folder of the level.",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "type": "number"
+            }
+          },
+          {
+            "name": "foldersCursor",
+            "required": false,
+            "in": "query",
+            "description": "Opaque `foldersNextCursor` of a previous page. Returns only that page of folders, without tools.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "createdFrom",
             "required": false,
             "in": "query",
@@ -11292,6 +11312,19 @@
             "type": "string",
             "example": "Ana (support)",
             "maxLength": 60
+          },
+          "sources": {
+            "type": "array",
+            "description": "Kinds of comment that alert this number. Defaults to all four.",
+            "items": {
+              "type": "string",
+              "enum": [
+                "woku",
+                "nps",
+                "csat",
+                "ces"
+              ]
+            }
           }
         },
         "required": [

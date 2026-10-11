@@ -3782,6 +3782,8 @@ export interface components {
             whatsappId: string;
             /** @example Ana (support) */
             name: string;
+            /** @description Kinds of comment that alert this number. Defaults to all four. */
+            sources?: ("woku" | "nps" | "csat" | "ces")[];
         };
         UpdateFolderBodyDTO: {
             name?: string;
@@ -8670,6 +8672,10 @@ export interface operations {
                 /** @description Opaque `nextCursor` of the previous page. */
                 cursor?: string;
                 limit?: number;
+                /** @description Folders per page ("see more"). Omitted returns every folder of the level. */
+                foldersLimit?: number;
+                /** @description Opaque `foldersNextCursor` of a previous page. Returns only that page of folders, without tools. */
+                foldersCursor?: string;
                 /** @description Only tools created on or after this date (ISO 8601). */
                 createdFrom?: string;
                 /** @description Only tools created on or before this date (ISO 8601). */
