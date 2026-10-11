@@ -149,6 +149,8 @@ export const Feedback = ({ messages }: FeedbackProps) => {
       await createWokuTextnote({
         apiBaseUrl: config.apiBaseUrl,
         publishableKey: config.publishableKey,
+        collectionKind: config.collectionKind,
+        flowId: config.flowId,
         wokuId,
         qualification: q,
         description: textnote,
@@ -167,6 +169,8 @@ export const Feedback = ({ messages }: FeedbackProps) => {
       await createWokuVoicemail({
         apiBaseUrl: config.apiBaseUrl,
         publishableKey: config.publishableKey,
+        collectionKind: config.collectionKind,
+        flowId: config.flowId,
         wokuId,
         qualification: q,
         file: feedbackAudio,
@@ -191,6 +195,8 @@ export const Feedback = ({ messages }: FeedbackProps) => {
         await createNps({
           apiBaseUrl: config.apiBaseUrl,
           publishableKey: config.publishableKey,
+          collectionKind: config.collectionKind,
+          flowId: config.flowId,
           score,
           npsToolId: config.npsToolId,
           ...(anonymous || (!email && !config.phone)
@@ -209,6 +215,8 @@ export const Feedback = ({ messages }: FeedbackProps) => {
       await createNpsTextnote({
         apiBaseUrl: config.apiBaseUrl,
         publishableKey: config.publishableKey,
+        collectionKind: config.collectionKind,
+        flowId: config.flowId,
         npsId,
         description: textnote,
       });
@@ -219,6 +227,8 @@ export const Feedback = ({ messages }: FeedbackProps) => {
       await createNpsVoicemail({
         apiBaseUrl: config.apiBaseUrl,
         publishableKey: config.publishableKey,
+        collectionKind: config.collectionKind,
+        flowId: config.flowId,
         npsId,
         file: feedbackAudio,
       });

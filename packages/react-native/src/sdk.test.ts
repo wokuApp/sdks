@@ -171,3 +171,120 @@ it('returns confirmed delivery even when local acknowledgement persistence fails
   expect(bodies[1].id).toBe(bodies[0].id);
   expect(await sdk.pendingCount()).toBe(0);
 });
+
+it.each(['woku', 'nps', 'csat', 'ces'] as const)(
+  'declares standalone by default and preserves explicit flow for %s',
+  async (kind) => {
+    const request = vi.fn(async (_req: HttpRequest) => ok);
+    const sdk = mkSdk({ request });
+    const capture = (context: {
+      collectionKind?: 'standalone' | 'flow';
+      flowId?: string;
+    }): ReturnType<WokuSdk['captureNps']> => {
+      switch (kind) {
+        case 'woku':
+          return sdk.captureWoku({ wokuId: 'w1', rating: 2, ...context });
+        case 'nps':
+          return sdk.captureNps({ npsId: 'n1', score: 2, ...context });
+        case 'csat':
+          return sdk.captureCsat({ csatId: 's1', score: 2, ...context });
+        case 'ces':
+          return sdk.captureCes({ cesId: 'e1', score: 2, ...context });
+      }
+    };
+    await capture({});
+    await capture({ collectionKind: 'flow', flowId: 'f1' });
+    expect(JSON.parse(request.mock.calls[0]![0].body as string)).toMatchObject({
+      collectionKind: 'standalone',
+    });
+    expect(JSON.parse(request.mock.calls[1]![0].body as string)).toMatchObject({
+      collectionKind: 'flow',
+      flowId: 'f1',
+    });
+  },
+);
+
+it.each([false, true])(
+  'replays the same flow payload and id after restart, audio=%s',
+  async (audio) => {
+    const storage = new InMemoryStorage();
+    const request = vi.fn(async (_req: HttpRequest) => {
+      throw new Error('offline');
+    });
+    const config = {
+      apiUrl: 'https://api.woku.app',
+      publicKey: 'pk_test',
+      companyId: 'c1',
+      storage,
+      http: { request },
+    };
+    await new WokuSdk(config).captureNps({
+      score: 2,
+      collectionKind: 'flow',
+      flowId: 'f1',
+      ...(audio
+        ? { audio: { uri: 'file://a.m4a', mimeType: 'audio/m4a' } }
+        : {}),
+    });
+    const original = request.mock.calls[0]![0];
+    const replay = vi.fn(async (_req: HttpRequest) => ok);
+    const restarted = new WokuSdk({
+      ...config,
+      language: 'en',
+      http: { request: replay },
+    });
+    await Promise.all([restarted.flush(), restarted.flush()]);
+    expect(replay).toHaveBeenCalledTimes(1);
+    const sent = replay.mock.calls[0]![0];
+    const payload = (req: HttpRequest): string | FormDataEntryValue | null =>
+      typeof req.body === 'string'
+        ? req.body
+        : (req.body as FormData).get('payload');
+    expect(payload(sent)).toBe(payload(original));
+    expect(sent.headers['X-Woku-Idempotency-Key']).toBe(
+      original.headers['X-Woku-Idempotency-Key'],
+    );
+    expect(JSON.parse(payload(sent) as string)).toMatchObject({
+      collectionKind: 'flow',
+      flowId: 'f1',
+    });
+  },
+);
+
+it.each([false, true])(
+  'preserves legacy queued bodies without inventing provenance or language, audio=%s',
+  async (audio) => {
+    const storage = new InMemoryStorage();
+    const original = {
+      id: 'old-capture',
+      legacyContext: { source: 'older-package' },
+      kind: 'nps',
+      companyId: 'c1',
+      score: 2,
+      createdAt: Date.now(),
+      ...(audio
+        ? { audio: { uri: 'file://a.m4a', mimeType: 'audio/m4a' } }
+        : {}),
+    };
+    await storage.setItem(
+      'woku.sdk.queue.v1',
+      JSON.stringify([{ submission: original, attempts: 1 }]),
+    );
+    const request = vi.fn(async (_req: HttpRequest) => ok);
+    await new WokuSdk({
+      apiUrl: 'https://api.woku.app',
+      publicKey: 'pk_test',
+      companyId: 'c1',
+      storage,
+      language: 'en',
+      http: { request },
+    }).flush();
+    const req = request.mock.calls[0]![0];
+    const payload =
+      typeof req.body === 'string'
+        ? req.body
+        : (req.body as FormData).get('payload');
+    expect(JSON.parse(payload as string)).toEqual(original);
+    expect(req.headers['X-Woku-Idempotency-Key']).toBe('old-capture');
+  },
+);

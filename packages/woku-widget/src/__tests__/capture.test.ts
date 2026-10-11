@@ -408,3 +408,56 @@ it('preserves identified journey context in Woku audio multipart', async () => {
   expect(options.body.get('dispatchToken')).toBe('jent_test');
   expect(options.body.get('clientPhone')).toBe('56912345678');
 });
+
+it.each(['standalone', 'flow'] as const)(
+  'preserves %s provenance across Woku and NPS text/audio chains',
+  async (collectionKind) => {
+    const context = {
+      collectionKind,
+      ...(collectionKind === 'flow' ? { flowId: 'f1' } : {}),
+    };
+    const common = { apiBaseUrl: BASE, publishableKey: PK, ...context };
+    const file = new Blob(['audio'], { type: 'audio/webm' });
+    await createWokuTextnote({
+      ...common,
+      wokuId: 'w1',
+      qualification: 2,
+      description: 'slow',
+    });
+    await createWokuVoicemail({
+      ...common,
+      wokuId: 'w1',
+      qualification: 2,
+      file,
+    });
+    await createNps({ ...common, score: 2 });
+    await createNpsTextnote({ ...common, npsId: 'n1', description: 'slow' });
+    await createNpsVoicemail({ ...common, npsId: 'n1', file });
+    const calls = (fetch as ReturnType<typeof vi.fn>).mock.calls;
+    expect(calls).toHaveLength(5);
+    for (const [, opts] of calls) {
+      if (typeof opts.body === 'string')
+        expect(JSON.parse(opts.body)).toMatchObject(context);
+      else {
+        expect(opts.body.get('collectionKind')).toBe(collectionKind);
+        expect(opts.body.get('flowId')).toBe(context.flowId ?? null);
+      }
+    }
+  },
+);
+
+it('declares new standalone Woku and NPS captures without host provenance', async () => {
+  const common = { apiBaseUrl: BASE, publishableKey: PK };
+  await createWokuTextnote({
+    ...common,
+    wokuId: 'w1',
+    qualification: 2,
+    description: 'slow',
+  });
+  await createNps({ ...common, score: 2 });
+  for (const [, opts] of (fetch as ReturnType<typeof vi.fn>).mock.calls)
+    expect(JSON.parse(opts.body)).toHaveProperty(
+      'collectionKind',
+      'standalone',
+    );
+});

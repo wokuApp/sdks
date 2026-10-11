@@ -34,6 +34,7 @@ export {
 } from './errors';
 
 export type {
+  CaptureContext,
   CaptureKind,
   CaptureLanguage,
   CsatCaptureInput,

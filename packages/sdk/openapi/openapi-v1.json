@@ -1,6 +1,47 @@
 {
   "openapi": "3.0.0",
   "paths": {
+    "/v1/follow-ups/{id}": {
+      "get": {
+        "description": "Management secret key required. Capture publishable keys cannot read conversations.",
+        "operationId": "V1FollowUpsController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FollowUpEnvelopeDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Follow-up not found in this company"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Read a company follow-up conversation",
+        "tags": [
+          "v1 - follow-ups"
+        ]
+      }
+    },
     "/v1/health": {
       "get": {
         "description": "Returns { ok: true } when the v1 namespace is reachable. Unauthenticated.",
@@ -13,7 +54,9 @@
         },
         "security": [],
         "summary": "V1 namespace healthcheck",
-        "tags": ["v1"]
+        "tags": [
+          "v1"
+        ]
       }
     },
     "/v1/external-trackers": {
@@ -74,7 +117,9 @@
           }
         ],
         "summary": "List external tracker definitions of the caller company",
-        "tags": ["v1 - external-trackers"]
+        "tags": [
+          "v1 - external-trackers"
+        ]
       },
       "post": {
         "description": "The company and creator are resolved server-side from the caller key. Tracker names are unique per company.",
@@ -117,7 +162,9 @@
           }
         ],
         "summary": "Create an external tracker definition in the company catalog",
-        "tags": ["v1 - external-trackers"]
+        "tags": [
+          "v1 - external-trackers"
+        ]
       }
     },
     "/v1/external-trackers/wokus/{wokuId}": {
@@ -145,7 +192,9 @@
           }
         ],
         "summary": "List tracker values assigned to a Woku",
-        "tags": ["v1 - external-trackers"]
+        "tags": [
+          "v1 - external-trackers"
+        ]
       },
       "post": {
         "description": "Idempotent: if (wokuId, trackerName) already has a value, it is overwritten. Resolves trackerId server-side.",
@@ -191,7 +240,9 @@
           }
         ],
         "summary": "Assign (upsert) a tracker value to a Woku by tracker name",
-        "tags": ["v1 - external-trackers"]
+        "tags": [
+          "v1 - external-trackers"
+        ]
       }
     },
     "/v1/external-trackers/wokus/{wokuId}/{trackerName}": {
@@ -230,7 +281,9 @@
           }
         ],
         "summary": "Remove a tracker value from a Woku by tracker name",
-        "tags": ["v1 - external-trackers"]
+        "tags": [
+          "v1 - external-trackers"
+        ]
       }
     },
     "/v1/external-trackers/search": {
@@ -291,7 +344,9 @@
           }
         ],
         "summary": "Search Woku tracker assignments matching (name, value) within the company. Returns paginated WokuExternalTracker entries — caller can map .wokuId to fetch full Wokus.",
-        "tags": ["v1 - external-trackers"]
+        "tags": [
+          "v1 - external-trackers"
+        ]
       }
     },
     "/v1/external-trackers/search-entities": {
@@ -323,7 +378,9 @@
           }
         ],
         "summary": "Search VoC entities by tracker filters (AND, partial match)",
-        "tags": ["v1 - external-trackers"]
+        "tags": [
+          "v1 - external-trackers"
+        ]
       }
     },
     "/v1/external-trackers/{id}": {
@@ -354,7 +411,9 @@
           }
         ],
         "summary": "Get one tracker definition (including inactive)",
-        "tags": ["v1 - external-trackers"]
+        "tags": [
+          "v1 - external-trackers"
+        ]
       },
       "patch": {
         "operationId": "ExternalTrackersController_updateTracker",
@@ -396,7 +455,9 @@
           }
         ],
         "summary": "Update a tracker definition (name, system, description)",
-        "tags": ["v1 - external-trackers"]
+        "tags": [
+          "v1 - external-trackers"
+        ]
       }
     },
     "/v1/external-trackers/{id}/activate": {
@@ -427,7 +488,9 @@
           }
         ],
         "summary": "Re-activate a deactivated tracker definition",
-        "tags": ["v1 - external-trackers"]
+        "tags": [
+          "v1 - external-trackers"
+        ]
       }
     },
     "/v1/external-trackers/{id}/deactivate": {
@@ -458,7 +521,9 @@
           }
         ],
         "summary": "Deactivate a tracker definition (soft-delete). Existing values stay readable.",
-        "tags": ["v1 - external-trackers"]
+        "tags": [
+          "v1 - external-trackers"
+        ]
       }
     },
     "/v1/external-trackers/{entityType}/{id}": {
@@ -470,7 +535,13 @@
             "required": true,
             "in": "path",
             "schema": {
-              "enum": ["nps", "csat", "ces", "form", "flow"],
+              "enum": [
+                "nps",
+                "csat",
+                "ces",
+                "form",
+                "flow"
+              ],
               "type": "string"
             }
           },
@@ -498,7 +569,9 @@
           }
         ],
         "summary": "List tracker values assigned to a VoC entity (tool/form/flow)",
-        "tags": ["v1 - external-trackers"]
+        "tags": [
+          "v1 - external-trackers"
+        ]
       },
       "post": {
         "description": "Idempotent: if (entity, trackerName) already has a value, it is overwritten. Resolves trackerId server-side.",
@@ -509,7 +582,13 @@
             "required": true,
             "in": "path",
             "schema": {
-              "enum": ["nps", "csat", "ces", "form", "flow"],
+              "enum": [
+                "nps",
+                "csat",
+                "ces",
+                "form",
+                "flow"
+              ],
               "type": "string"
             }
           },
@@ -553,7 +632,9 @@
           }
         ],
         "summary": "Assign (upsert) a tracker value to a VoC entity by tracker name",
-        "tags": ["v1 - external-trackers"]
+        "tags": [
+          "v1 - external-trackers"
+        ]
       }
     },
     "/v1/external-trackers/{entityType}/{id}/{trackerName}": {
@@ -565,7 +646,13 @@
             "required": true,
             "in": "path",
             "schema": {
-              "enum": ["nps", "csat", "ces", "form", "flow"],
+              "enum": [
+                "nps",
+                "csat",
+                "ces",
+                "form",
+                "flow"
+              ],
               "type": "string"
             }
           },
@@ -601,7 +688,9 @@
           }
         ],
         "summary": "Remove a tracker value from a VoC entity by tracker name",
-        "tags": ["v1 - external-trackers"]
+        "tags": [
+          "v1 - external-trackers"
+        ]
       }
     },
     "/v1/ticket-destinations": {
@@ -619,7 +708,9 @@
           }
         ],
         "summary": "List the ticket destinations of the caller company",
-        "tags": ["v1 - ticket-destinations"]
+        "tags": [
+          "v1 - ticket-destinations"
+        ]
       },
       "post": {
         "description": "kind: zendesk | custom | email. config/credentials are validated per kind. routingConditions support operator \"equals\" (a value) or \"any\" (the whole tracker).",
@@ -649,7 +740,9 @@
           }
         ],
         "summary": "Create a ticket destination",
-        "tags": ["v1 - ticket-destinations"]
+        "tags": [
+          "v1 - ticket-destinations"
+        ]
       }
     },
     "/v1/ticket-destinations/{id}": {
@@ -680,7 +773,9 @@
           }
         ],
         "summary": "Get one ticket destination",
-        "tags": ["v1 - ticket-destinations"]
+        "tags": [
+          "v1 - ticket-destinations"
+        ]
       },
       "patch": {
         "operationId": "V1TicketDestinationsController_update",
@@ -722,7 +817,9 @@
           }
         ],
         "summary": "Update a ticket destination",
-        "tags": ["v1 - ticket-destinations"]
+        "tags": [
+          "v1 - ticket-destinations"
+        ]
       },
       "delete": {
         "operationId": "V1TicketDestinationsController_remove",
@@ -751,7 +848,9 @@
           }
         ],
         "summary": "Delete a ticket destination",
-        "tags": ["v1 - ticket-destinations"]
+        "tags": [
+          "v1 - ticket-destinations"
+        ]
       }
     },
     "/v1/ticket-destinations/{id}/test": {
@@ -796,7 +895,9 @@
           }
         ],
         "summary": "Send a real connectivity test to a saved destination",
-        "tags": ["v1 - ticket-destinations"]
+        "tags": [
+          "v1 - ticket-destinations"
+        ]
       }
     },
     "/v1/action-plan-groups": {
@@ -824,7 +925,9 @@
           }
         ],
         "summary": "List the action plan groups of the caller company",
-        "tags": ["v1 - action-plan-groups"]
+        "tags": [
+          "v1 - action-plan-groups"
+        ]
       },
       "post": {
         "operationId": "V1ActionPlanGroupsController_create",
@@ -853,7 +956,9 @@
           }
         ],
         "summary": "Create an action plan group",
-        "tags": ["v1 - action-plan-groups"]
+        "tags": [
+          "v1 - action-plan-groups"
+        ]
       }
     },
     "/v1/action-plan-groups/{id}": {
@@ -884,7 +989,9 @@
           }
         ],
         "summary": "Get one action plan group",
-        "tags": ["v1 - action-plan-groups"]
+        "tags": [
+          "v1 - action-plan-groups"
+        ]
       },
       "patch": {
         "operationId": "V1ActionPlanGroupsController_update",
@@ -926,7 +1033,9 @@
           }
         ],
         "summary": "Update an action plan group",
-        "tags": ["v1 - action-plan-groups"]
+        "tags": [
+          "v1 - action-plan-groups"
+        ]
       },
       "delete": {
         "operationId": "V1ActionPlanGroupsController_remove",
@@ -955,7 +1064,9 @@
           }
         ],
         "summary": "Delete an action plan group",
-        "tags": ["v1 - action-plan-groups"]
+        "tags": [
+          "v1 - action-plan-groups"
+        ]
       }
     },
     "/v1/action-plan-groups/{id}/enabled": {
@@ -996,7 +1107,9 @@
           }
         ],
         "summary": "Enable or disable an action plan group",
-        "tags": ["v1 - action-plan-groups"]
+        "tags": [
+          "v1 - action-plan-groups"
+        ]
       }
     },
     "/v1/action-plans": {
@@ -1036,7 +1149,11 @@
             "description": "Presentation stage; expands to the technical statuses it groups (review=draft; active=approved,in_progress,delivery_error; closed=completed,sent,canceled). Mutually exclusive with status.",
             "schema": {
               "type": "string",
-              "enum": ["review", "active", "closed"]
+              "enum": [
+                "review",
+                "active",
+                "closed"
+              ]
             }
           },
           {
@@ -1046,7 +1163,12 @@
             "description": "Plans whose sources include this VoC source.",
             "schema": {
               "type": "string",
-              "enum": ["woku", "nps", "csat", "ces"]
+              "enum": [
+                "woku",
+                "nps",
+                "csat",
+                "ces"
+              ]
             }
           },
           {
@@ -1056,7 +1178,10 @@
             "description": "How the source filter maps to plans (AP-0064): \"single\" matches plans whose sources is EXACTLY the given source (requires source); \"mixed\" matches cross-source plans with more than one source (forbids source). Omitting it keeps the legacy membership semantics of source alone.",
             "schema": {
               "type": "string",
-              "enum": ["single", "mixed"]
+              "enum": [
+                "single",
+                "mixed"
+              ]
             }
           },
           {
@@ -1065,7 +1190,11 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": ["high", "medium", "low"]
+              "enum": [
+                "high",
+                "medium",
+                "low"
+              ]
             }
           },
           {
@@ -1128,7 +1257,9 @@
           }
         ],
         "summary": "List the action plans of the caller company",
-        "tags": ["v1 - action-plans"]
+        "tags": [
+          "v1 - action-plans"
+        ]
       }
     },
     "/v1/action-plans/{id}": {
@@ -1159,7 +1290,9 @@
           }
         ],
         "summary": "Get one action plan",
-        "tags": ["v1 - action-plans"]
+        "tags": [
+          "v1 - action-plans"
+        ]
       }
     },
     "/v1/action-plans/{id}/events": {
@@ -1190,7 +1323,9 @@
           }
         ],
         "summary": "Get the plan timeline (events, oldest first)",
-        "tags": ["v1 - action-plans"]
+        "tags": [
+          "v1 - action-plans"
+        ]
       }
     },
     "/v1/action-plans/{id}/conversation": {
@@ -1222,7 +1357,9 @@
           }
         ],
         "summary": "Get the plan AI conversation",
-        "tags": ["v1 - action-plans"]
+        "tags": [
+          "v1 - action-plans"
+        ]
       },
       "post": {
         "description": "Requires confirm:true. Returns an ack of the human message; the AI reply is composed asynchronously, so poll GET conversation until busy is false. Only a plan in draft accepts replies (409 otherwise).",
@@ -1268,7 +1405,9 @@
           }
         ],
         "summary": "Reply to the plan AI agent (paid AI turn, confirm required)",
-        "tags": ["v1 - action-plans"]
+        "tags": [
+          "v1 - action-plans"
+        ]
       }
     },
     "/v1/action-plans/{id}/send": {
@@ -1310,7 +1449,9 @@
           }
         ],
         "summary": "Manage an approved plan inside woku",
-        "tags": ["v1 - action-plans"]
+        "tags": [
+          "v1 - action-plans"
+        ]
       }
     },
     "/v1/action-plans/{id}/tasks": {
@@ -1351,7 +1492,9 @@
           }
         ],
         "summary": "Add a task (draft or managed plan)",
-        "tags": ["v1 - action-plans"]
+        "tags": [
+          "v1 - action-plans"
+        ]
       }
     },
     "/v1/action-plans/{id}/tasks/reorder": {
@@ -1389,7 +1532,9 @@
           }
         ],
         "summary": "Reorder tasks (draft or managed plan)",
-        "tags": ["v1 - action-plans"]
+        "tags": [
+          "v1 - action-plans"
+        ]
       }
     },
     "/v1/action-plans/{id}/tasks/{taskId}": {
@@ -1439,7 +1584,9 @@
           }
         ],
         "summary": "Edit a task: text on a draft/managed plan, status & assignee on a managed plan",
-        "tags": ["v1 - action-plans"]
+        "tags": [
+          "v1 - action-plans"
+        ]
       },
       "delete": {
         "operationId": "V1ActionPlansController_deleteTask",
@@ -1474,7 +1621,9 @@
           }
         ],
         "summary": "Remove a task (draft or managed plan)",
-        "tags": ["v1 - action-plans"]
+        "tags": [
+          "v1 - action-plans"
+        ]
       }
     },
     "/v1/action-plans/{id}/approve": {
@@ -1502,7 +1651,9 @@
           }
         ],
         "summary": "Approve a draft plan",
-        "tags": ["v1 - action-plans"]
+        "tags": [
+          "v1 - action-plans"
+        ]
       }
     },
     "/v1/action-plans/{id}/reopen": {
@@ -1530,7 +1681,9 @@
           }
         ],
         "summary": "Reopen an approved/delivery_error plan to draft",
-        "tags": ["v1 - action-plans"]
+        "tags": [
+          "v1 - action-plans"
+        ]
       }
     },
     "/v1/action-plans/{id}/cancel": {
@@ -1558,7 +1711,9 @@
           }
         ],
         "summary": "Cancel a plan",
-        "tags": ["v1 - action-plans"]
+        "tags": [
+          "v1 - action-plans"
+        ]
       }
     },
     "/v1/action-plans/{id}/complete": {
@@ -1586,7 +1741,9 @@
           }
         ],
         "summary": "Close a managed plan",
-        "tags": ["v1 - action-plans"]
+        "tags": [
+          "v1 - action-plans"
+        ]
       }
     },
     "/v1/action-plans/{id}/resume": {
@@ -1614,7 +1771,9 @@
           }
         ],
         "summary": "Reopen a completed managed plan",
-        "tags": ["v1 - action-plans"]
+        "tags": [
+          "v1 - action-plans"
+        ]
       }
     },
     "/v1/wokus": {
@@ -1649,7 +1808,9 @@
           }
         ],
         "summary": "List the wokus of the caller company (paginated)",
-        "tags": ["v1 - wokus"]
+        "tags": [
+          "v1 - wokus"
+        ]
       },
       "post": {
         "operationId": "V1WokusController_createWoku",
@@ -1694,7 +1855,9 @@
           }
         ],
         "summary": "Create a woku (v1 alias of POST /wokus/create-woku)",
-        "tags": ["v1 - wokus"]
+        "tags": [
+          "v1 - wokus"
+        ]
       }
     },
     "/v1/wokus/{id}": {
@@ -1728,7 +1891,9 @@
           }
         ],
         "summary": "Get a woku with aggregated review stats",
-        "tags": ["v1 - wokus"]
+        "tags": [
+          "v1 - wokus"
+        ]
       },
       "patch": {
         "operationId": "V1WokusController_updateWoku",
@@ -1780,7 +1945,9 @@
           }
         ],
         "summary": "Update a woku definition (only if it has no reviews)",
-        "tags": ["v1 - wokus"]
+        "tags": [
+          "v1 - wokus"
+        ]
       },
       "delete": {
         "operationId": "V1WokusController_deleteWoku",
@@ -1812,7 +1979,9 @@
           }
         ],
         "summary": "Delete a woku and all its reviews",
-        "tags": ["v1 - wokus"]
+        "tags": [
+          "v1 - wokus"
+        ]
       }
     },
     "/v1/wokus/{id}/reviews": {
@@ -1863,7 +2032,9 @@
           }
         ],
         "summary": "List the reviews of a woku (text and voice, paginated)",
-        "tags": ["v1 - wokus"]
+        "tags": [
+          "v1 - wokus"
+        ]
       }
     },
     "/v1/wokus/{id}/settings": {
@@ -1918,7 +2089,9 @@
           }
         ],
         "summary": "Update the woku boolean settings (idempotent)",
-        "tags": ["v1 - wokus"]
+        "tags": [
+          "v1 - wokus"
+        ]
       }
     },
     "/v1/wokus/{id}/move": {
@@ -1972,7 +2145,9 @@
           }
         ],
         "summary": "Move a woku into a folder, or to the root (folderId: null)",
-        "tags": ["v1 - wokus"]
+        "tags": [
+          "v1 - wokus"
+        ]
       }
     },
     "/v1/wokus/form-data": {
@@ -2009,7 +2184,9 @@
           }
         ],
         "summary": "Create a woku with a file upload (v1 alias of POST /wokus/create-woku-form-data)",
-        "tags": ["v1 - wokus"]
+        "tags": [
+          "v1 - wokus"
+        ]
       }
     },
     "/v1/wokus/{wokuId}/review": {
@@ -2045,7 +2222,9 @@
           }
         ],
         "summary": "Get review data for a woku (v1 alias of GET /wokus/review/:wokuId)",
-        "tags": ["v1 - wokus"]
+        "tags": [
+          "v1 - wokus"
+        ]
       }
     },
     "/v1/wokus/{wokuId}/textnotes": {
@@ -2091,7 +2270,9 @@
           }
         ],
         "summary": "Create a text review for a woku (v1 alias of POST /wokus/create-textnote)",
-        "tags": ["v1 - wokus"]
+        "tags": [
+          "v1 - wokus"
+        ]
       }
     },
     "/v1/wokus/{wokuId}/voicemails": {
@@ -2137,7 +2318,9 @@
           }
         ],
         "summary": "Create a voice review for a woku (v1 alias of POST /wokus/create-voicemail)",
-        "tags": ["v1 - wokus"]
+        "tags": [
+          "v1 - wokus"
+        ]
       }
     },
     "/v1/wokus/{wokuId}/share": {
@@ -2183,7 +2366,9 @@
           }
         ],
         "summary": "Share a woku review link via email (v1 alias of POST /wokus/share-woku-to-email)",
-        "tags": ["v1 - wokus"]
+        "tags": [
+          "v1 - wokus"
+        ]
       }
     },
     "/v1/woku-media": {
@@ -2197,7 +2382,9 @@
             "multipart/form-data": {
               "schema": {
                 "type": "object",
-                "required": ["file"],
+                "required": [
+                  "file"
+                ],
                 "properties": {
                   "file": {
                     "type": "string",
@@ -2242,7 +2429,9 @@
           }
         ],
         "summary": "Upload a Woku image or MP4 video",
-        "tags": ["v1 - wokus"]
+        "tags": [
+          "v1 - wokus"
+        ]
       }
     },
     "/v1/companies/me": {
@@ -2273,7 +2462,9 @@
           }
         ],
         "summary": "Get the caller company (v1 alias of GET /companies)",
-        "tags": ["v1 - companies"]
+        "tags": [
+          "v1 - companies"
+        ]
       }
     },
     "/v1/companies/me/rotate-key": {
@@ -2302,7 +2493,9 @@
           }
         ],
         "summary": "Rotate the company API key",
-        "tags": ["v1 - companies"]
+        "tags": [
+          "v1 - companies"
+        ]
       }
     },
     "/v1/companies/me/revoke-key": {
@@ -2331,7 +2524,9 @@
           }
         ],
         "summary": "Revoke the company API key",
-        "tags": ["v1 - companies"]
+        "tags": [
+          "v1 - companies"
+        ]
       }
     },
     "/v1/reports/company-nps": {
@@ -2350,7 +2545,9 @@
           }
         ],
         "summary": "Get the company-wide NPS report",
-        "tags": ["v1 - reports"]
+        "tags": [
+          "v1 - reports"
+        ]
       }
     },
     "/v1/reports/nps-tool/{npsToolId}": {
@@ -2382,7 +2579,9 @@
           }
         ],
         "summary": "Get the NPS report for a specific NPS tool",
-        "tags": ["v1 - reports"]
+        "tags": [
+          "v1 - reports"
+        ]
       }
     },
     "/v1/nps-tool/{id}": {
@@ -2413,7 +2612,9 @@
           }
         ],
         "summary": "Get an NPS tool definition (to build the survey question)",
-        "tags": ["v1 - nps"]
+        "tags": [
+          "v1 - nps"
+        ]
       }
     },
     "/v1/nps": {
@@ -2454,7 +2655,9 @@
           }
         ],
         "summary": "Capture an NPS score (company-level or tool-specific)",
-        "tags": ["v1 - nps"]
+        "tags": [
+          "v1 - nps"
+        ]
       },
       "get": {
         "description": "Paginated, most recent first. Filter by tool, date range and whether the response carries feedback (textnote or voicemail). Responses never include client contact data, only clientId.",
@@ -2526,7 +2729,9 @@
           }
         ],
         "summary": "List the NPS responses of the caller company",
-        "tags": ["v1 - nps"]
+        "tags": [
+          "v1 - nps"
+        ]
       }
     },
     "/v1/nps/{id}/textnotes": {
@@ -2580,7 +2785,9 @@
           }
         ],
         "summary": "Add an optional text review to an NPS score",
-        "tags": ["v1 - nps"]
+        "tags": [
+          "v1 - nps"
+        ]
       }
     },
     "/v1/nps/{id}/voicemails": {
@@ -2611,11 +2818,17 @@
                   },
                   "language": {
                     "type": "string",
-                    "enum": ["es", "en"],
+                    "enum": [
+                      "es",
+                      "en"
+                    ],
                     "description": "Spoken language used for transcription"
                   }
                 },
-                "required": ["file", "language"]
+                "required": [
+                  "file",
+                  "language"
+                ]
               }
             }
           }
@@ -2637,7 +2850,9 @@
           }
         ],
         "summary": "Add an optional voice review to an NPS score",
-        "tags": ["v1 - nps"]
+        "tags": [
+          "v1 - nps"
+        ]
       }
     },
     "/v1/csat-tool/{id}": {
@@ -2668,7 +2883,9 @@
           }
         ],
         "summary": "Get a CSAT tool definition (to build the survey)",
-        "tags": ["v1 - csat"]
+        "tags": [
+          "v1 - csat"
+        ]
       }
     },
     "/v1/csat": {
@@ -2709,7 +2926,9 @@
           }
         ],
         "summary": "Capture a CSAT score (1-5, tool-specific)",
-        "tags": ["v1 - csat"]
+        "tags": [
+          "v1 - csat"
+        ]
       },
       "get": {
         "operationId": "V1CsatDataController_listCsat",
@@ -2776,7 +2995,9 @@
           }
         ],
         "summary": "List the CSAT responses of the caller company",
-        "tags": ["v1 - csat"]
+        "tags": [
+          "v1 - csat"
+        ]
       }
     },
     "/v1/csat/{id}/textnotes": {
@@ -2830,7 +3051,9 @@
           }
         ],
         "summary": "Add an optional text comment to a CSAT response",
-        "tags": ["v1 - csat"]
+        "tags": [
+          "v1 - csat"
+        ]
       }
     },
     "/v1/csat/{id}/voicemails": {
@@ -2861,11 +3084,17 @@
                   },
                   "language": {
                     "type": "string",
-                    "enum": ["es", "en"],
+                    "enum": [
+                      "es",
+                      "en"
+                    ],
                     "description": "Spoken language used for transcription"
                   }
                 },
-                "required": ["file", "language"]
+                "required": [
+                  "file",
+                  "language"
+                ]
               }
             }
           }
@@ -2887,7 +3116,9 @@
           }
         ],
         "summary": "Add an optional voice comment to a CSAT response",
-        "tags": ["v1 - csat"]
+        "tags": [
+          "v1 - csat"
+        ]
       }
     },
     "/v1/ces-tool/{id}": {
@@ -2918,7 +3149,9 @@
           }
         ],
         "summary": "Get a CES tool definition (to build the survey)",
-        "tags": ["v1 - ces"]
+        "tags": [
+          "v1 - ces"
+        ]
       }
     },
     "/v1/ces": {
@@ -2959,7 +3192,9 @@
           }
         ],
         "summary": "Capture a CES score (1-5, tool-specific)",
-        "tags": ["v1 - ces"]
+        "tags": [
+          "v1 - ces"
+        ]
       },
       "get": {
         "operationId": "V1CesDataController_listCes",
@@ -3026,7 +3261,9 @@
           }
         ],
         "summary": "List the CES responses of the caller company",
-        "tags": ["v1 - ces"]
+        "tags": [
+          "v1 - ces"
+        ]
       }
     },
     "/v1/ces/{id}/textnotes": {
@@ -3080,7 +3317,9 @@
           }
         ],
         "summary": "Add an optional text comment to a CES response",
-        "tags": ["v1 - ces"]
+        "tags": [
+          "v1 - ces"
+        ]
       }
     },
     "/v1/ces/{id}/voicemails": {
@@ -3111,11 +3350,17 @@
                   },
                   "language": {
                     "type": "string",
-                    "enum": ["es", "en"],
+                    "enum": [
+                      "es",
+                      "en"
+                    ],
                     "description": "Spoken language used for transcription"
                   }
                 },
-                "required": ["file", "language"]
+                "required": [
+                  "file",
+                  "language"
+                ]
               }
             }
           }
@@ -3137,7 +3382,9 @@
           }
         ],
         "summary": "Add an optional voice comment to a CES response",
-        "tags": ["v1 - ces"]
+        "tags": [
+          "v1 - ces"
+        ]
       }
     },
     "/v1/captures": {
@@ -3207,7 +3454,9 @@
           }
         ],
         "summary": "Capture a woku review or NPS response from the mobile SDK",
-        "tags": ["v1 - captures"]
+        "tags": [
+          "v1 - captures"
+        ]
       }
     },
     "/v1/quarantines/check": {
@@ -3245,7 +3494,9 @@
           }
         ],
         "summary": "Check whether a respondent is currently quarantined",
-        "tags": ["v1 - quarantines"]
+        "tags": [
+          "v1 - quarantines"
+        ]
       }
     },
     "/v1/nps/invitations": {
@@ -3304,7 +3555,9 @@
           }
         ],
         "summary": "Send the NPS survey by email or WhatsApp",
-        "tags": ["v1 - invitations"]
+        "tags": [
+          "v1 - invitations"
+        ]
       }
     },
     "/v1/csat/invitations": {
@@ -3362,7 +3615,9 @@
           }
         ],
         "summary": "Send the CSAT survey by email or WhatsApp",
-        "tags": ["v1 - invitations"]
+        "tags": [
+          "v1 - invitations"
+        ]
       }
     },
     "/v1/ces/invitations": {
@@ -3420,7 +3675,9 @@
           }
         ],
         "summary": "Send the CES survey by email or WhatsApp",
-        "tags": ["v1 - invitations"]
+        "tags": [
+          "v1 - invitations"
+        ]
       }
     },
     "/v1/forms/{id}/invitations": {
@@ -3492,7 +3749,9 @@
           }
         ],
         "summary": "Send a form by email or WhatsApp",
-        "tags": ["v1 - invitations"]
+        "tags": [
+          "v1 - invitations"
+        ]
       }
     },
     "/v1/wokus/{id}/invitations": {
@@ -3564,7 +3823,9 @@
           }
         ],
         "summary": "Send a woku review invitation by email or WhatsApp",
-        "tags": ["v1 - invitations"]
+        "tags": [
+          "v1 - invitations"
+        ]
       }
     },
     "/v1/forms": {
@@ -3599,7 +3860,9 @@
           }
         ],
         "summary": "List the forms of the caller company (paginated)",
-        "tags": ["v1 - forms"]
+        "tags": [
+          "v1 - forms"
+        ]
       }
     },
     "/v1/forms/{id}/responses": {
@@ -3651,7 +3914,9 @@
           }
         ],
         "summary": "List the responses of a form (paginated)",
-        "tags": ["v1 - forms"]
+        "tags": [
+          "v1 - forms"
+        ]
       },
       "post": {
         "description": "Records a response for the form. Answers are validated against the form definition before being stored; quarantined respondents are rejected with 429.",
@@ -3708,7 +3973,9 @@
           }
         ],
         "summary": "Submit a form response",
-        "tags": ["v1 - forms"]
+        "tags": [
+          "v1 - forms"
+        ]
       }
     },
     "/v1/forms/{id}": {
@@ -3744,7 +4011,9 @@
           }
         ],
         "summary": "Get a form definition (to render the form)",
-        "tags": ["v1 - forms"]
+        "tags": [
+          "v1 - forms"
+        ]
       }
     },
     "/v1/flows": {
@@ -3779,7 +4048,9 @@
           }
         ],
         "summary": "List the flows of the caller company (paginated)",
-        "tags": ["v1 - flows"]
+        "tags": [
+          "v1 - flows"
+        ]
       }
     },
     "/v1/flows/{id}": {
@@ -3814,7 +4085,9 @@
           }
         ],
         "summary": "Get the data of a flow (wokus in order, branding, linked NPS)",
-        "tags": ["v1 - flows"]
+        "tags": [
+          "v1 - flows"
+        ]
       }
     },
     "/v1/nps-tools": {
@@ -3850,7 +4123,9 @@
           }
         ],
         "summary": "List the NPS tools of the caller company",
-        "tags": ["v1 - nps"]
+        "tags": [
+          "v1 - nps"
+        ]
       },
       "post": {
         "operationId": "V1NpsToolsController_createNpsTool",
@@ -3899,7 +4174,9 @@
           }
         ],
         "summary": "Create an NPS tool definition",
-        "tags": ["v1 - nps-tools"]
+        "tags": [
+          "v1 - nps-tools"
+        ]
       }
     },
     "/v1/nps/{id}": {
@@ -3933,7 +4210,9 @@
           }
         ],
         "summary": "Get a single NPS response",
-        "tags": ["v1 - nps"]
+        "tags": [
+          "v1 - nps"
+        ]
       }
     },
     "/v1/csat-tools": {
@@ -3968,7 +4247,9 @@
           }
         ],
         "summary": "List the CSAT tools of the caller company",
-        "tags": ["v1 - csat"]
+        "tags": [
+          "v1 - csat"
+        ]
       },
       "post": {
         "operationId": "V1CsatToolsController_createCsatTool",
@@ -4017,7 +4298,9 @@
           }
         ],
         "summary": "Create a CSAT tool definition",
-        "tags": ["v1 - csat-tools"]
+        "tags": [
+          "v1 - csat-tools"
+        ]
       }
     },
     "/v1/csat/{id}": {
@@ -4048,7 +4331,9 @@
           }
         ],
         "summary": "Get a single CSAT response",
-        "tags": ["v1 - csat"]
+        "tags": [
+          "v1 - csat"
+        ]
       }
     },
     "/v1/ces-tools": {
@@ -4083,7 +4368,9 @@
           }
         ],
         "summary": "List the CES tools of the caller company",
-        "tags": ["v1 - ces"]
+        "tags": [
+          "v1 - ces"
+        ]
       },
       "post": {
         "operationId": "V1CesToolsController_createCesTool",
@@ -4132,7 +4419,9 @@
           }
         ],
         "summary": "Create a CES tool definition",
-        "tags": ["v1 - ces-tools"]
+        "tags": [
+          "v1 - ces-tools"
+        ]
       }
     },
     "/v1/ces/{id}": {
@@ -4163,7 +4452,9 @@
           }
         ],
         "summary": "Get a single CES response",
-        "tags": ["v1 - ces"]
+        "tags": [
+          "v1 - ces"
+        ]
       }
     },
     "/v1/nps-tools/{id}": {
@@ -4214,7 +4505,9 @@
           }
         ],
         "summary": "Update an NPS tool definition (only if it has no responses)",
-        "tags": ["v1 - nps-tools"]
+        "tags": [
+          "v1 - nps-tools"
+        ]
       },
       "delete": {
         "operationId": "V1NpsToolsController_deleteNpsTool",
@@ -4243,7 +4536,9 @@
           }
         ],
         "summary": "Delete an NPS tool definition and all its responses",
-        "tags": ["v1 - nps-tools"]
+        "tags": [
+          "v1 - nps-tools"
+        ]
       }
     },
     "/v1/csat-tools/{id}": {
@@ -4294,7 +4589,9 @@
           }
         ],
         "summary": "Update a CSAT tool definition (only if it has no responses)",
-        "tags": ["v1 - csat-tools"]
+        "tags": [
+          "v1 - csat-tools"
+        ]
       },
       "delete": {
         "operationId": "V1CsatToolsController_deleteCsatTool",
@@ -4323,7 +4620,9 @@
           }
         ],
         "summary": "Delete a CSAT tool definition and all its responses",
-        "tags": ["v1 - csat-tools"]
+        "tags": [
+          "v1 - csat-tools"
+        ]
       }
     },
     "/v1/ces-tools/{id}": {
@@ -4374,7 +4673,9 @@
           }
         ],
         "summary": "Update a CES tool definition (only if it has no responses)",
-        "tags": ["v1 - ces-tools"]
+        "tags": [
+          "v1 - ces-tools"
+        ]
       },
       "delete": {
         "operationId": "V1CesToolsController_deleteCesTool",
@@ -4403,7 +4704,9 @@
           }
         ],
         "summary": "Delete a CES tool definition and all its responses",
-        "tags": ["v1 - ces-tools"]
+        "tags": [
+          "v1 - ces-tools"
+        ]
       }
     },
     "/v1/tickets": {
@@ -4417,7 +4720,13 @@
             "description": "Only tickets originated by this tool.",
             "schema": {
               "type": "string",
-              "enum": ["woku", "nps", "form", "csat", "ces"]
+              "enum": [
+                "woku",
+                "nps",
+                "form",
+                "csat",
+                "ces"
+              ]
             }
           },
           {
@@ -4426,7 +4735,11 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": ["high", "medium", "low"]
+              "enum": [
+                "high",
+                "medium",
+                "low"
+              ]
             }
           },
           {
@@ -4492,7 +4805,14 @@
         ],
         "responses": {
           "200": {
-            "description": "Paginated tickets"
+            "description": "Paginated tickets",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicTicketsPageDto"
+                }
+              }
+            }
           },
           "400": {
             "description": "Validation error",
@@ -4511,7 +4831,9 @@
           }
         ],
         "summary": "List the support tickets of the caller company",
-        "tags": ["v1 - tickets"]
+        "tags": [
+          "v1 - tickets"
+        ]
       }
     },
     "/v1/tickets/stats": {
@@ -4559,7 +4881,9 @@
           }
         ],
         "summary": "Ticket counts by tool and by SAC destination",
-        "tags": ["v1 - tickets"]
+        "tags": [
+          "v1 - tickets"
+        ]
       }
     },
     "/v1/tickets/{id}": {
@@ -4578,7 +4902,14 @@
         ],
         "responses": {
           "200": {
-            "description": "Ticket"
+            "description": "Ticket",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicTicketDto"
+                }
+              }
+            }
           },
           "404": {
             "description": "Ticket not found"
@@ -4590,7 +4921,9 @@
           }
         ],
         "summary": "Get one support ticket",
-        "tags": ["v1 - tickets"]
+        "tags": [
+          "v1 - tickets"
+        ]
       },
       "patch": {
         "operationId": "V1TicketsController_updateTicket",
@@ -4617,7 +4950,14 @@
         },
         "responses": {
           "200": {
-            "description": "Ticket updated"
+            "description": "Ticket updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicTicketDto"
+                }
+              }
+            }
           },
           "400": {
             "description": "Validation error",
@@ -4639,7 +4979,9 @@
           }
         ],
         "summary": "Update a ticket (title, severity, AI summary or category)",
-        "tags": ["v1 - tickets"]
+        "tags": [
+          "v1 - tickets"
+        ]
       }
     },
     "/v1/dispatches": {
@@ -4654,7 +4996,10 @@
             "description": "Outbound channel of the send.",
             "schema": {
               "type": "string",
-              "enum": ["email", "whatsapp"]
+              "enum": [
+                "email",
+                "whatsapp"
+              ]
             }
           },
           {
@@ -4664,7 +5009,14 @@
             "description": "Only dispatches targeting this tool kind.",
             "schema": {
               "type": "string",
-              "enum": ["woku", "nps", "form", "client-form", "csat", "ces"]
+              "enum": [
+                "woku",
+                "nps",
+                "form",
+                "client-form",
+                "csat",
+                "ces"
+              ]
             }
           },
           {
@@ -4702,7 +5054,12 @@
             "description": "Lifecycle status of the whole invitation.",
             "schema": {
               "type": "string",
-              "enum": ["invited", "partially_responded", "responded", "failed"]
+              "enum": [
+                "invited",
+                "partially_responded",
+                "responded",
+                "failed"
+              ]
             }
           },
           {
@@ -4747,7 +5104,9 @@
           }
         ],
         "summary": "List the invitation dispatches of the caller company",
-        "tags": ["v1 - dispatches"]
+        "tags": [
+          "v1 - dispatches"
+        ]
       }
     },
     "/v1/dispatches/stats": {
@@ -4762,7 +5121,10 @@
             "description": "Outbound channel of the send.",
             "schema": {
               "type": "string",
-              "enum": ["email", "whatsapp"]
+              "enum": [
+                "email",
+                "whatsapp"
+              ]
             }
           },
           {
@@ -4772,7 +5134,14 @@
             "description": "Only dispatches targeting this tool kind.",
             "schema": {
               "type": "string",
-              "enum": ["woku", "nps", "form", "client-form", "csat", "ces"]
+              "enum": [
+                "woku",
+                "nps",
+                "form",
+                "client-form",
+                "csat",
+                "ces"
+              ]
             }
           },
           {
@@ -4815,7 +5184,9 @@
           }
         ],
         "summary": "Response-rate metrics over the invitation dispatches",
-        "tags": ["v1 - dispatches"]
+        "tags": [
+          "v1 - dispatches"
+        ]
       }
     },
     "/v1/journeys/{id}/enrollments": {
@@ -4885,7 +5256,9 @@
           }
         ],
         "summary": "List evaluations of one journey, newest first",
-        "tags": ["v1 - journeys"]
+        "tags": [
+          "v1 - journeys"
+        ]
       },
       "post": {
         "description": "Starts an operator-led v2 participation without requiring its first answer. A v2 contact can have one unfinished participation per journey. The same subjectKey can start a new cycle after completion or stopping finishes; each cycle has a distinct enrollment id. Legacy definitions retain their enrollment behavior.",
@@ -4960,7 +5333,9 @@
           }
         ],
         "summary": "Enroll a subject in this journey",
-        "tags": ["v1 - journeys"]
+        "tags": [
+          "v1 - journeys"
+        ]
       }
     },
     "/v1/journeys/{id}/enrollments/{enrollmentId}": {
@@ -5018,7 +5393,9 @@
           }
         ],
         "summary": "Read one customer evaluation and its moment history",
-        "tags": ["v1 - journeys"]
+        "tags": [
+          "v1 - journeys"
+        ]
       }
     },
     "/v1/journeys/{id}/enrollments/{enrollmentId}/stop": {
@@ -5098,7 +5475,9 @@
           }
         ],
         "summary": "Stop this evaluation, retaining answers, tickets, plans and other participations",
-        "tags": ["v1 - journeys"]
+        "tags": [
+          "v1 - journeys"
+        ]
       }
     },
     "/v1/journeys/{id}/connections": {
@@ -5151,7 +5530,9 @@
           }
         ],
         "summary": "Read per-moment credential readiness without exposing secrets",
-        "tags": ["v1 - journeys"]
+        "tags": [
+          "v1 - journeys"
+        ]
       }
     },
     "/v1/journeys/{id}/moments/{stageKey}/url-token": {
@@ -5224,7 +5605,9 @@
           }
         ],
         "summary": "Generate a moment URL, replacing its previous URL credential",
-        "tags": ["v1 - journeys"]
+        "tags": [
+          "v1 - journeys"
+        ]
       }
     },
     "/v1/journeys/{id}/moments/{stageKey}/sender-secret": {
@@ -5285,7 +5668,9 @@
           }
         ],
         "summary": "Store the sender signing secret encrypted for one moment",
-        "tags": ["v1 - journeys"]
+        "tags": [
+          "v1 - journeys"
+        ]
       }
     },
     "/v1/journeys/{id}/moments/{stageKey}/preview": {
@@ -5354,7 +5739,9 @@
           }
         ],
         "summary": "Test payload mapping without creating or sending an evaluation",
-        "tags": ["v1 - journeys"]
+        "tags": [
+          "v1 - journeys"
+        ]
       }
     },
     "/v1/journeys": {
@@ -5398,7 +5785,9 @@
           }
         ],
         "summary": "List your journeys",
-        "tags": ["v1 - journeys"]
+        "tags": [
+          "v1 - journeys"
+        ]
       },
       "post": {
         "description": "The response carries `webhookSecret` once and only here: it is what signs legacy woku_signature calls. V2 url_token and sender_hmac credentials are configured separately per moment. Store the secret securely.",
@@ -5464,7 +5853,9 @@
           }
         ],
         "summary": "Create a journey",
-        "tags": ["v1 - journeys"]
+        "tags": [
+          "v1 - journeys"
+        ]
       }
     },
     "/v1/journeys/{id}": {
@@ -5515,7 +5906,9 @@
           }
         ],
         "summary": "Read one journey with its moments",
-        "tags": ["v1 - journeys"]
+        "tags": [
+          "v1 - journeys"
+        ]
       },
       "patch": {
         "description": "Replacing the moments mints a new version. The enrollments already running keep executing the version they started with.",
@@ -5578,7 +5971,9 @@
           }
         ],
         "summary": "Rename a journey, switch it on or off, or replace its moments",
-        "tags": ["v1 - journeys"]
+        "tags": [
+          "v1 - journeys"
+        ]
       },
       "delete": {
         "operationId": "V1JourneysController_remove",
@@ -5620,7 +6015,9 @@
           }
         ],
         "summary": "Delete a journey",
-        "tags": ["v1 - journeys"]
+        "tags": [
+          "v1 - journeys"
+        ]
       }
     },
     "/v1/journeys/{id}/webhook-secret": {
@@ -5672,7 +6069,9 @@
           }
         ],
         "summary": "Rotate the legacy journey-wide woku_signature secret",
-        "tags": ["v1 - journeys"]
+        "tags": [
+          "v1 - journeys"
+        ]
       }
     },
     "/v1/journey-events": {
@@ -5737,7 +6136,9 @@
           }
         ],
         "summary": "Emit one of your own events",
-        "tags": ["v1 - journeys"]
+        "tags": [
+          "v1 - journeys"
+        ]
       }
     },
     "/v1/journey-entries/{journeyId}": {
@@ -5774,7 +6175,9 @@
         },
         "security": [],
         "summary": "Read the public evaluation entry for a journey",
-        "tags": ["journey entries"]
+        "tags": [
+          "journey entries"
+        ]
       },
       "post": {
         "description": "Public customer endpoint. Returns the tool and an opaque response token; does not start the journey or send invitations.",
@@ -5825,7 +6228,9 @@
         },
         "security": [],
         "summary": "Prepare the first evaluation tool for a customer",
-        "tags": ["journey entries"]
+        "tags": [
+          "journey entries"
+        ]
       }
     }
   },
@@ -5887,7 +6292,11 @@
             "example": "Bad Request"
           }
         },
-        "required": ["statusCode", "message", "error"]
+        "required": [
+          "statusCode",
+          "message",
+          "error"
+        ]
       },
       "CreateWokuApiDto": {
         "type": "object",
@@ -5914,7 +6323,10 @@
             "type": "number"
           }
         },
-        "required": ["description", "fileUrl"]
+        "required": [
+          "description",
+          "fileUrl"
+        ]
       },
       "CreateWokuFormDataApiDto": {
         "type": "object",
@@ -5937,7 +6349,302 @@
             "type": "string"
           }
         },
-        "required": ["description"]
+        "required": [
+          "description"
+        ]
+      },
+      "FollowUpOriginDto": {
+        "type": "object",
+        "properties": {
+          "tool": {
+            "type": "string",
+            "enum": [
+              "woku",
+              "nps",
+              "csat",
+              "ces"
+            ]
+          },
+          "refId": {
+            "type": "string"
+          },
+          "instrumentId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "tool",
+          "refId"
+        ]
+      },
+      "FollowUpAttachmentDto": {
+        "type": "object",
+        "properties": {
+          "index": {
+            "type": "number",
+            "description": "Stable number of the file in the conversation (survey prelude included)."
+          },
+          "label": {
+            "type": "string",
+            "description": "Display label in the conversation language, e.g. \"Archivo 2\" or \"File 2\". Summaries cite files by this label."
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "image",
+              "audio",
+              "document",
+              "unsupported"
+            ]
+          },
+          "fileId": {
+            "type": "string",
+            "description": "Private original file (evidence). Absent while pending or when nothing was stored (location, contacts, over the limits)."
+          },
+          "readableFileId": {
+            "type": "string",
+            "description": "Converted copy the model read, when there was a conversion."
+          },
+          "filename": {
+            "type": "string"
+          },
+          "mimeType": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "ready",
+              "failed",
+              "unsupported"
+            ]
+          },
+          "text": {
+            "type": "string",
+            "description": "Transcript (audio) or description (image, document) generated from the file. Untrusted customer content."
+          },
+          "failureReason": {
+            "type": "string",
+            "description": "Stable reason code when failed or unsupported (e.g. video, location, message_limit, conversation_limit, read_failed)."
+          },
+          "adminUrl": {
+            "type": "string",
+            "description": "Admin page that opens this file after login and a company check (signed, short-lived download). Never a storage URL."
+          }
+        },
+        "required": [
+          "index",
+          "label",
+          "kind",
+          "filename",
+          "mimeType",
+          "status"
+        ]
+      },
+      "FollowUpMessageDto": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "agent",
+              "client"
+            ]
+          },
+          "content": {
+            "type": "string",
+            "description": "Message text. May be empty when the message only has files."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "phase": {
+            "type": "string",
+            "enum": [
+              "survey",
+              "follow_up"
+            ],
+            "description": "survey: the prelude, what the customer said in the survey before the follow-up. On the survey_thread line it is the WhatsApp survey exchange; on every other line (follow_up_number, email) it is the original comment as a client message. follow_up: the follow-up itself. Every line may start with the prelude, so messages[0] can be a client message; filter phase === 'follow_up' to read only the follow-up."
+          },
+          "responseType": {
+            "type": "string"
+          },
+          "selectedOption": {
+            "type": "string"
+          },
+          "attachments": {
+            "description": "Files the customer sent with this message.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FollowUpAttachmentDto"
+            }
+          }
+        },
+        "required": [
+          "role",
+          "content",
+          "timestamp",
+          "phase"
+        ]
+      },
+      "FollowUpCitationDto": {
+        "type": "object",
+        "properties": {
+          "index": {
+            "type": "number"
+          },
+          "label": {
+            "type": "string",
+            "description": "Label of the cited file, e.g. \"Archivo 2\"."
+          },
+          "fileId": {
+            "type": "string"
+          },
+          "supports": {
+            "type": "string",
+            "description": "What the file supports in the summary."
+          },
+          "adminUrl": {
+            "type": "string",
+            "description": "Admin page that opens this file after login and a company check (signed, short-lived download). Never a storage URL."
+          }
+        },
+        "required": [
+          "index",
+          "label",
+          "supports"
+        ]
+      },
+      "FollowUpConversationDto": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "companyId": {
+            "type": "string"
+          },
+          "origin": {
+            "$ref": "#/components/schemas/FollowUpOriginDto"
+          },
+          "wokuId": {
+            "type": "string"
+          },
+          "reviewId": {
+            "type": "string"
+          },
+          "reviewType": {
+            "type": "string",
+            "enum": [
+              "textnote",
+              "voicemail"
+            ]
+          },
+          "originalReview": {
+            "type": "string"
+          },
+          "originalQualification": {
+            "type": "number"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "initial_sent",
+              "awaiting_detail",
+              "closing",
+              "completed",
+              "timed_out",
+              "cancelled"
+            ]
+          },
+          "channel": {
+            "type": "string",
+            "enum": [
+              "email",
+              "whatsapp"
+            ]
+          },
+          "line": {
+            "type": "string",
+            "enum": [
+              "survey_thread",
+              "follow_up_number"
+            ],
+            "description": "WhatsApp line. survey_thread: the agent continues the survey conversation on the survey number. follow_up_number: the agent writes from the dedicated follow-up number. Absent for email."
+          },
+          "reason": {
+            "type": "string",
+            "description": "Stable reason code for exclusion, failure or uncertain delivery. Provider error details are never exposed."
+          },
+          "messages": {
+            "description": "Messages in order: the survey prelude (phase survey) first, then the follow-up (phase follow_up). Filter phase === 'follow_up' for the follow-up messages only.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FollowUpMessageDto"
+            }
+          },
+          "executiveSummary": {
+            "type": "string"
+          },
+          "actionItems": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "sentiment": {
+            "type": "string"
+          },
+          "topics": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "summaryCitations": {
+            "description": "Files the summary cites; the summary text mentions them as \"(Archivo N)\".",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FollowUpCitationDto"
+            }
+          },
+          "summaryVersion": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "_id",
+          "companyId",
+          "origin",
+          "reviewType",
+          "originalReview",
+          "state",
+          "channel",
+          "messages",
+          "summaryVersion"
+        ]
+      },
+      "FollowUpEnvelopeDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/FollowUpConversationDto"
+          }
+        },
+        "required": [
+          "data"
+        ]
       },
       "CreateExternalTrackerDefinitionDTO": {
         "type": "object",
@@ -5962,7 +6669,10 @@
             "maxLength": 500
           }
         },
-        "required": ["name", "system"]
+        "required": [
+          "name",
+          "system"
+        ]
       },
       "AssignWokuExternalTrackerByNameDTO": {
         "type": "object",
@@ -5980,7 +6690,10 @@
             "maxLength": 500
           }
         },
-        "required": ["name", "value"]
+        "required": [
+          "name",
+          "value"
+        ]
       },
       "ExternalTrackerFilterDTO": {
         "type": "object",
@@ -5998,7 +6711,10 @@
             "maxLength": 500
           }
         },
-        "required": ["name", "value"]
+        "required": [
+          "name",
+          "value"
+        ]
       },
       "SearchEntitiesByTrackersDTO": {
         "type": "object",
@@ -6006,7 +6722,13 @@
           "entityType": {
             "type": "string",
             "description": "VoC entity type to search.",
-            "enum": ["nps", "csat", "ces", "form", "flow"],
+            "enum": [
+              "nps",
+              "csat",
+              "ces",
+              "form",
+              "flow"
+            ],
             "example": "nps"
           },
           "filters": {
@@ -6019,7 +6741,10 @@
             }
           }
         },
-        "required": ["entityType", "filters"]
+        "required": [
+          "entityType",
+          "filters"
+        ]
       },
       "UpdateExternalTrackerDefinitionDTO": {
         "type": "object",
@@ -6058,14 +6783,83 @@
             "maxLength": 500
           }
         },
-        "required": ["name", "value"]
+        "required": [
+          "name",
+          "value"
+        ]
+      },
+      "CustomTicketDestinationUpdateDto": {
+        "type": "object",
+        "properties": {
+          "mode": {
+            "type": "string",
+            "enum": [
+              "upsert",
+              "remote-id"
+            ],
+            "description": "upsert explicitly reuses the creation URL/method with a stable externalId. remote-id updates the previously created remote resource."
+          },
+          "url": {
+            "type": "string",
+            "maxLength": 2000,
+            "description": "remote-id only: same-origin URL containing {{remoteId}}; credentials and fragments are forbidden."
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "PUT",
+              "PATCH"
+            ],
+            "default": "PATCH",
+            "description": "remote-id only."
+          },
+          "responseIdPath": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Dot-separated path to the ID in the creation response, required for remote-id. Prototype keys are forbidden."
+          }
+        },
+        "required": [
+          "mode"
+        ]
+      },
+      "CustomTicketDestinationConfigDto": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "POST",
+              "PUT"
+            ]
+          },
+          "headers": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "update": {
+            "$ref": "#/components/schemas/CustomTicketDestinationUpdateDto"
+          }
+        },
+        "required": [
+          "url"
+        ]
       },
       "TicketRoutingConditionDto": {
         "type": "object",
         "properties": {
           "relationToPrevious": {
             "type": "string",
-            "enum": ["AND", "OR"]
+            "enum": [
+              "AND",
+              "OR"
+            ]
           },
           "trackerId": {
             "type": "string",
@@ -6073,7 +6867,10 @@
           },
           "operator": {
             "type": "string",
-            "enum": ["equals", "any"],
+            "enum": [
+              "equals",
+              "any"
+            ],
             "default": "equals"
           },
           "value": {
@@ -6081,7 +6878,9 @@
             "description": "The value the tracker must equal. Required unless operator is \"any\"."
           }
         },
-        "required": ["trackerId"]
+        "required": [
+          "trackerId"
+        ]
       },
       "TicketDestinationTemplateDto": {
         "type": "object",
@@ -6095,7 +6894,9 @@
             "description": "Custom JSON body with {{path}} placeholders."
           }
         },
-        "required": ["preset"]
+        "required": [
+          "preset"
+        ]
       },
       "V1CreateTicketDestinationDto": {
         "type": "object",
@@ -6106,9 +6907,17 @@
             "maxLength": 120
           },
           "config": {
-            "type": "object",
-            "description": "Non-secret provider config (validated per kind).",
-            "additionalProperties": true
+            "description": "Kind-specific destination configuration. Custom update is optional and explicit; omission never causes a second create.",
+            "additionalProperties": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CustomTicketDestinationConfigDto"
+              },
+              {
+                "type": "object",
+                "additionalProperties": true
+              }
+            ]
           },
           "credentials": {
             "type": "object",
@@ -6134,10 +6943,19 @@
           },
           "kind": {
             "type": "string",
-            "enum": ["zendesk", "custom", "email"]
+            "enum": [
+              "zendesk",
+              "custom",
+              "email"
+            ]
           }
         },
-        "required": ["name", "config", "credentials", "kind"]
+        "required": [
+          "name",
+          "config",
+          "credentials",
+          "kind"
+        ]
       },
       "V1UpdateTicketDestinationDto": {
         "type": "object",
@@ -6147,8 +6965,17 @@
             "maxLength": 120
           },
           "config": {
-            "type": "object",
-            "additionalProperties": true
+            "additionalProperties": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CustomTicketDestinationConfigDto"
+              },
+              {
+                "type": "object",
+                "additionalProperties": true
+              }
+            ],
+            "description": "Kind-specific configuration including explicit custom update capability."
           },
           "credentials": {
             "type": "object",
@@ -6177,7 +7004,11 @@
           },
           "kind": {
             "type": "string",
-            "enum": ["zendesk", "custom", "email"]
+            "enum": [
+              "zendesk",
+              "custom",
+              "email"
+            ]
           }
         }
       },
@@ -6189,14 +7020,19 @@
             "description": "Must be true. The test sends a real request to the destination (custom webhooks receive a test payload; other kinds run a read-only auth probe)."
           }
         },
-        "required": ["confirm"]
+        "required": [
+          "confirm"
+        ]
       },
       "ActionPlanGroupConditionDto": {
         "type": "object",
         "properties": {
           "relationToPrevious": {
             "type": "string",
-            "enum": ["AND", "OR"]
+            "enum": [
+              "AND",
+              "OR"
+            ]
           },
           "trackerId": {
             "type": "string",
@@ -6204,7 +7040,10 @@
           },
           "operator": {
             "type": "string",
-            "enum": ["equals", "any"],
+            "enum": [
+              "equals",
+              "any"
+            ],
             "default": "equals"
           },
           "value": {
@@ -6212,7 +7051,9 @@
             "description": "The value the tracker must equal. Required unless operator is \"any\"."
           }
         },
-        "required": ["trackerId"]
+        "required": [
+          "trackerId"
+        ]
       },
       "ActionPlanGroupMemberDto": {
         "type": "object",
@@ -6223,10 +7064,16 @@
           },
           "role": {
             "type": "string",
-            "enum": ["admin", "assignee"]
+            "enum": [
+              "admin",
+              "assignee"
+            ]
           }
         },
-        "required": ["userId", "role"]
+        "required": [
+          "userId",
+          "role"
+        ]
       },
       "CreateActionPlanGroupDto": {
         "type": "object",
@@ -6268,7 +7115,11 @@
             "description": "New improvement comments that trigger a plan draft (default 300)."
           }
         },
-        "required": ["name", "conditions", "members"]
+        "required": [
+          "name",
+          "conditions",
+          "members"
+        ]
       },
       "UpdateActionPlanGroupDto": {
         "type": "object",
@@ -6314,7 +7165,9 @@
             "type": "boolean"
           }
         },
-        "required": ["enabled"]
+        "required": [
+          "enabled"
+        ]
       },
       "PostPlanReplyBodyDTO": {
         "type": "object",
@@ -6330,14 +7183,19 @@
             "description": "Must be true. Each reply triggers a paid AI turn; the reply is composed asynchronously and delivered over the plan channel."
           }
         },
-        "required": ["text", "confirm"]
+        "required": [
+          "text",
+          "confirm"
+        ]
       },
       "V1SendActionPlanDto": {
         "type": "object",
         "properties": {
           "provider": {
             "type": "string",
-            "enum": ["internal"],
+            "enum": [
+              "internal"
+            ],
             "description": "Only `internal` (manage the plan inside woku) is available."
           },
           "resourceLabel": {
@@ -6346,7 +7204,9 @@
             "description": "Optional human-readable label for the destination."
           }
         },
-        "required": ["provider"]
+        "required": [
+          "provider"
+        ]
       },
       "CreateActionPlanTaskDto": {
         "type": "object",
@@ -6357,7 +7217,9 @@
             "description": "Task text."
           }
         },
-        "required": ["text"]
+        "required": [
+          "text"
+        ]
       },
       "ReorderActionPlanTasksDto": {
         "type": "object",
@@ -6370,7 +7232,9 @@
             }
           }
         },
-        "required": ["orderedTaskIds"]
+        "required": [
+          "orderedTaskIds"
+        ]
       },
       "UpdateActionPlanTaskDto": {
         "type": "object",
@@ -6382,7 +7246,11 @@
           },
           "status": {
             "type": "string",
-            "enum": ["todo", "in_progress", "done"]
+            "enum": [
+              "todo",
+              "in_progress",
+              "done"
+            ]
           },
           "assigneeId": {
             "type": "string",
@@ -6395,7 +7263,10 @@
         "properties": {
           "locale": {
             "type": "string",
-            "enum": ["es", "en"],
+            "enum": [
+              "es",
+              "en"
+            ],
             "example": "en"
           },
           "description": {
@@ -6404,7 +7275,10 @@
             "maxLength": 140
           }
         },
-        "required": ["locale", "description"]
+        "required": [
+          "locale",
+          "description"
+        ]
       },
       "UpdateWokuBodyDTO": {
         "type": "object",
@@ -6417,7 +7291,10 @@
           },
           "availableLocales": {
             "description": "Locales the survey is available in (subset of es/en).",
-            "example": ["es", "en"],
+            "example": [
+              "es",
+              "en"
+            ],
             "type": "array",
             "items": {
               "type": "string"
@@ -6425,7 +7302,10 @@
           },
           "defaultLocale": {
             "type": "string",
-            "enum": ["es", "en"]
+            "enum": [
+              "es",
+              "en"
+            ]
           },
           "localizedContent": {
             "type": "array",
@@ -6466,11 +7346,26 @@
             "description": "Target folder id, or null to move the woku to the root."
           }
         },
-        "required": ["folderId"]
+        "required": [
+          "folderId"
+        ]
       },
       "V1CreateTextnoteBodyDto": {
         "type": "object",
         "properties": {
+          "collectionKind": {
+            "type": "string",
+            "enum": [
+              "standalone",
+              "flow"
+            ],
+            "description": "Collection provenance. Omitted historical inputs remain unknown and cannot start follow-up."
+          },
+          "flowId": {
+            "type": "string",
+            "format": "ObjectId",
+            "description": "Required for flow captures; validated against the company and instrument."
+          },
           "dispatchToken": {
             "type": "string",
             "description": "Opaque invitation or prepared journey-entry response token. Consumed after saving feedback; never stored on the review.",
@@ -6504,11 +7399,27 @@
             "maxLength": 48
           }
         },
-        "required": ["qualification", "description"]
+        "required": [
+          "qualification",
+          "description"
+        ]
       },
       "V1CreateVoicemailBodyDto": {
         "type": "object",
         "properties": {
+          "collectionKind": {
+            "type": "string",
+            "enum": [
+              "standalone",
+              "flow"
+            ],
+            "description": "Collection provenance. Omitted historical inputs remain unknown and cannot start follow-up."
+          },
+          "flowId": {
+            "type": "string",
+            "format": "ObjectId",
+            "description": "Required for flow captures; validated against the company and instrument."
+          },
           "dispatchToken": {
             "type": "string",
             "description": "Opaque invitation or prepared journey-entry response token. Consumed after saving feedback; never stored on the review.",
@@ -6522,13 +7433,22 @@
           "qualification": {
             "type": "string",
             "description": "Star rating (1-5)",
-            "enum": ["1", "2", "3", "4", "5"],
+            "enum": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
             "example": "5"
           },
           "language": {
             "type": "string",
             "description": "Spoken language used to improve audio transcription",
-            "enum": ["es", "en"],
+            "enum": [
+              "es",
+              "en"
+            ],
             "example": "es"
           },
           "clientEmail": {
@@ -6542,7 +7462,10 @@
           "anonymous": {
             "type": "string",
             "description": "Whether the review is anonymous",
-            "enum": ["true", "false"]
+            "enum": [
+              "true",
+              "false"
+            ]
           },
           "responseChannel": {
             "type": "string",
@@ -6551,7 +7474,11 @@
             "maxLength": 48
           }
         },
-        "required": ["file", "qualification", "language"]
+        "required": [
+          "file",
+          "qualification",
+          "language"
+        ]
       },
       "V1ShareWokuBodyDto": {
         "type": "object",
@@ -6581,10 +7508,17 @@
           },
           "type": {
             "type": "string",
-            "enum": ["image", "video"]
+            "enum": [
+              "image",
+              "video"
+            ]
           }
         },
-        "required": ["fileId", "filename", "type"]
+        "required": [
+          "fileId",
+          "filename",
+          "type"
+        ]
       },
       "V1ApiKeyResultDto": {
         "type": "object",
@@ -6594,7 +7528,9 @@
             "description": "The new company secret API key. The previous key is now invalid; store this value, it is not retrievable again."
           }
         },
-        "required": ["apiKey"]
+        "required": [
+          "apiKey"
+        ]
       },
       "V1RevokeApiKeyResultDto": {
         "type": "object",
@@ -6605,11 +7541,26 @@
             "example": true
           }
         },
-        "required": ["revoked"]
+        "required": [
+          "revoked"
+        ]
       },
       "V1CreateNpsBodyDto": {
         "type": "object",
         "properties": {
+          "collectionKind": {
+            "type": "string",
+            "enum": [
+              "standalone",
+              "flow"
+            ],
+            "description": "Collection provenance. Omitted historical inputs remain unknown and cannot start follow-up."
+          },
+          "flowId": {
+            "type": "string",
+            "format": "ObjectId",
+            "description": "Required for flow captures; validated against the company and instrument."
+          },
           "score": {
             "type": "number",
             "description": "NPS score 0-10 (0-6 detractor, 7-8 passive, 9-10 promoter)",
@@ -6648,7 +7599,9 @@
             "maxLength": 64
           }
         },
-        "required": ["score"]
+        "required": [
+          "score"
+        ]
       },
       "V1CreateNpsTextnoteBodyDto": {
         "type": "object",
@@ -6660,11 +7613,26 @@
             "example": "El producto cumple mis expectativas."
           }
         },
-        "required": ["description"]
+        "required": [
+          "description"
+        ]
       },
       "V1CreateCsatBodyDto": {
         "type": "object",
         "properties": {
+          "collectionKind": {
+            "type": "string",
+            "enum": [
+              "standalone",
+              "flow"
+            ],
+            "description": "Collection provenance. Omitted historical inputs remain unknown and cannot start follow-up."
+          },
+          "flowId": {
+            "type": "string",
+            "format": "ObjectId",
+            "description": "Required for flow captures; validated against the company and instrument."
+          },
           "score": {
             "type": "number",
             "description": "CSAT satisfaction score 1-5",
@@ -6698,7 +7666,10 @@
             "maxLength": 64
           }
         },
-        "required": ["score", "csatToolId"]
+        "required": [
+          "score",
+          "csatToolId"
+        ]
       },
       "V1CreateCsatTextnoteBodyDto": {
         "type": "object",
@@ -6710,11 +7681,26 @@
             "example": "El proceso fue muy facil."
           }
         },
-        "required": ["description"]
+        "required": [
+          "description"
+        ]
       },
       "V1CreateCesBodyDto": {
         "type": "object",
         "properties": {
+          "collectionKind": {
+            "type": "string",
+            "enum": [
+              "standalone",
+              "flow"
+            ],
+            "description": "Collection provenance. Omitted historical inputs remain unknown and cannot start follow-up."
+          },
+          "flowId": {
+            "type": "string",
+            "format": "ObjectId",
+            "description": "Required for flow captures; validated against the company and instrument."
+          },
           "score": {
             "type": "number",
             "description": "CES effort score 1-5",
@@ -6748,7 +7734,10 @@
             "maxLength": 64
           }
         },
-        "required": ["score", "cesToolId"]
+        "required": [
+          "score",
+          "cesToolId"
+        ]
       },
       "V1CreateCesTextnoteBodyDto": {
         "type": "object",
@@ -6760,7 +7749,9 @@
             "example": "Resolver fue muy facil."
           }
         },
-        "required": ["description"]
+        "required": [
+          "description"
+        ]
       },
       "V1CaptureAudioDto": {
         "type": "object",
@@ -6799,6 +7790,19 @@
       "V1CaptureBodyDto": {
         "type": "object",
         "properties": {
+          "collectionKind": {
+            "type": "string",
+            "enum": [
+              "standalone",
+              "flow"
+            ],
+            "description": "Collection provenance. Omitted historical inputs remain unknown and cannot start follow-up."
+          },
+          "flowId": {
+            "type": "string",
+            "format": "ObjectId",
+            "description": "Required for flow captures; validated against the company and instrument."
+          },
           "dispatchToken": {
             "type": "string",
             "description": "Opaque invitation or prepared journey-entry response token. Consumed after saving feedback; never stored on the review.",
@@ -6810,13 +7814,21 @@
           },
           "kind": {
             "type": "string",
-            "enum": ["woku", "nps", "csat", "ces"],
+            "enum": [
+              "woku",
+              "nps",
+              "csat",
+              "ces"
+            ],
             "example": "woku"
           },
           "language": {
             "type": "string",
             "description": "Spoken language. Required when the capture includes an audio file.",
-            "enum": ["es", "en"]
+            "enum": [
+              "es",
+              "en"
+            ]
           },
           "targetId": {
             "type": "string",
@@ -6844,7 +7856,9 @@
             "$ref": "#/components/schemas/V1CaptureRespondentDto"
           }
         },
-        "required": ["kind"]
+        "required": [
+          "kind"
+        ]
       },
       "V1CaptureResultDto": {
         "type": "object",
@@ -6855,7 +7869,12 @@
           },
           "kind": {
             "type": "string",
-            "enum": ["woku", "nps", "csat", "ces"]
+            "enum": [
+              "woku",
+              "nps",
+              "csat",
+              "ces"
+            ]
           },
           "remoteId": {
             "type": "string",
@@ -6863,10 +7882,15 @@
           },
           "status": {
             "type": "string",
-            "enum": ["accepted"]
+            "enum": [
+              "accepted"
+            ]
           }
         },
-        "required": ["kind", "status"]
+        "required": [
+          "kind",
+          "status"
+        ]
       },
       "V1CreateNpsInvitationsBodyDto": {
         "type": "object",
@@ -6874,12 +7898,17 @@
           "channel": {
             "type": "string",
             "description": "Delivery channel for the invitations",
-            "enum": ["email", "whatsapp"],
+            "enum": [
+              "email",
+              "whatsapp"
+            ],
             "example": "whatsapp"
           },
           "recipients": {
             "description": "Recipients: email addresses for the email channel, phone numbers (digits, country code included, e.g. 56912345678) for whatsapp",
-            "example": ["56912345678"],
+            "example": [
+              "56912345678"
+            ],
             "maxItems": 100,
             "type": "array",
             "items": {
@@ -6889,7 +7918,10 @@
           "language": {
             "type": "string",
             "description": "Language of the invitation template",
-            "enum": ["es", "en"],
+            "enum": [
+              "es",
+              "en"
+            ],
             "example": "es"
           },
           "npsToolId": {
@@ -6898,7 +7930,10 @@
             "format": "ObjectId"
           }
         },
-        "required": ["channel", "recipients"]
+        "required": [
+          "channel",
+          "recipients"
+        ]
       },
       "V1RejectedInvitationDto": {
         "type": "object",
@@ -6918,14 +7953,20 @@
             ]
           }
         },
-        "required": ["recipient", "reason"]
+        "required": [
+          "recipient",
+          "reason"
+        ]
       },
       "V1InvitationsResultDto": {
         "type": "object",
         "properties": {
           "channel": {
             "type": "string",
-            "enum": ["email", "whatsapp"]
+            "enum": [
+              "email",
+              "whatsapp"
+            ]
           },
           "accepted": {
             "description": "Recipients whose invitation was dispatched (or queued)",
@@ -6942,7 +7983,11 @@
             }
           }
         },
-        "required": ["channel", "accepted", "rejected"]
+        "required": [
+          "channel",
+          "accepted",
+          "rejected"
+        ]
       },
       "V1CreateCsatInvitationsBodyDto": {
         "type": "object",
@@ -6950,12 +7995,17 @@
           "channel": {
             "type": "string",
             "description": "Delivery channel for the invitations",
-            "enum": ["email", "whatsapp"],
+            "enum": [
+              "email",
+              "whatsapp"
+            ],
             "example": "whatsapp"
           },
           "recipients": {
             "description": "Recipients: email addresses for the email channel, phone numbers (digits, country code included, e.g. 56912345678) for whatsapp",
-            "example": ["56912345678"],
+            "example": [
+              "56912345678"
+            ],
             "maxItems": 100,
             "type": "array",
             "items": {
@@ -6965,7 +8015,10 @@
           "language": {
             "type": "string",
             "description": "Language of the invitation template",
-            "enum": ["es", "en"],
+            "enum": [
+              "es",
+              "en"
+            ],
             "example": "es"
           },
           "csatToolId": {
@@ -6974,7 +8027,11 @@
             "format": "ObjectId"
           }
         },
-        "required": ["channel", "recipients", "csatToolId"]
+        "required": [
+          "channel",
+          "recipients",
+          "csatToolId"
+        ]
       },
       "V1CreateCesInvitationsBodyDto": {
         "type": "object",
@@ -6982,12 +8039,17 @@
           "channel": {
             "type": "string",
             "description": "Delivery channel for the invitations",
-            "enum": ["email", "whatsapp"],
+            "enum": [
+              "email",
+              "whatsapp"
+            ],
             "example": "whatsapp"
           },
           "recipients": {
             "description": "Recipients: email addresses for the email channel, phone numbers (digits, country code included, e.g. 56912345678) for whatsapp",
-            "example": ["56912345678"],
+            "example": [
+              "56912345678"
+            ],
             "maxItems": 100,
             "type": "array",
             "items": {
@@ -6997,7 +8059,10 @@
           "language": {
             "type": "string",
             "description": "Language of the invitation template",
-            "enum": ["es", "en"],
+            "enum": [
+              "es",
+              "en"
+            ],
             "example": "es"
           },
           "cesToolId": {
@@ -7006,7 +8071,11 @@
             "format": "ObjectId"
           }
         },
-        "required": ["channel", "recipients", "cesToolId"]
+        "required": [
+          "channel",
+          "recipients",
+          "cesToolId"
+        ]
       },
       "V1CreateInvitationsBodyDto": {
         "type": "object",
@@ -7014,12 +8083,17 @@
           "channel": {
             "type": "string",
             "description": "Delivery channel for the invitations",
-            "enum": ["email", "whatsapp"],
+            "enum": [
+              "email",
+              "whatsapp"
+            ],
             "example": "whatsapp"
           },
           "recipients": {
             "description": "Recipients: email addresses for the email channel, phone numbers (digits, country code included, e.g. 56912345678) for whatsapp",
-            "example": ["56912345678"],
+            "example": [
+              "56912345678"
+            ],
             "maxItems": 100,
             "type": "array",
             "items": {
@@ -7029,11 +8103,17 @@
           "language": {
             "type": "string",
             "description": "Language of the invitation template",
-            "enum": ["es", "en"],
+            "enum": [
+              "es",
+              "en"
+            ],
             "example": "es"
           }
         },
-        "required": ["channel", "recipients"]
+        "required": [
+          "channel",
+          "recipients"
+        ]
       },
       "V1CreateFormResponseBodyDto": {
         "type": "object",
@@ -7075,14 +8155,20 @@
             "maxLength": 64
           }
         },
-        "required": ["anonymous", "answers"]
+        "required": [
+          "anonymous",
+          "answers"
+        ]
       },
       "NpsToolLocalizedContentBodyDTO": {
         "type": "object",
         "properties": {
           "locale": {
             "type": "string",
-            "enum": ["es", "en"],
+            "enum": [
+              "es",
+              "en"
+            ],
             "example": "en"
           },
           "npsMessage": {
@@ -7099,7 +8185,10 @@
             "maxLength": 140
           }
         },
-        "required": ["locale", "npsMessage"]
+        "required": [
+          "locale",
+          "npsMessage"
+        ]
       },
       "CreateNpsToolBodyDTO": {
         "type": "object",
@@ -7125,7 +8214,10 @@
           },
           "availableLocales": {
             "description": "Locales the tool is available in (subset of es/en).",
-            "example": ["es", "en"],
+            "example": [
+              "es",
+              "en"
+            ],
             "type": "array",
             "items": {
               "type": "string"
@@ -7135,7 +8227,10 @@
             "type": "string",
             "description": "Default locale used when none is requested.",
             "example": "es",
-            "enum": ["es", "en"]
+            "enum": [
+              "es",
+              "en"
+            ]
           },
           "localizedContent": {
             "type": "array",
@@ -7144,7 +8239,10 @@
             }
           }
         },
-        "required": ["name", "npsMessage"]
+        "required": [
+          "name",
+          "npsMessage"
+        ]
       },
       "UpdateNpsToolBodyDTO": {
         "type": "object",
@@ -7167,7 +8265,10 @@
             "maxLength": 140
           },
           "availableLocales": {
-            "example": ["es", "en"],
+            "example": [
+              "es",
+              "en"
+            ],
             "type": "array",
             "items": {
               "type": "string"
@@ -7175,7 +8276,10 @@
           },
           "defaultLocale": {
             "type": "string",
-            "enum": ["es", "en"]
+            "enum": [
+              "es",
+              "en"
+            ]
           },
           "localizedContent": {
             "type": "array",
@@ -7190,7 +8294,10 @@
         "properties": {
           "locale": {
             "type": "string",
-            "enum": ["es", "en"],
+            "enum": [
+              "es",
+              "en"
+            ],
             "example": "en"
           },
           "question": {
@@ -7207,7 +8314,10 @@
             "maxLength": 140
           }
         },
-        "required": ["locale", "question"]
+        "required": [
+          "locale",
+          "question"
+        ]
       },
       "CreateCsatToolBodyDTO": {
         "type": "object",
@@ -7233,7 +8343,10 @@
           },
           "availableLocales": {
             "description": "Locales the tool is available in (subset of es/en).",
-            "example": ["es", "en"],
+            "example": [
+              "es",
+              "en"
+            ],
             "type": "array",
             "items": {
               "type": "string"
@@ -7243,7 +8356,10 @@
             "type": "string",
             "description": "Default locale used when none is requested.",
             "example": "es",
-            "enum": ["es", "en"]
+            "enum": [
+              "es",
+              "en"
+            ]
           },
           "localizedContent": {
             "type": "array",
@@ -7252,7 +8368,10 @@
             }
           }
         },
-        "required": ["name", "question"]
+        "required": [
+          "name",
+          "question"
+        ]
       },
       "UpdateCsatToolBodyDTO": {
         "type": "object",
@@ -7271,7 +8390,10 @@
             "maxLength": 140
           },
           "availableLocales": {
-            "example": ["es", "en"],
+            "example": [
+              "es",
+              "en"
+            ],
             "type": "array",
             "items": {
               "type": "string"
@@ -7279,7 +8401,10 @@
           },
           "defaultLocale": {
             "type": "string",
-            "enum": ["es", "en"]
+            "enum": [
+              "es",
+              "en"
+            ]
           },
           "localizedContent": {
             "type": "array",
@@ -7294,7 +8419,10 @@
         "properties": {
           "locale": {
             "type": "string",
-            "enum": ["es", "en"],
+            "enum": [
+              "es",
+              "en"
+            ],
             "example": "en"
           },
           "question": {
@@ -7311,7 +8439,10 @@
             "maxLength": 140
           }
         },
-        "required": ["locale", "question"]
+        "required": [
+          "locale",
+          "question"
+        ]
       },
       "CreateCesToolBodyDTO": {
         "type": "object",
@@ -7337,7 +8468,10 @@
           },
           "availableLocales": {
             "description": "Locales the tool is available in (subset of es/en).",
-            "example": ["es", "en"],
+            "example": [
+              "es",
+              "en"
+            ],
             "type": "array",
             "items": {
               "type": "string"
@@ -7347,7 +8481,10 @@
             "type": "string",
             "description": "Default locale used when none is requested.",
             "example": "es",
-            "enum": ["es", "en"]
+            "enum": [
+              "es",
+              "en"
+            ]
           },
           "localizedContent": {
             "type": "array",
@@ -7356,7 +8493,10 @@
             }
           }
         },
-        "required": ["name", "question"]
+        "required": [
+          "name",
+          "question"
+        ]
       },
       "UpdateCesToolBodyDTO": {
         "type": "object",
@@ -7375,7 +8515,10 @@
             "maxLength": 140
           },
           "availableLocales": {
-            "example": ["es", "en"],
+            "example": [
+              "es",
+              "en"
+            ],
             "type": "array",
             "items": {
               "type": "string"
@@ -7383,7 +8526,10 @@
           },
           "defaultLocale": {
             "type": "string",
-            "enum": ["es", "en"]
+            "enum": [
+              "es",
+              "en"
+            ]
           },
           "localizedContent": {
             "type": "array",
@@ -7392,6 +8538,282 @@
             }
           }
         }
+      },
+      "PublicTicketOriginDto": {
+        "type": "object",
+        "properties": {
+          "tool": {
+            "type": "string",
+            "enum": [
+              "woku",
+              "nps",
+              "form",
+              "csat",
+              "ces"
+            ]
+          },
+          "refId": {
+            "type": "string"
+          },
+          "instrumentId": {
+            "type": "string"
+          },
+          "instrumentName": {
+            "type": "string"
+          },
+          "trackers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "trackerId": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "tool",
+          "refId"
+        ]
+      },
+      "TicketFollowUpDto": {
+        "type": "object",
+        "properties": {
+          "conversationId": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "not_applicable",
+              "pending",
+              "initial_sent",
+              "awaiting_detail",
+              "closing",
+              "completed",
+              "timed_out",
+              "cancelled"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          },
+          "availableSummaryVersion": {
+            "type": "number"
+          },
+          "enrichmentState": {
+            "type": "string",
+            "enum": [
+              "processing",
+              "applied",
+              "failed",
+              "skipped"
+            ],
+            "description": "Current result of applying follow-up evidence to the ticket."
+          },
+          "enrichmentReason": {
+            "type": "string",
+            "description": "Machine-readable reason for the enrichment result, without provider details or credentials."
+          },
+          "appliedSummaryVersion": {
+            "type": "number",
+            "description": "Last summary version successfully applied to this ticket. Conversation completion alone does not imply enrichment."
+          },
+          "enrichedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "state"
+        ]
+      },
+      "PublicTicketDto": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "high",
+              "medium",
+              "low"
+            ]
+          },
+          "destinationId": {
+            "type": "string"
+          },
+          "origin": {
+            "$ref": "#/components/schemas/PublicTicketOriginDto"
+          },
+          "contentVersion": {
+            "type": "number",
+            "minimum": 1,
+            "default": 1,
+            "description": "Monotonic version of generated ticket content."
+          },
+          "followUp": {
+            "$ref": "#/components/schemas/TicketFollowUpDto"
+          },
+          "score": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": "number"
+              },
+              "max": {
+                "type": "number"
+              },
+              "kind": {
+                "type": "string"
+              },
+              "display": {
+                "type": "string"
+              }
+            }
+          },
+          "aiSummary": {
+            "type": "string"
+          },
+          "aiCategory": {
+            "type": "string"
+          },
+          "caseDescription": {
+            "type": "string"
+          },
+          "historyHighlights": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "whatCustomerWants": {
+            "type": "string"
+          },
+          "suggestedResolution": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string"
+          },
+          "churnRisk": {
+            "type": "string"
+          },
+          "criteria": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "historySnapshot": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "sentiment": {
+            "type": "string"
+          },
+          "generatedByAI": {
+            "type": "boolean"
+          },
+          "customerComment": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string"
+              },
+              "isAudio": {
+                "type": "boolean"
+              },
+              "audioUrl": {
+                "type": "string"
+              },
+              "transcription": {
+                "type": "string"
+              }
+            }
+          },
+          "client": {
+            "type": "object",
+            "properties": {
+              "clientId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+              "phone": {
+                "type": "string"
+              }
+            }
+          },
+          "timeline": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "_id",
+          "title",
+          "severity",
+          "origin",
+          "contentVersion"
+        ]
+      },
+      "PublicTicketsPageDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicTicketDto"
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "data",
+          "total",
+          "page",
+          "limit"
+        ]
       },
       "UpdateTicketBodyDTO": {
         "type": "object",
@@ -7402,7 +8824,11 @@
           },
           "severity": {
             "type": "string",
-            "enum": ["high", "medium", "low"]
+            "enum": [
+              "high",
+              "medium",
+              "low"
+            ]
           },
           "aiSummary": {
             "type": "string",
@@ -7439,7 +8865,9 @@
             "type": "string"
           }
         },
-        "required": ["key"]
+        "required": [
+          "key"
+        ]
       },
       "V1JourneyMomentProgressDto": {
         "type": "object",
@@ -7466,11 +8894,21 @@
           },
           "toolType": {
             "type": "string",
-            "enum": ["woku", "csat", "ces", "nps", "flow", "form"]
+            "enum": [
+              "woku",
+              "csat",
+              "ces",
+              "nps",
+              "flow",
+              "form"
+            ]
           },
           "toolScope": {
             "type": "string",
-            "enum": ["shared", "per_enrollment"]
+            "enum": [
+              "shared",
+              "per_enrollment"
+            ]
           },
           "sentAt": {
             "type": "string",
@@ -7482,14 +8920,24 @@
           },
           "activationSource": {
             "type": "string",
-            "enum": ["operator", "response", "webhook", "timer", "fallback"]
+            "enum": [
+              "operator",
+              "response",
+              "webhook",
+              "timer",
+              "fallback"
+            ]
           },
           "hookReceivedAt": {
             "type": "string",
             "format": "date-time"
           }
         },
-        "required": ["key", "name", "status"]
+        "required": [
+          "key",
+          "name",
+          "status"
+        ]
       },
       "V1JourneyParticipationDto": {
         "type": "object",
@@ -7505,7 +8953,13 @@
           },
           "lifecycle": {
             "type": "string",
-            "enum": ["pending", "running", "stopping", "stopped", "completed"]
+            "enum": [
+              "pending",
+              "running",
+              "stopping",
+              "stopped",
+              "completed"
+            ]
           },
           "definitionVersion": {
             "type": "number"
@@ -7516,7 +8970,11 @@
           },
           "startSource": {
             "type": "string",
-            "enum": ["operator", "response", "webhook"]
+            "enum": [
+              "operator",
+              "response",
+              "webhook"
+            ]
           },
           "stoppedAt": {
             "type": "string",
@@ -7567,14 +9025,24 @@
               },
               "source": {
                 "type": "string",
-                "enum": ["operator", "response", "webhook", "timer", "fallback"]
+                "enum": [
+                  "operator",
+                  "response",
+                  "webhook",
+                  "timer",
+                  "fallback"
+                ]
               },
               "scheduledFor": {
                 "type": "string",
                 "format": "date-time"
               }
             },
-            "required": ["stageKey", "name", "source"]
+            "required": [
+              "stageKey",
+              "name",
+              "source"
+            ]
           }
         },
         "required": [
@@ -7602,7 +9070,9 @@
             "description": "Present only when another page exists; omit cursor for the first page."
           }
         },
-        "required": ["items"]
+        "required": [
+          "items"
+        ]
       },
       "StopJourneyParticipationDto": {
         "type": "object",
@@ -7621,7 +9091,11 @@
           },
           "mode": {
             "type": "string",
-            "enum": ["woku_signature", "url_token", "sender_hmac"]
+            "enum": [
+              "woku_signature",
+              "url_token",
+              "sender_hmac"
+            ]
           },
           "configured": {
             "type": "boolean",
@@ -7632,7 +9106,12 @@
             "description": "Credential-free inbound endpoint. Minting a URL token returns the credential URL separately."
           }
         },
-        "required": ["stageKey", "mode", "configured", "url"]
+        "required": [
+          "stageKey",
+          "mode",
+          "configured",
+          "url"
+        ]
       },
       "V1JourneyMomentUrlDto": {
         "type": "object",
@@ -7646,7 +9125,10 @@
             "description": "Credential URL. Minting replaces the prior token, including for existing participations."
           }
         },
-        "required": ["token", "url"]
+        "required": [
+          "token",
+          "url"
+        ]
       },
       "SetSenderSecretDto": {
         "type": "object",
@@ -7656,7 +9138,9 @@
             "description": "The signing secret the external system gave you. Stored encrypted; never returned."
           }
         },
-        "required": ["senderSecret"]
+        "required": [
+          "senderSecret"
+        ]
       },
       "V1PreviewJourneyMomentDto": {
         "type": "object",
@@ -7667,7 +9151,9 @@
             "description": "Sample payload. Does not verify signatures, enroll clients or send invitations."
           }
         },
-        "required": ["payload"]
+        "required": [
+          "payload"
+        ]
       },
       "V1JourneyTrackerDto": {
         "type": "object",
@@ -7681,7 +9167,10 @@
             "example": "black-friday"
           }
         },
-        "required": ["name", "value"]
+        "required": [
+          "name",
+          "value"
+        ]
       },
       "V1JourneyLocaleDto": {
         "type": "object",
@@ -7710,7 +9199,10 @@
             "type": "string"
           }
         },
-        "required": ["secondaryKey", "name"]
+        "required": [
+          "secondaryKey",
+          "name"
+        ]
       },
       "V1JourneyPreviewContentDto": {
         "type": "object",
@@ -7751,7 +9243,10 @@
             "description": "Resolved additional client fields."
           }
         },
-        "required": ["title", "clientFields"]
+        "required": [
+          "title",
+          "clientFields"
+        ]
       },
       "V1JourneyPreviewResponseDto": {
         "type": "object",
@@ -7774,7 +9269,11 @@
             ]
           }
         },
-        "required": ["matches", "subjectKey", "contact"]
+        "required": [
+          "matches",
+          "subjectKey",
+          "contact"
+        ]
       },
       "JourneyPlanMemberDto": {
         "type": "object",
@@ -7785,10 +9284,16 @@
           },
           "role": {
             "type": "string",
-            "enum": ["admin", "assignee"]
+            "enum": [
+              "admin",
+              "assignee"
+            ]
           }
         },
-        "required": ["userId", "role"]
+        "required": [
+          "userId",
+          "role"
+        ]
       },
       "JourneyRecipientsDto": {
         "type": "object",
@@ -7816,7 +9321,10 @@
             }
           }
         },
-        "required": ["ticketEmails", "planMembers"]
+        "required": [
+          "ticketEmails",
+          "planMembers"
+        ]
       },
       "V1JourneyRoutingDto": {
         "type": "object",
@@ -7834,7 +9342,10 @@
             "type": "string"
           }
         },
-        "required": ["ticketsReady", "plansReady"]
+        "required": [
+          "ticketsReady",
+          "plansReady"
+        ]
       },
       "V1JourneyToolSpecDto": {
         "type": "object",
@@ -7888,14 +9399,22 @@
             "example": "America/Santiago"
           }
         },
-        "required": ["startHour", "endHour", "timeZone"]
+        "required": [
+          "startHour",
+          "endHour",
+          "timeZone"
+        ]
       },
       "V1JourneyVerificationDto": {
         "type": "object",
         "properties": {
           "mode": {
             "type": "string",
-            "enum": ["woku_signature", "url_token", "sender_hmac"],
+            "enum": [
+              "woku_signature",
+              "url_token",
+              "sender_hmac"
+            ],
             "description": "Verification configuration only. Set secret material through the credential endpoints."
           },
           "header": {
@@ -7903,20 +9422,28 @@
           },
           "encoding": {
             "type": "string",
-            "enum": ["hex", "base64"]
+            "enum": [
+              "hex",
+              "base64"
+            ]
           },
           "prefix": {
             "type": "string"
           },
           "signedPayload": {
             "type": "string",
-            "enum": ["body", "timestamp_dot_body"]
+            "enum": [
+              "body",
+              "timestamp_dot_body"
+            ]
           },
           "timestampHeader": {
             "type": "string"
           }
         },
-        "required": ["mode"]
+        "required": [
+          "mode"
+        ]
       },
       "V1JourneyPayloadRuleDto": {
         "type": "object",
@@ -7930,7 +9457,10 @@
             "example": "delivered"
           }
         },
-        "required": ["path", "equals"]
+        "required": [
+          "path",
+          "equals"
+        ]
       },
       "V1JourneyClientFieldDto": {
         "type": "object",
@@ -7944,7 +9474,10 @@
             "example": "customer.tier"
           }
         },
-        "required": ["key", "path"]
+        "required": [
+          "key",
+          "path"
+        ]
       },
       "V1JourneyPayloadMapDto": {
         "type": "object",
@@ -7981,7 +9514,12 @@
         "properties": {
           "type": {
             "type": "string",
-            "enum": ["manual", "event", "webhook", "afterStage"]
+            "enum": [
+              "manual",
+              "event",
+              "webhook",
+              "afterStage"
+            ]
           },
           "event": {
             "type": "string",
@@ -7993,7 +9531,11 @@
           },
           "anchor": {
             "type": "string",
-            "enum": ["sent", "response", "event"]
+            "enum": [
+              "sent",
+              "response",
+              "event"
+            ]
           },
           "delayMs": {
             "type": "number",
@@ -8020,21 +9562,29 @@
             ]
           }
         },
-        "required": ["type"]
+        "required": [
+          "type"
+        ]
       },
       "V1JourneyTextValueDto": {
         "type": "object",
         "properties": {
           "mode": {
             "type": "string",
-            "enum": ["literal", "javascript"]
+            "enum": [
+              "literal",
+              "javascript"
+            ]
           },
           "value": {
             "type": "string",
             "description": "Literal (up to 200 characters) or bounded JavaScript function body (up to 2000). JavaScript receives payload and must return a string; no IO or imports."
           }
         },
-        "required": ["mode", "value"]
+        "required": [
+          "mode",
+          "value"
+        ]
       },
       "V1JourneyDynamicLocaleDto": {
         "type": "object",
@@ -8059,7 +9609,10 @@
             "example": "order.id"
           }
         },
-        "required": ["name", "path"]
+        "required": [
+          "name",
+          "path"
+        ]
       },
       "V1JourneyWebhookContentDto": {
         "type": "object",
@@ -8112,7 +9665,10 @@
           },
           "contentMode": {
             "type": "string",
-            "enum": ["manual", "webhook"],
+            "enum": [
+              "manual",
+              "webhook"
+            ],
             "description": "Content source, independent from trigger. Webhook content requires per_enrollment scope."
           },
           "schema": {
@@ -8169,13 +9725,23 @@
         "properties": {
           "type": {
             "type": "string",
-            "enum": ["csat", "ces", "woku", "nps", "flow", "form"]
+            "enum": [
+              "csat",
+              "ces",
+              "woku",
+              "nps",
+              "flow",
+              "form"
+            ]
           },
           "id": {
             "type": "string"
           }
         },
-        "required": ["type", "id"]
+        "required": [
+          "type",
+          "id"
+        ]
       },
       "V1JourneyMomentReadDto": {
         "type": "object",
@@ -8198,11 +9764,19 @@
           },
           "tool": {
             "type": "string",
-            "enum": ["woku", "csat", "ces", "nps"]
+            "enum": [
+              "woku",
+              "csat",
+              "ces",
+              "nps"
+            ]
           },
           "toolScope": {
             "type": "string",
-            "enum": ["shared", "per_enrollment"],
+            "enum": [
+              "shared",
+              "per_enrollment"
+            ],
             "description": "V2 defaults to shared within this moment. Dynamic webhook content requires per_enrollment."
           },
           "toolSpec": {
@@ -8219,7 +9793,10 @@
           },
           "channel": {
             "type": "string",
-            "enum": ["email", "whatsapp_first"]
+            "enum": [
+              "email",
+              "whatsapp_first"
+            ]
           },
           "sequence": {
             "$ref": "#/components/schemas/V1JourneySequenceDto"
@@ -8246,7 +9823,14 @@
             ]
           }
         },
-        "required": ["key", "tool", "enabled", "trigger", "channel", "sequence"]
+        "required": [
+          "key",
+          "tool",
+          "enabled",
+          "trigger",
+          "channel",
+          "sequence"
+        ]
       },
       "V1JourneyResponseDto": {
         "type": "object",
@@ -8268,11 +9852,18 @@
           },
           "authoringVersion": {
             "type": "number",
-            "enum": [1, 2]
+            "enum": [
+              1,
+              2
+            ]
           },
           "startMode": {
             "type": "string",
-            "enum": ["operator", "response", "webhook"]
+            "enum": [
+              "operator",
+              "response",
+              "webhook"
+            ]
           },
           "recipients": {
             "$ref": "#/components/schemas/JourneyRecipientsDto"
@@ -8295,7 +9886,12 @@
             "format": "date-time"
           }
         },
-        "required": ["id", "enabled", "version", "moments"]
+        "required": [
+          "id",
+          "enabled",
+          "version",
+          "moments"
+        ]
       },
       "V1JourneyMomentDto": {
         "type": "object",
@@ -8318,11 +9914,19 @@
           },
           "tool": {
             "type": "string",
-            "enum": ["woku", "csat", "ces", "nps"]
+            "enum": [
+              "woku",
+              "csat",
+              "ces",
+              "nps"
+            ]
           },
           "toolScope": {
             "type": "string",
-            "enum": ["shared", "per_enrollment"],
+            "enum": [
+              "shared",
+              "per_enrollment"
+            ],
             "description": "V2 defaults to shared within this moment. Dynamic webhook content requires per_enrollment."
           },
           "toolSpec": {
@@ -8339,7 +9943,10 @@
           },
           "channel": {
             "type": "string",
-            "enum": ["email", "whatsapp_first"]
+            "enum": [
+              "email",
+              "whatsapp_first"
+            ]
           },
           "sequence": {
             "$ref": "#/components/schemas/V1JourneySequenceDto"
@@ -8357,7 +9964,14 @@
             "description": "Key of the enabled moment that arms the secondary wait."
           }
         },
-        "required": ["key", "tool", "enabled", "trigger", "channel", "sequence"]
+        "required": [
+          "key",
+          "tool",
+          "enabled",
+          "trigger",
+          "channel",
+          "sequence"
+        ]
       },
       "V1CreateJourneyBodyDto": {
         "type": "object",
@@ -8370,12 +9984,19 @@
           },
           "authoringVersion": {
             "type": "number",
-            "enum": [1, 2],
+            "enum": [
+              1,
+              2
+            ],
             "description": "Use 2 for the business-form contract. Existing v1 definitions keep their execution rules."
           },
           "startMode": {
             "type": "string",
-            "enum": ["operator", "response", "webhook"],
+            "enum": [
+              "operator",
+              "response",
+              "webhook"
+            ],
             "description": "Who starts the first moment. Response means a saved first answer, not opening its link."
           },
           "recipients": {
@@ -8398,7 +10019,9 @@
             }
           }
         },
-        "required": ["name"]
+        "required": [
+          "name"
+        ]
       },
       "V1CreatedJourneyResponseDto": {
         "type": "object",
@@ -8420,11 +10043,18 @@
           },
           "authoringVersion": {
             "type": "number",
-            "enum": [1, 2]
+            "enum": [
+              1,
+              2
+            ]
           },
           "startMode": {
             "type": "string",
-            "enum": ["operator", "response", "webhook"]
+            "enum": [
+              "operator",
+              "response",
+              "webhook"
+            ]
           },
           "recipients": {
             "$ref": "#/components/schemas/JourneyRecipientsDto"
@@ -8451,7 +10081,13 @@
             "description": "Legacy journey-wide signature secret, returned once. It is not the per-moment URL token or sender secret."
           }
         },
-        "required": ["id", "enabled", "version", "moments", "webhookSecret"]
+        "required": [
+          "id",
+          "enabled",
+          "version",
+          "moments",
+          "webhookSecret"
+        ]
       },
       "V1UpdateJourneyBodyDto": {
         "type": "object",
@@ -8464,12 +10100,19 @@
           },
           "authoringVersion": {
             "type": "number",
-            "enum": [1, 2],
+            "enum": [
+              1,
+              2
+            ],
             "description": "Use 2 for the business-form contract. Existing v1 definitions keep their execution rules."
           },
           "startMode": {
             "type": "string",
-            "enum": ["operator", "response", "webhook"],
+            "enum": [
+              "operator",
+              "response",
+              "webhook"
+            ],
             "description": "Who starts the first moment. Response means a saved first answer, not opening its link."
           },
           "recipients": {
@@ -8498,7 +10141,9 @@
             "description": "Legacy journey-wide signature secret, returned only by create or rotate. V2 url_token and sender_hmac use separate per-moment credentials."
           }
         },
-        "required": ["webhookSecret"]
+        "required": [
+          "webhookSecret"
+        ]
       },
       "V1EnrollSubjectBodyDto": {
         "type": "object",
@@ -8534,7 +10179,10 @@
             "additionalProperties": true
           }
         },
-        "required": ["subjectKey", "contact"]
+        "required": [
+          "subjectKey",
+          "contact"
+        ]
       },
       "V1JourneyEnrollmentResponseDto": {
         "type": "object",
@@ -8546,7 +10194,10 @@
             "type": "string"
           }
         },
-        "required": ["subjectKey", "journeyId"]
+        "required": [
+          "subjectKey",
+          "journeyId"
+        ]
       },
       "V1EmitJourneyEventBodyDto": {
         "type": "object",
@@ -8579,7 +10230,10 @@
             "additionalProperties": true
           }
         },
-        "required": ["event", "subjectKey"]
+        "required": [
+          "event",
+          "subjectKey"
+        ]
       },
       "V1JourneyEventResponseDto": {
         "type": "object",
@@ -8588,7 +10242,9 @@
             "type": "number"
           }
         },
-        "required": ["journeys"]
+        "required": [
+          "journeys"
+        ]
       },
       "JourneyEntryInfoDto": {
         "type": "object",
@@ -8601,14 +10257,22 @@
           },
           "tool": {
             "type": "string",
-            "enum": ["woku", "csat", "ces", "nps"]
+            "enum": [
+              "woku",
+              "csat",
+              "ces",
+              "nps"
+            ]
           },
           "requiresReference": {
             "type": "boolean",
             "description": "A case reference is required when later moments start on webhooks."
           }
         },
-        "required": ["tool", "requiresReference"]
+        "required": [
+          "tool",
+          "requiresReference"
+        ]
       },
       "PrepareJourneyEntryDto": {
         "type": "object",
@@ -8631,7 +10295,9 @@
             "maxLength": 200
           }
         },
-        "required": ["requestId"]
+        "required": [
+          "requestId"
+        ]
       },
       "PreparedJourneyEntryDto": {
         "type": "object",
@@ -8641,7 +10307,12 @@
           },
           "tool": {
             "type": "string",
-            "enum": ["woku", "csat", "ces", "nps"]
+            "enum": [
+              "woku",
+              "csat",
+              "ces",
+              "nps"
+            ]
           },
           "toolId": {
             "type": "string"
@@ -8654,7 +10325,13 @@
             "type": "string"
           }
         },
-        "required": ["companyId", "tool", "toolId", "token", "subjectKey"]
+        "required": [
+          "companyId",
+          "tool",
+          "toolId",
+          "token",
+          "subjectKey"
+        ]
       }
     }
   }

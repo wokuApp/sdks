@@ -1,0 +1,152 @@
+[
+  {
+    "name": "pending",
+    "ticket": {
+      "_id": "aaaaaaaaaaaaaaaaaaaaaaaa",
+      "title": "Feedback case",
+      "severity": "high",
+      "origin": {
+        "tool": "nps",
+        "refId": "bbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "contentVersion": 1,
+      "followUp": {
+        "conversationId": "cccccccccccccccccccccccc",
+        "state": "pending"
+      }
+    },
+    "enriched": false
+  },
+  {
+    "name": "flow-excluded",
+    "ticket": {
+      "_id": "aaaaaaaaaaaaaaaaaaaaaaaa",
+      "title": "Feedback case",
+      "severity": "high",
+      "origin": {
+        "tool": "nps",
+        "refId": "bbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "contentVersion": 1,
+      "followUp": {
+        "state": "not_applicable",
+        "reason": "flow"
+      }
+    },
+    "enriched": false
+  },
+  {
+    "name": "no-response",
+    "ticket": {
+      "_id": "aaaaaaaaaaaaaaaaaaaaaaaa",
+      "title": "Feedback case",
+      "severity": "high",
+      "origin": {
+        "tool": "nps",
+        "refId": "bbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "contentVersion": 1,
+      "followUp": {
+        "conversationId": "cccccccccccccccccccccccc",
+        "state": "timed_out"
+      }
+    },
+    "enriched": false
+  },
+  {
+    "name": "enriched",
+    "ticket": {
+      "_id": "aaaaaaaaaaaaaaaaaaaaaaaa",
+      "title": "Feedback case",
+      "severity": "high",
+      "origin": {
+        "tool": "nps",
+        "refId": "bbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "contentVersion": 2,
+      "followUp": {
+        "conversationId": "cccccccccccccccccccccccc",
+        "state": "completed",
+        "availableSummaryVersion": 1,
+        "appliedSummaryVersion": 1,
+        "enrichedAt": "2026-09-27T12:00:00.000Z"
+      }
+    },
+    "enriched": true
+  },
+  {
+    "name": "reopened",
+    "ticket": {
+      "_id": "aaaaaaaaaaaaaaaaaaaaaaaa",
+      "title": "Feedback case",
+      "severity": "high",
+      "origin": {
+        "tool": "nps",
+        "refId": "bbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "contentVersion": 2,
+      "followUp": {
+        "conversationId": "cccccccccccccccccccccccc",
+        "state": "awaiting_detail",
+        "availableSummaryVersion": 2,
+        "appliedSummaryVersion": 1,
+        "enrichedAt": "2026-09-27T12:00:00.000Z"
+      }
+    },
+    "enriched": true
+  },
+  {
+    "name": "historical",
+    "ticket": {
+      "_id": "aaaaaaaaaaaaaaaaaaaaaaaa",
+      "title": "Feedback case",
+      "severity": "high",
+      "origin": {
+        "tool": "nps",
+        "refId": "bbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "contentVersion": 1
+    },
+    "enriched": false
+  },
+  {
+    "name": "completed-not-applied",
+    "ticket": {
+      "_id": "aaaaaaaaaaaaaaaaaaaaaaaa",
+      "title": "Feedback case",
+      "severity": "high",
+      "origin": {
+        "tool": "nps",
+        "refId": "bbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "contentVersion": 1,
+      "followUp": {
+        "conversationId": "cccccccccccccccccccccccc",
+        "state": "completed",
+        "availableSummaryVersion": 1
+      }
+    },
+    "enriched": false
+  },
+  {
+    "enriched": false,
+    "ticket": {
+      "_id": "dddddddddddddddddddddddd",
+      "title": "Feedback case",
+      "severity": "high",
+      "origin": {
+        "tool": "nps",
+        "refId": "bbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "contentVersion": 1,
+      "followUp": {
+        "conversationId": "eeeeeeeeeeeeeeeeeeeeeeee",
+        "state": "completed",
+        "availableSummaryVersion": 1,
+        "enrichmentState": "failed",
+        "enrichmentReason": "processing_failed"
+      }
+    },
+    "name": "enrichment-failed"
+  }
+]

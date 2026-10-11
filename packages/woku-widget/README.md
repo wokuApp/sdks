@@ -5,6 +5,22 @@ Ambivalent web widget for capturing **Woku ratings (1-5 stars)** and **NPS score
 Distributed as a micro-app hosted on `cdn.woku.app` (S3 + CloudFront) and embedded in any
 website via a lightweight loader `<script>` (~2.5 KB gzipped) that injects an `<iframe>`.
 
+## Proposed capture provenance (unreleased)
+
+The next package and CDN release adds `collectionKind` and `flowId` to loader
+configuration. New Woku and NPS captures default to `standalone`. An external
+Flow host must pass `collectionKind: 'flow'` and the actual `flowId`; the API
+validates company and instrument membership. The loader sends this context by
+postMessage and the app preserves it through config merging, text/audio bodies,
+and initial NPS score plus comment attachments. Changing provenance resets the
+prepared evaluation so a comment cannot attach to an earlier response.
+
+Flow responses may create normal tickets but do not start follow-up, including
+one-step and incomplete Flows. Individual instruments inside a customer journey
+remain standalone unless the response actually comes from a Flow. This capture
+widget does not expose support conversations. Use the new options after the
+matching API, npm package and CDN assets are released.
+
 ## Quick start
 
 ```html
@@ -47,6 +63,8 @@ interface WokuWidgetConfig {
   email?: string; // preidentified customer
   phone?: string; // alternative to email
   dispatchToken?: string; // prepared journey response token
+  collectionKind?: 'standalone' | 'flow'; // proposed, unreleased
+  flowId?: string; // required with collectionKind: 'flow'
   npsToolId?: string; // optional for NPS — omit for company-level
   apiBaseUrl?: string; // default: https://clientapi.woku.app
   widgetBaseUrl?: string; // default: https://cdn.woku.app/sdks/woku-widget/v1
@@ -130,14 +148,14 @@ Build outputs:
 | `dist/app/index.html`   | Micro-app entry — loaded inside the iframe           |
 | `dist/app/assets/*`     | Hashed JS/CSS bundles for the micro-app              |
 
-## CDN paths (S3 + CloudFront)
+## CDN paths for the proposed release (S3 + CloudFront)
 
 ```
 cdn.woku.app/sdks/woku-widget/v1/loader.js          ← major-alias (cache 5 min)
 cdn.woku.app/sdks/woku-widget/v1/index.html         ← major-alias (cache 5 min)
-cdn.woku.app/sdks/woku-widget/v0.2.0/loader.js      ← semver-pinned (cache immutable)
-cdn.woku.app/sdks/woku-widget/v0.2.0/index.html
-cdn.woku.app/sdks/woku-widget/v0.2.0/assets/*
+cdn.woku.app/sdks/woku-widget/v0.3.0/loader.js      ← semver-pinned (cache immutable)
+cdn.woku.app/sdks/woku-widget/v0.3.0/index.html
+cdn.woku.app/sdks/woku-widget/v0.3.0/assets/*
 ```
 
 Deploy `dist/app/` and `dist/loader/loader.js` to both CDN prefixes after the compatible API release. Upload hashed assets before `index.html`; keep pinned versions immutable and invalidate only the `v1` alias. CDN deployment is separate from npm publication.

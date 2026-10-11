@@ -86,6 +86,132 @@ export interface InvitationsResult {
   [key: string]: unknown;
 }
 
+export type FollowUpState =
+  | 'pending'
+  | 'initial_sent'
+  | 'awaiting_detail'
+  | 'closing'
+  | 'completed'
+  | 'timed_out'
+  | 'cancelled';
+
+export interface FollowUpOrigin {
+  tool: 'woku' | 'nps' | 'csat' | 'ces';
+  refId: string;
+  instrumentId?: string;
+}
+
+/** Lightweight evidence state. Completion alone does not mean evidence was applied. */
+export interface FollowUp {
+  conversationId?: string;
+  state: FollowUpState | 'not_applicable';
+  reason?: string;
+  availableSummaryVersion?: number;
+  appliedSummaryVersion?: number;
+  enrichedAt?: string;
+  /** Ticket processing status; conversation completion does not imply application. */
+  enrichmentState?: 'processing' | 'applied' | 'failed' | 'skipped';
+  enrichmentReason?: string;
+}
+
+/**
+ * WhatsApp line of a follow-up. `survey_thread`: the agent continued the
+ * survey conversation on the survey number. `follow_up_number`: it wrote from
+ * the dedicated follow-up number. Absent for email.
+ */
+export type FollowUpLine = 'survey_thread' | 'follow_up_number';
+
+/**
+ * `survey`: the survey exchange that preceded the follow-up (prelude).
+ * `follow_up`: the follow-up itself.
+ */
+export type FollowUpMessagePhase = 'survey' | 'follow_up';
+
+/**
+ * A file the customer sent. `adminUrl` opens it in the woku admin after login
+ * and a company check; the file itself and storage URLs are never returned.
+ */
+export interface FollowUpAttachment {
+  /** Stable number of the file in the conversation (prelude included). */
+  index: number;
+  /** Label in the conversation language, e.g. "Archivo 2" or "File 2". */
+  label: string;
+  kind: 'image' | 'audio' | 'document' | 'unsupported';
+  /** Private original file. Absent while pending or when nothing was stored. */
+  fileId?: string;
+  /** Converted copy the model read, when there was a conversion. */
+  readableFileId?: string;
+  filename: string;
+  mimeType: string;
+  status: 'pending' | 'ready' | 'failed' | 'unsupported';
+  /** Transcript (audio) or description (image, document). Untrusted customer content. */
+  text?: string;
+  /** Stable reason code when failed or unsupported (e.g. `video`, `read_failed`). */
+  failureReason?: string;
+  adminUrl?: string;
+}
+
+/** A file the executive summary cites as "(Archivo N)". */
+export interface FollowUpCitation {
+  index: number;
+  label: string;
+  fileId?: string;
+  /** What the file supports in the summary. */
+  supports: string;
+  adminUrl?: string;
+}
+
+export interface FollowUpMessage {
+  role: 'agent' | 'client';
+  /** May be empty when the message only has files. */
+  content: string;
+  timestamp: string;
+  phase: FollowUpMessagePhase;
+  responseType?: string;
+  selectedOption?: string;
+  attachments?: FollowUpAttachment[];
+}
+
+/** Authorized conversation detail, without response tokens or transport credentials. */
+export interface FollowUpConversation {
+  _id: string;
+  companyId: string;
+  origin: FollowUpOrigin;
+  wokuId?: string;
+  reviewId?: string;
+  reviewType: 'textnote' | 'voicemail';
+  originalReview: string;
+  originalQualification?: number;
+  state: FollowUpState;
+  channel: Channel;
+  line?: FollowUpLine;
+  reason?: string;
+  messages: FollowUpMessage[];
+  executiveSummary?: string;
+  actionItems?: string[];
+  sentiment?: string;
+  topics?: string[];
+  summaryCitations?: FollowUpCitation[];
+  summaryVersion?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface TicketOriginTracker {
+  trackerId?: string;
+  name?: string;
+  value: string;
+}
+
+export interface TicketOrigin {
+  tool: FollowUpOrigin['tool'] | 'form';
+  refId: string;
+  instrumentId?: string;
+  instrumentName?: string;
+  trackers?: TicketOriginTracker[];
+  [key: string]: unknown;
+}
+
 /** Support ticket (curated allow-list). */
 export interface Ticket {
   _id: string;
@@ -93,7 +219,9 @@ export interface Ticket {
   title: string;
   severity: Severity;
   destinationId?: string;
-  origin?: WokuRecord;
+  origin?: TicketOrigin;
+  followUp?: FollowUp;
+  contentVersion?: number;
   score?: WokuRecord;
   aiSummary?: string;
   aiCategory?: string;

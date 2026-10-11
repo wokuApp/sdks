@@ -10,6 +10,12 @@
 export type CaptureKind = 'woku' | 'nps' | 'csat' | 'ces';
 export type CaptureLanguage = 'es' | 'en';
 
+/** Capture provenance, declared when the response is first created. */
+export interface CaptureContext {
+  collectionKind?: 'standalone' | 'flow';
+  flowId?: string;
+}
+
 /** An audio attachment for a text/voice comment. */
 export interface AudioAttachment {
   /** URI or local path to the recorded audio file. */
@@ -29,7 +35,7 @@ export interface Respondent {
 }
 
 /** Input for a Woku capture (1-tap rating 1..5 + optional comment/audio). */
-export interface WokuCaptureInput {
+export interface WokuCaptureInput extends CaptureContext {
   wokuId: string;
   /** Integer 1..5. */
   rating: number;
@@ -43,7 +49,7 @@ export interface WokuCaptureInput {
 }
 
 /** Input for an NPS capture (score 0..10 + optional review). */
-export interface NpsCaptureInput {
+export interface NpsCaptureInput extends CaptureContext {
   npsId?: string;
   /** Integer 0..10. */
   score: number;
@@ -56,7 +62,7 @@ export interface NpsCaptureInput {
 }
 
 /** Normalized submission persisted in the offline queue and sent to Woku. */
-export interface CaptureSubmission {
+export interface CaptureSubmission extends CaptureContext {
   /** Client-generated idempotency id. */
   id: string;
   kind: CaptureKind;
@@ -85,7 +91,7 @@ export interface SubmissionResult {
 }
 
 /** Focused satisfaction/effort scores; audio is not supported by these API kinds. */
-export interface CsatCaptureInput {
+export interface CsatCaptureInput extends CaptureContext {
   csatId: string;
   score: number;
   comment?: string;
@@ -93,7 +99,7 @@ export interface CsatCaptureInput {
   metadata?: Record<string, unknown>;
   dispatchToken?: string;
 }
-export interface CesCaptureInput {
+export interface CesCaptureInput extends CaptureContext {
   cesId: string;
   score: number;
   comment?: string;

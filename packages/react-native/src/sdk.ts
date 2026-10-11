@@ -90,6 +90,8 @@ export class WokuSdk {
       respondent: input.respondent,
       metadata: input.metadata,
       dispatchToken: input.dispatchToken,
+      collectionKind: input.collectionKind ?? 'standalone',
+      flowId: input.flowId,
       language: input.language ?? (input.audio ? this.language : undefined),
       createdAt: Date.now(),
     };
@@ -110,6 +112,8 @@ export class WokuSdk {
       respondent: input.respondent,
       metadata: input.metadata,
       dispatchToken: input.dispatchToken,
+      collectionKind: input.collectionKind ?? 'standalone',
+      flowId: input.flowId,
       language: input.language ?? (input.audio ? this.language : undefined),
       createdAt: Date.now(),
     };
@@ -128,6 +132,8 @@ export class WokuSdk {
       respondent: input.respondent,
       metadata: input.metadata,
       dispatchToken: input.dispatchToken,
+      collectionKind: input.collectionKind ?? 'standalone',
+      flowId: input.flowId,
       createdAt: Date.now(),
     });
   }
@@ -143,6 +149,8 @@ export class WokuSdk {
       respondent: input.respondent,
       metadata: input.metadata,
       dispatchToken: input.dispatchToken,
+      collectionKind: input.collectionKind ?? 'standalone',
+      flowId: input.flowId,
       createdAt: Date.now(),
     });
   }

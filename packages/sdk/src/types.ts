@@ -38,6 +38,23 @@ export type CreateTicketDestinationParams =
 export type UpdateTicketDestinationParams =
   Schemas['V1UpdateTicketDestinationDto'];
 
+/** Explicit receiver contract for updating the original custom support case. */
+export type CustomTicketUpdateConfig =
+  | { mode: 'upsert'; responseIdPath?: string }
+  | {
+      mode: 'remote-id';
+      url: string;
+      method?: 'PUT' | 'PATCH';
+      responseIdPath: string;
+    };
+
+export type CustomTicketDestinationConfig = {
+  url: string;
+  method?: 'POST' | 'PUT';
+  headers?: Record<string, string>;
+  update?: CustomTicketUpdateConfig;
+};
+
 export type CreateActionPlanGroupParams = Schemas['CreateActionPlanGroupDto'];
 export type UpdateActionPlanGroupParams = Schemas['UpdateActionPlanGroupDto'];
 export type CreateActionPlanTaskParams = Schemas['CreateActionPlanTaskDto'];
