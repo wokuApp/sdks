@@ -1894,6 +1894,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/folders/{id}/pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Download the folder report as PDF
+         * @description PDF of the folder report over every woku, NPS, CSAT and CES tool of the folder and its subfolders, with a per-type breakdown on each native scale (no mixed rating distribution).
+         */
+        get: operations["V1FoldersController_getFolderPdf"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/folders/{id}/csv": {
         parameters: {
             query?: never;
@@ -3754,6 +3774,15 @@ export interface components {
             /** @example #3498db */
             color?: string;
         };
+        WhatsappAlertRecipientDTO: {
+            /**
+             * @description E.164 phone number without the leading +.
+             * @example 56912345678
+             */
+            whatsappId: string;
+            /** @example Ana (support) */
+            name: string;
+        };
         UpdateFolderBodyDTO: {
             name?: string;
             /**
@@ -3761,6 +3790,8 @@ export interface components {
              * @example #3498db
              */
             color?: string | null;
+            /** @description Replaces the WhatsApp numbers alerted when a comment of any tool in this folder is an improvement (wokus, NPS, CSAT, CES). Send [] to clear. */
+            whatsappAlertRecipients?: components["schemas"]["WhatsappAlertRecipientDTO"][];
         };
         MoveFolderBodyDTO: {
             /**
@@ -8515,6 +8546,38 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Folder not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1FoldersController_getFolderPdf: {
+        parameters: {
+            query?: {
+                /** @description Language of the PDF. Defaults to the report language. */
+                lang?: "es" | "en";
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description PDF file */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                };
             };
             /** @description Folder not found */
             404: {

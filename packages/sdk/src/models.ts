@@ -356,6 +356,13 @@ export type FolderOrigin =
   | 'journey-moment'
   | 'integration';
 
+/** A WhatsApp number that receives improvement alerts of a folder. */
+export interface WhatsappAlertRecipient {
+  /** E.164 phone number without the leading +. */
+  whatsappId: string;
+  name: string;
+}
+
 /** A folder with its breadcrumb path and subtree stats. */
 export interface Folder {
   id: string;
@@ -366,6 +373,8 @@ export interface Folder {
   path: string;
   /** System folder kind, `null` for a folder you created. */
   origin: FolderOrigin | null;
+  /** WhatsApp numbers alerted when a comment of any tool in the folder is an improvement. */
+  whatsappAlertRecipients: WhatsappAlertRecipient[];
   createdAt: string | null;
   stats: FolderStats;
 }

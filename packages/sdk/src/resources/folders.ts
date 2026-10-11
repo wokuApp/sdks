@@ -37,7 +37,10 @@ export class Folders {
     });
   }
 
-  /** Rename or recolor a folder (`color: null` clears the color). */
+  /**
+   * Rename or recolor a folder (`color: null` clears the color) and/or replace
+   * its WhatsApp alert recipients (`whatsappAlertRecipients`, `[]` clears them).
+   */
   update(
     id: string,
     body: UpdateFolderParams,

@@ -46,6 +46,7 @@ const folder = {
   parentFolderId: null,
   path: 'Post-sale',
   origin: null,
+  whatsappAlertRecipients: [],
   createdAt: null,
   stats: {
     toolCounts: { woku: 0, nps: 1, csat: 0, ces: 0 },
@@ -82,7 +83,11 @@ const cases: [string, string, string, string, (w: Woku) => Promise<unknown>][] =
       'PATCH',
       '/v1/folders/f1',
       '/v1/folders/{id}',
-      (w) => w.folders.update('f1', { color: null }),
+      (w) =>
+        w.folders.update('f1', {
+          color: null,
+          whatsappAlertRecipients: [{ whatsappId: '56912345678', name: 'Ana' }],
+        }),
     ],
     [
       'folders.move',

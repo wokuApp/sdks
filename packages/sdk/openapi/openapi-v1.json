@@ -6646,6 +6646,61 @@
         ]
       }
     },
+    "/v1/folders/{id}/pdf": {
+      "get": {
+        "description": "PDF of the folder report over every woku, NPS, CSAT and CES tool of the folder and its subfolders, with a per-type breakdown on each native scale (no mixed rating distribution).",
+        "operationId": "V1FoldersController_getFolderPdf",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          },
+          {
+            "name": "lang",
+            "required": false,
+            "in": "query",
+            "description": "Language of the PDF. Defaults to the report language.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "es",
+                "en"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PDF file",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Folder not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download the folder report as PDF",
+        "tags": [
+          "v1 - folders"
+        ]
+      }
+    },
     "/v1/folders/{id}/csv": {
       "get": {
         "description": "One row per response of every woku, NPS, CSAT and CES tool of the folder and its subfolders, with the native scale next to each score.",
@@ -11225,6 +11280,25 @@
           "name"
         ]
       },
+      "WhatsappAlertRecipientDTO": {
+        "type": "object",
+        "properties": {
+          "whatsappId": {
+            "type": "string",
+            "example": "56912345678",
+            "description": "E.164 phone number without the leading +."
+          },
+          "name": {
+            "type": "string",
+            "example": "Ana (support)",
+            "maxLength": 60
+          }
+        },
+        "required": [
+          "whatsappId",
+          "name"
+        ]
+      },
       "UpdateFolderBodyDTO": {
         "type": "object",
         "properties": {
@@ -11238,6 +11312,13 @@
             "nullable": true,
             "example": "#3498db",
             "description": "Hex color, or null to clear it."
+          },
+          "whatsappAlertRecipients": {
+            "description": "Replaces the WhatsApp numbers alerted when a comment of any tool in this folder is an improvement (wokus, NPS, CSAT, CES). Send [] to clear.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WhatsappAlertRecipientDTO"
+            }
           }
         }
       },

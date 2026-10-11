@@ -381,6 +381,12 @@ await woku.npsTools.move('nps_tool_id', { folderId: null });
 const report = await woku.folders.report(folder.id, { lang: 'en' });
 const csv: string = await woku.folders.csv(folder.id);
 
+// WhatsApp numbers alerted when a comment on any tool of the folder is an
+// improvement (wokus, NPS, CSAT and CES). The list replaces the previous one.
+await woku.folders.update(folder.id, {
+  whatsappAlertRecipients: [{ whatsappId: '56912345678', name: 'Ana' }],
+});
+
 // Deleting a folder never deletes its content: it moves up to the parent.
 await woku.folders.delete(folder.id);
 ```
