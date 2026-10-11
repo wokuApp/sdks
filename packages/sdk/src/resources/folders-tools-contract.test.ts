@@ -118,6 +118,13 @@ const cases: [string, string, string, string, (w: Woku) => Promise<unknown>][] =
       (w) => w.folders.csv('f1'),
     ],
     [
+      'folders.pdf',
+      'GET',
+      '/v1/folders/f1/pdf',
+      '/v1/folders/{id}/pdf',
+      (w) => w.folders.pdf('f1', { lang: 'en' }),
+    ],
+    [
       'tools.stats',
       'GET',
       '/v1/tools/stats',
@@ -189,6 +196,40 @@ describe('folders', () => {
     expect(seen[0]).toBeTruthy();
   });
 
+  it('pdf returns the raw bytes untouched and asks for application/pdf', async () => {
+    const bytes = new Uint8Array([0x25, 0x50, 0x44, 0x46, 0x00, 0xff, 0xfe]);
+    const seen: { url: string; accept: string }[] = [];
+    const fetch = vi.fn(
+      async (url: string, init: { headers: Record<string, string> }) => {
+        seen.push({ url, accept: init.headers.Accept });
+        return new Response(bytes, {
+          status: 200,
+          headers: { 'Content-Type': 'application/pdf' },
+        });
+      },
+    );
+    const woku = new Woku({
+      apiKey: 'sk_test',
+      fetch: fetch as never,
+      maxRetries: 0,
+    });
+
+    const pdf = await woku.folders.pdf('f1', { lang: 'es' });
+
+    expect(pdf).toBeInstanceOf(Uint8Array);
+    expect(Array.from(pdf)).toEqual(Array.from(bytes));
+    expect(seen[0].accept).toBe('application/pdf');
+    expect(new URL(seen[0].url).searchParams.get('lang')).toBe('es');
+  });
+
+  it('pdf still maps an error response to an API error', async () => {
+    const { woku } = client(() => ({
+      status: 404,
+      body: { error: { message: 'Folder not found' } },
+    }));
+    await expect(woku.folders.pdf('nope')).rejects.toThrow();
+  });
+
   it('csv returns the raw text', async () => {
     const { woku } = client(() => ({ body: 'Carpeta,Tipo\nViajes,NPS' }));
     expect(await woku.folders.csv('f1')).toBe('Carpeta,Tipo\nViajes,NPS');
@@ -255,6 +296,60 @@ describe('tools.list', () => {
     expect(ids).toEqual(['a', 'b', 'c']);
     expect(calls).toHaveLength(2);
     expect(page.hasNextPage()).toBe(true);
+  });
+
+  it('pages the folders with foldersLimit and foldersCursor', async () => {
+    const { woku, calls } = client((call) => {
+      const cursor = call.url.searchParams.get('foldersCursor');
+      if (!cursor)
+        return {
+          body: {
+            folders: [folder],
+            foldersNextCursor: 'fc1',
+            tools: [tool('a')],
+            nextCursor: null,
+            facets: { types: {} },
+          },
+        };
+      return {
+        body: {
+          folders: [{ ...folder, id: 'f2' }],
+          foldersNextCursor: null,
+          tools: [],
+          nextCursor: null,
+          facets: { types: {} },
+        },
+      };
+    });
+
+    const page = await woku.tools.list({ foldersLimit: 12 });
+    expect(calls[0].url.searchParams.get('foldersLimit')).toBe('12');
+    expect(page.hasMoreFolders()).toBe(true);
+
+    const more = await page.getMoreFolders();
+    expect(calls[1].url.searchParams.get('foldersCursor')).toBe('fc1');
+    expect(calls[1].url.searchParams.get('foldersLimit')).toBe('12');
+    expect(calls[1].url.searchParams.get('cursor')).toBeNull();
+    expect(more.folders.map((f) => f.id)).toEqual(['f2']);
+    expect(more.tools).toEqual([]);
+    expect(more.hasMoreFolders()).toBe(false);
+    expect(() => more.getMoreFolders()).toThrow(RangeError);
+  });
+
+  it('does not repeat the folders cursor when paging the tools', async () => {
+    const { woku, calls } = client((call) => ({
+      body: {
+        folders: [],
+        foldersNextCursor: null,
+        tools: [tool(call.url.searchParams.get('cursor') ? 'b' : 'a')],
+        nextCursor: call.url.searchParams.get('cursor') ? null : 'c1',
+        facets: { types: {} },
+      },
+    }));
+    const page = await woku.tools.list({ foldersLimit: 5 });
+    await page.getNextPage();
+    expect(calls[1].url.searchParams.get('cursor')).toBe('c1');
+    expect(calls[1].url.searchParams.get('foldersCursor')).toBeNull();
   });
 
   it('getNextPage throws when there is none', async () => {

@@ -105,4 +105,26 @@ export class Folders {
       opts,
     );
   }
+
+  /**
+   * PDF of the folder report (every woku, NPS, CSAT and CES tool of the folder
+   * and its subfolders) with a breakdown per type on each native scale.
+   * Returns the file bytes: write them to disk or send them as is.
+   */
+  pdf(
+    id: string,
+    params?: { lang?: 'es' | 'en' },
+    opts?: RequestOptions,
+  ): Promise<Uint8Array> {
+    return this.client.request<Uint8Array>(
+      'get',
+      `/v1/folders/${encodeURIComponent(id)}/pdf`,
+      {
+        ...opts,
+        headers: { Accept: 'application/pdf', ...opts?.headers },
+        query: { ...params, ...opts?.query },
+        binary: true,
+      },
+    );
+  }
 }

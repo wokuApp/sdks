@@ -364,6 +364,14 @@ for await (const tool of page) {
 }
 const found = await woku.tools.list({ q: 'delivery', scope: 'company' });
 
+// "See more" for folders: foldersLimit pages the folders of the level (omit it
+// to receive all of them). The tools keep their own cursor.
+const first = await woku.tools.list({ foldersLimit: 12 });
+if (first.hasMoreFolders()) {
+  const more = await first.getMoreFolders(); // only the next folders, no tools
+  console.log(more.folders.length);
+}
+
 // Headline figures per type (native scales, never mixed), company or folder.
 const stats = await woku.tools.stats({ folderId: folder.id });
 
@@ -380,6 +388,8 @@ await woku.npsTools.move('nps_tool_id', { folderId: null });
 // AI report and CSV over every tool of the folder and its subfolders.
 const report = await woku.folders.report(folder.id, { lang: 'en' });
 const csv: string = await woku.folders.csv(folder.id);
+// PDF of that report with a breakdown per type (bytes, e.g. write them to a file).
+const pdf: Uint8Array = await woku.folders.pdf(folder.id, { lang: 'en' });
 
 // WhatsApp numbers alerted when a comment on any tool of the folder is an
 // improvement (wokus, NPS, CSAT and CES). The list replaces the previous one.

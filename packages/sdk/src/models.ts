@@ -384,6 +384,8 @@ export interface Folder {
 /** One page of `tools.list`: folders, tools, facet counts and the cursor. */
 export interface ToolItemsPageResponse {
   folders: Folder[];
+  /** Cursor of the next page of folders; null when they were all returned. */
+  foldersNextCursor: string | null;
   tools: ToolItem[];
   nextCursor: string | null;
   facets: { types: Record<ToolType, number> };

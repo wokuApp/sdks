@@ -22,6 +22,8 @@ export type FetchLike = (
   status: number;
   headers: { get(name: string): string | null };
   text(): Promise<string>;
+  /** Needed only by binary downloads such as the folder PDF. */
+  arrayBuffer?(): Promise<ArrayBuffer>;
 }>;
 
 export interface WokuClientOptions {
@@ -53,6 +55,11 @@ interface RequestArgs extends RequestOptions {
    * (send/approve/test) so they are never silently replayed.
    */
   idempotent?: boolean;
+  /**
+   * Return a successful response as raw bytes (`Uint8Array`) instead of parsed
+   * JSON. Error responses are still parsed and mapped to API errors.
+   */
+  binary?: boolean;
 }
 
 const DEFAULT_BASE_URL = 'https://clientapi.woku.app';
@@ -182,13 +189,14 @@ export class WokuClient {
           bodyText,
           timeout,
           args.signal,
+          args.binary,
         );
         if (status >= 200 && status < 300) {
           return body as T;
         }
         const apiError = WokuAPIError.from(
           status,
-          body,
+          body as WokuErrorBody | string | undefined,
           requestId,
           retryAfterSeconds,
         );
@@ -323,9 +331,10 @@ export class WokuClient {
     body: string | FormData | undefined,
     timeout: number,
     signal?: AbortSignal,
+    binary?: boolean,
   ): Promise<{
     status: number;
-    body: WokuErrorBody | string | undefined;
+    body: WokuErrorBody | string | Uint8Array | undefined;
     requestId?: string;
     retryAfterSeconds?: number;
   }> {
@@ -350,6 +359,20 @@ export class WokuClient {
         body,
         signal: controller.signal,
       });
+      if (binary && response.status >= 200 && response.status < 300) {
+        if (!response.arrayBuffer) {
+          throw new WokuError(
+            'The fetch implementation cannot read binary responses.',
+            { code: 'config_error' },
+          );
+        }
+        return {
+          status: response.status,
+          body: new Uint8Array(await response.arrayBuffer()),
+          requestId: requestIdFrom(response.headers),
+          retryAfterSeconds: retryAfterFromHeaders(response.headers),
+        };
+      }
       const text = await response.text();
       return {
         status: response.status,
