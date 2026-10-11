@@ -1,5 +1,21 @@
 # @wokuapp/sdk
 
+## 0.4.0
+
+### Minor Changes
+
+- 7f50ee3: Add authorized read-only follow-up conversations and typed ticket evidence
+  metadata to the management SDK. Preserve explicit standalone/Flow capture
+  provenance in mobile and widget submissions, and keep historical offline
+  payloads and IDs unchanged during replay.
+
+  Add explicit typed custom HTTP destination update contracts, retaining receiver
+  event/case identity and original remote references.
+
+- fecc584: Type the follow-up WhatsApp `line`, each message's `phase` (survey prelude or
+  follow-up), the files the customer sent (`attachments`, with `adminUrl`) and
+  the files the summary cites (`summaryCitations`) on `followUps.get`.
+
 ## 0.3.0
 
 ### Minor Changes
