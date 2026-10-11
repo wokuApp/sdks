@@ -1,5 +1,17 @@
 # @wokuapp/react-native
 
+## 0.3.0
+
+### Minor Changes
+
+- 7f50ee3: Add authorized read-only follow-up conversations and typed ticket evidence
+  metadata to the management SDK. Preserve explicit standalone/Flow capture
+  provenance in mobile and widget submissions, and keep historical offline
+  payloads and IDs unchanged during replay.
+
+  Add explicit typed custom HTTP destination update contracts, retaining receiver
+  event/case identity and original remote references.
+
 ## 0.2.0
 
 - Reject malformed persisted queue rows without losing their stored contents.
