@@ -4051,6 +4051,55 @@
         "tags": [
           "v1 - flows"
         ]
+      },
+      "post": {
+        "description": "Steps can be wokus and NPS, CSAT or CES tools of your company, in any order, each at most once (maximum 20). A flow lives outside folders.",
+        "operationId": "V1FlowsController_createFlow",
+        "parameters": [
+          {
+            "name": "X-Woku-Idempotency-Key",
+            "in": "header",
+            "description": "Client-generated key to make the create safe to retry. A retry with the same key returns the original result instead of creating again.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFlowBodyDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Flow created"
+          },
+          "400": {
+            "description": "Validation error or a step is not a tool of your company",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a flow of ordered steps",
+        "tags": [
+          "v1 - flows"
+        ]
       }
     },
     "/v1/flows/{id}": {
@@ -4084,7 +4133,79 @@
             "bearer": []
           }
         ],
-        "summary": "Get the data of a flow (wokus in order, branding, linked NPS)",
+        "summary": "Get the data of a flow (ordered steps with their tools, wokus, branding)",
+        "tags": [
+          "v1 - flows"
+        ]
+      },
+      "patch": {
+        "operationId": "V1FlowsController_updateFlow",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateFlowBodyDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Flow updated"
+          },
+          "404": {
+            "description": "Flow not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Rename a flow or replace its steps",
+        "tags": [
+          "v1 - flows"
+        ]
+      },
+      "delete": {
+        "operationId": "V1FlowsController_deleteFlow",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Flow deleted"
+          },
+          "404": {
+            "description": "Flow not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete a flow (its tools and responses stay)",
         "tags": [
           "v1 - flows"
         ]
@@ -8900,6 +9021,71 @@
           "anonymous",
           "answers"
         ]
+      },
+      "FlowStepBodyDTO": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "woku",
+              "nps",
+              "csat",
+              "ces"
+            ],
+            "description": "Kind of tool the respondent answers in this step."
+          },
+          "toolId": {
+            "type": "string",
+            "format": "ObjectId",
+            "description": "Tool id (woku, NPS tool, CSAT tool or CES tool). For an nps step, your company id means the company-level NPS."
+          }
+        },
+        "required": [
+          "type",
+          "toolId"
+        ]
+      },
+      "CreateFlowBodyDTO": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 140,
+            "example": "Post-purchase journey"
+          },
+          "steps": {
+            "minItems": 1,
+            "maxItems": 20,
+            "description": "Ordered steps. A tool can appear once. Flows live outside folders.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FlowStepBodyDTO"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "steps"
+        ]
+      },
+      "UpdateFlowBodyDTO": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 140
+          },
+          "steps": {
+            "minItems": 1,
+            "maxItems": 20,
+            "description": "The new full ordered list of steps.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FlowStepBodyDTO"
+            }
+          }
+        }
       },
       "NpsToolLocalizedContentBodyDTO": {
         "type": "object",

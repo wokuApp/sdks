@@ -13,6 +13,9 @@ export type SearchEntitiesByTrackersParams =
 export type AssignTrackerByNameParams =
   Schemas['AssignExternalTrackerByNameDTO'];
 
+export type CreateFlowParams = Schemas['CreateFlowBodyDTO'];
+export type UpdateFlowParams = Schemas['UpdateFlowBodyDTO'];
+
 export type CreateFolderParams = Schemas['CreateFolderBodyDTO'];
 export type UpdateFolderParams = Schemas['UpdateFolderBodyDTO'];
 export type MoveToolItemsParams = Schemas['MoveToolItemsBodyDTO'];

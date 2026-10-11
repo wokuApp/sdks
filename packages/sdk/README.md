@@ -313,6 +313,32 @@ available if re-enabled later.
 Existing definitions retain their contract; create a new v2 journey to adopt these
 rules. Current participations retain their original definition version.
 
+### Flows
+
+A flow is an ordered sequence of steps, each a woku or an NPS, CSAT or CES tool,
+that a respondent answers one after the other. Flows live outside folders.
+
+```ts
+const flow = await woku.flows.create({
+  name: 'Post-purchase',
+  steps: [
+    { type: 'nps', toolId: 'nps_tool_id' },
+    { type: 'csat', toolId: 'csat_tool_id' },
+    { type: 'woku', toolId: 'woku_id' },
+  ],
+});
+await woku.flows.update(flow._id, {
+  steps: [{ type: 'csat', toolId: 'csat_tool_id' }],
+});
+for await (const f of await woku.flows.list())
+  console.log(f.name, f.steps.length);
+await woku.flows.delete(flow._id); // its tools and responses stay
+```
+
+Use 1 to 20 steps, each tool once and all of your company. For an `nps` step,
+your company id as `toolId` means the company-level NPS. `flows.get(id)` returns
+the flow data (steps with their tools, wokus and branding).
+
 ### Folders and tools
 
 One folder tree holds wokus and NPS, CSAT and CES tools together. Create folders,

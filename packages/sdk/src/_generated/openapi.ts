@@ -1284,7 +1284,11 @@ export interface paths {
         /** List the flows of the caller company (paginated) */
         get: operations["V1FlowsController_listFlows"];
         put?: never;
-        post?: never;
+        /**
+         * Create a flow of ordered steps
+         * @description Steps can be wokus and NPS, CSAT or CES tools of your company, in any order, each at most once (maximum 20). A flow lives outside folders.
+         */
+        post: operations["V1FlowsController_createFlow"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1298,14 +1302,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get the data of a flow (wokus in order, branding, linked NPS) */
+        /** Get the data of a flow (ordered steps with their tools, wokus, branding) */
         get: operations["V1FlowsController_getFlow"];
         put?: never;
         post?: never;
-        delete?: never;
+        /** Delete a flow (its tools and responses stay) */
+        delete: operations["V1FlowsController_deleteFlow"];
         options?: never;
         head?: never;
-        patch?: never;
+        /** Rename a flow or replace its steps */
+        patch: operations["V1FlowsController_updateFlow"];
         trace?: never;
     };
     "/v1/nps-tools": {
@@ -2921,6 +2927,29 @@ export interface components {
              * @example a1b2c3d4-...
              */
             dispatchToken?: string;
+        };
+        FlowStepBodyDTO: {
+            /**
+             * @description Kind of tool the respondent answers in this step.
+             * @enum {string}
+             */
+            type: "woku" | "nps" | "csat" | "ces";
+            /**
+             * Format: ObjectId
+             * @description Tool id (woku, NPS tool, CSAT tool or CES tool). For an nps step, your company id means the company-level NPS.
+             */
+            toolId: string;
+        };
+        CreateFlowBodyDTO: {
+            /** @example Post-purchase journey */
+            name: string;
+            /** @description Ordered steps. A tool can appear once. Flows live outside folders. */
+            steps: components["schemas"]["FlowStepBodyDTO"][];
+        };
+        UpdateFlowBodyDTO: {
+            name?: string;
+            /** @description The new full ordered list of steps. */
+            steps?: components["schemas"]["FlowStepBodyDTO"][];
         };
         NpsToolLocalizedContentBodyDTO: {
             /**
@@ -6638,6 +6667,40 @@ export interface operations {
             };
         };
     };
+    V1FlowsController_createFlow: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Client-generated key to make the create safe to retry. A retry with the same key returns the original result instead of creating again. */
+                "X-Woku-Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateFlowBodyDTO"];
+            };
+        };
+        responses: {
+            /** @description Flow created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation error or a step is not a tool of your company */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+        };
+    };
     V1FlowsController_getFlow: {
         parameters: {
             query?: never;
@@ -6659,6 +6722,64 @@ export interface operations {
             };
             /** @description Flow does not belong to the caller company */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Flow not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1FlowsController_deleteFlow: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Flow deleted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Flow not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1FlowsController_updateFlow: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateFlowBodyDTO"];
+            };
+        };
+        responses: {
+            /** @description Flow updated */
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };

@@ -329,3 +329,102 @@ describe('journey folders', () => {
     expect((await woku.folders.list())[0].origin).toBe('journey');
   });
 });
+
+describe('flows with steps', () => {
+  const steps = [
+    { type: 'nps', toolId: 'n1' },
+    { type: 'csat', toolId: 'c1' },
+    { type: 'woku', toolId: 'w1' },
+  ] as const;
+
+  const flowCases: [
+    string,
+    string,
+    string,
+    string,
+    (w: Woku) => Promise<unknown>,
+  ][] = [
+    ['flows.list', 'GET', '/v1/flows', '/v1/flows', (w) => w.flows.list()],
+    [
+      'flows.get',
+      'GET',
+      '/v1/flows/fl1',
+      '/v1/flows/{id}',
+      (w) => w.flows.get('fl1'),
+    ],
+    [
+      'flows.create',
+      'POST',
+      '/v1/flows',
+      '/v1/flows',
+      (w) => w.flows.create({ name: 'Post-purchase', steps: [...steps] }),
+    ],
+    [
+      'flows.update',
+      'PATCH',
+      '/v1/flows/fl1',
+      '/v1/flows/{id}',
+      (w) => w.flows.update('fl1', { steps: [...steps] }),
+    ],
+    [
+      'flows.delete',
+      'DELETE',
+      '/v1/flows/fl1',
+      '/v1/flows/{id}',
+      (w) => w.flows.delete('fl1'),
+    ],
+  ];
+
+  it.each(flowCases)(
+    '%s matches the public operation',
+    async (_n, method, path, specPath, invoke) => {
+      expect(operations[specPath]?.[method.toLowerCase()]).toBeTruthy();
+      const { woku, calls } = client(() => ({
+        body: { data: [], total: 0, page: 1, limit: 20 },
+      }));
+      await invoke(woku);
+      expect(calls[0].method).toBe(method);
+      expect(calls[0].url.pathname).toBe(path);
+    },
+  );
+
+  it('create sends the ordered steps with an idempotency key', async () => {
+    const seen: { key?: string; body?: unknown }[] = [];
+    const fetch = vi.fn(
+      async (
+        _u: string,
+        init: { headers: Record<string, string>; body?: string },
+      ) => {
+        seen.push({
+          key: init.headers['X-Woku-Idempotency-Key'],
+          body: JSON.parse(init.body ?? '{}'),
+        });
+        return new Response(
+          JSON.stringify({ _id: 'fl1', name: 'Post-purchase', steps }),
+          { status: 201 },
+        );
+      },
+    );
+    const woku = new Woku({ apiKey: 'sk_test', fetch: fetch as never });
+    const flow = await woku.flows.create({
+      name: 'Post-purchase',
+      steps: [...steps],
+    });
+    expect(seen[0].key).toBeTruthy();
+    expect(seen[0].body).toEqual({ name: 'Post-purchase', steps });
+    expect(flow.steps.map((s) => s.type)).toEqual(['nps', 'csat', 'woku']);
+  });
+
+  it('list pages expose steps on each flow', async () => {
+    const { woku } = client(() => ({
+      body: {
+        data: [{ _id: 'fl1', name: 'A', steps }],
+        total: 1,
+        page: 1,
+        limit: 20,
+      },
+    }));
+    const page = await woku.flows.list();
+    expect(page.data[0].steps).toHaveLength(3);
+  });
+});

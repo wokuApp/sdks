@@ -411,3 +411,24 @@ export interface JourneyFoldersStatus {
   /** Journeys and tools still without a folder. */
   pending: { journeys: number; tools: number };
 }
+
+/** One step of a flow: the tool the respondent answers at that point. */
+export interface FlowStep {
+  type: ToolType;
+  /** Tool id. For an `nps` step, your company id means the company-level NPS. */
+  toolId: string;
+}
+
+/** A survey flow: an ordered sequence of woku, NPS, CSAT and CES steps. */
+export interface Flow {
+  _id: string;
+  name: string;
+  /** Ordered steps. Flows live outside folders. */
+  steps: FlowStep[];
+  /** Woku ids of the `woku` steps, in order (kept for compatibility). */
+  wokusIds?: string[];
+  npsToolId?: string | null;
+  companyIdNps?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+}
