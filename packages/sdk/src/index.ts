@@ -37,4 +37,8 @@ export * from './resources/journeys';
 
 export * from './resources/media';
 
+export { Folders } from './resources/folders';
+export { Tools, ToolsPage } from './resources/tools';
+export type { ListToolsParams } from './resources/tools';
+
 export { FollowUps } from './resources/follow-ups';

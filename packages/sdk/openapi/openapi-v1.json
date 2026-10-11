@@ -4541,6 +4541,49 @@
         ]
       }
     },
+    "/v1/nps-tools/{id}/move": {
+      "patch": {
+        "operationId": "V1NpsToolsController_moveNpsTool",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveToolBodyDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "NPS tool moved"
+          },
+          "404": {
+            "description": "Tool or folder not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Move a NPS tool into a folder, or to the root (folderId: null)",
+        "tags": [
+          "v1 - nps-tools"
+        ]
+      }
+    },
     "/v1/csat-tools/{id}": {
       "patch": {
         "operationId": "V1CsatToolsController_updateCsatTool",
@@ -4625,6 +4668,49 @@
         ]
       }
     },
+    "/v1/csat-tools/{id}/move": {
+      "patch": {
+        "operationId": "V1CsatToolsController_moveCsatTool",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveToolBodyDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Csat tool moved"
+          },
+          "404": {
+            "description": "Tool or folder not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Move a Csat tool into a folder, or to the root (folderId: null)",
+        "tags": [
+          "v1 - csat-tools"
+        ]
+      }
+    },
     "/v1/ces-tools/{id}": {
       "patch": {
         "operationId": "V1CesToolsController_updateCesTool",
@@ -4704,6 +4790,49 @@
           }
         ],
         "summary": "Delete a CES tool definition and all its responses",
+        "tags": [
+          "v1 - ces-tools"
+        ]
+      }
+    },
+    "/v1/ces-tools/{id}/move": {
+      "patch": {
+        "operationId": "V1CesToolsController_moveCesTool",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveToolBodyDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ces tool moved"
+          },
+          "404": {
+            "description": "Tool or folder not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Move a Ces tool into a folder, or to the root (folderId: null)",
         "tags": [
           "v1 - ces-tools"
         ]
@@ -6138,6 +6267,573 @@
         "summary": "Emit one of your own events",
         "tags": [
           "v1 - journeys"
+        ]
+      }
+    },
+    "/v1/folders": {
+      "get": {
+        "description": "Every folder of the company, or only the direct subfolders of `parentFolderId`. Each folder carries its breadcrumb `path` and subtree stats (tools per type, subfolders, reviews).",
+        "operationId": "V1FoldersController_listFolders",
+        "parameters": [
+          {
+            "name": "parentFolderId",
+            "required": false,
+            "in": "query",
+            "description": "List only the direct subfolders of this folder. Omit to list every folder of the company.",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Case and accent insensitive match on the folder name.",
+            "schema": {
+              "maxLength": 100,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Folders"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List folders",
+        "tags": [
+          "v1 - folders"
+        ]
+      },
+      "post": {
+        "operationId": "V1FoldersController_createFolder",
+        "parameters": [
+          {
+            "name": "X-Woku-Idempotency-Key",
+            "in": "header",
+            "description": "Client-generated key to make the create safe to retry. A retry with the same key returns the original result instead of creating again.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFolderBodyDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Folder created"
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Parent folder not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a folder",
+        "tags": [
+          "v1 - folders"
+        ]
+      }
+    },
+    "/v1/folders/{id}": {
+      "get": {
+        "operationId": "V1FoldersController_getFolder",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Folder"
+          },
+          "404": {
+            "description": "Folder not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a folder with its stats",
+        "tags": [
+          "v1 - folders"
+        ]
+      },
+      "patch": {
+        "operationId": "V1FoldersController_updateFolder",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateFolderBodyDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Folder updated"
+          },
+          "404": {
+            "description": "Folder not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Rename or recolor a folder",
+        "tags": [
+          "v1 - folders"
+        ]
+      },
+      "delete": {
+        "description": "The folder is removed; its subfolders, wokus and NPS, CSAT and CES tools move up to the parent folder (or the root). Nothing inside is deleted.",
+        "operationId": "V1FoldersController_deleteFolder",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Folder deleted"
+          },
+          "404": {
+            "description": "Folder not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete a folder",
+        "tags": [
+          "v1 - folders"
+        ]
+      }
+    },
+    "/v1/folders/{id}/report": {
+      "get": {
+        "description": "AI report over every woku, NPS, CSAT and CES tool of the folder and its subfolders (recognitions, improvements, word cloud and summary). Rating scales differ per type, so no rating distribution is returned. A folder with no tools or fewer than two commented responses returns an empty report, not an error.",
+        "operationId": "V1FoldersController_getFolderReport",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          },
+          {
+            "name": "regenerate",
+            "required": false,
+            "in": "query",
+            "description": "Regenerate the report even if the number of reviews did not change.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "lang",
+            "required": false,
+            "in": "query",
+            "description": "Language of the report narrative.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "es",
+                "en"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Folder report"
+          },
+          "404": {
+            "description": "Folder not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get the folder report",
+        "tags": [
+          "v1 - folders"
+        ]
+      }
+    },
+    "/v1/folders/{id}/csv": {
+      "get": {
+        "description": "One row per response of every woku, NPS, CSAT and CES tool of the folder and its subfolders, with the native scale next to each score.",
+        "operationId": "V1FoldersController_getFolderCsv",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "CSV file",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Folder not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download the folder responses as CSV",
+        "tags": [
+          "v1 - folders"
+        ]
+      }
+    },
+    "/v1/folders/{id}/move": {
+      "patch": {
+        "operationId": "V1FoldersController_moveFolder",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveFolderBodyDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Folder moved"
+          },
+          "400": {
+            "description": "A folder cannot move into itself or one of its subfolders",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Folder not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Move a folder under another folder, or to the root",
+        "tags": [
+          "v1 - folders"
+        ]
+      }
+    },
+    "/v1/tools": {
+      "get": {
+        "description": "Lists one folder level (`folderId`, root by default) or the whole company (`scope=company`). A search (`q`) is company-wide and also returns matching folders. Items of every type (woku, nps, csat, ces) come in one cursor-paginated list, with facet counts per type.",
+        "operationId": "V1ToolsController_listTools",
+        "parameters": [
+          {
+            "name": "scope",
+            "required": false,
+            "in": "query",
+            "description": "`level` (default) lists one folder level; `company` is a flat list of every tool of the company.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "level",
+                "company"
+              ]
+            }
+          },
+          {
+            "name": "types",
+            "required": false,
+            "in": "query",
+            "description": "Comma separated tool types: woku, nps, csat, ces.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Case and accent insensitive search over names and questions. A search is company-wide and also matches folder names.",
+            "schema": {
+              "maxLength": 100,
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "name",
+              "type": "string",
+              "enum": [
+                "name",
+                "-name",
+                "created",
+                "-created"
+              ]
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Opaque `nextCursor` of the previous page.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+              "type": "number"
+            }
+          },
+          {
+            "name": "createdFrom",
+            "required": false,
+            "in": "query",
+            "description": "Only tools created on or after this date (ISO 8601).",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "name": "createdTo",
+            "required": false,
+            "in": "query",
+            "description": "Only tools created on or before this date (ISO 8601).",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "name": "folderId",
+            "required": false,
+            "in": "query",
+            "description": "Folder whose direct content is listed. Omit for the root. Ignored when `scope=company` or when searching.",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Folders, tools and facets"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List and search tools and folders",
+        "tags": [
+          "v1 - tools"
+        ]
+      }
+    },
+    "/v1/tools/stats": {
+      "get": {
+        "description": "Reviews and the native-scale headline of each type (woku stars, NPS score, CSAT satisfied %, CES mean) for the whole company or one folder and its subfolders. Scales are never mixed. A type that fails to compute reports `{ error: true }` and the others stay valid.",
+        "operationId": "V1ToolsController_getToolsStats",
+        "parameters": [
+          {
+            "name": "folderId",
+            "required": false,
+            "in": "query",
+            "description": "Scope the figures to this folder and its subfolders. Omit for the whole company.",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "description": "Only responses on or after this date (ISO 8601).",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "description": "Only responses on or before this date (ISO 8601).",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Figures per type"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Headline figures per tool type",
+        "tags": [
+          "v1 - tools"
+        ]
+      }
+    },
+    "/v1/tools/move": {
+      "post": {
+        "description": "Moves items of mixed types (woku, nps, csat, ces, folder) in one call. It is idempotent: moving items to where they already are succeeds. Nothing moves if one item is missing.",
+        "operationId": "V1ToolsController_moveTools",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveToolItemsBodyDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Items moved"
+          },
+          "400": {
+            "description": "Invalid move (for example a folder into its own subtree)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Folder or item not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Move tools and folders into a folder, or to the root",
+        "tags": [
+          "v1 - tools"
         ]
       }
     },
@@ -8193,6 +8889,11 @@
       "CreateNpsToolBodyDTO": {
         "type": "object",
         "properties": {
+          "folderId": {
+            "type": "string",
+            "description": "Folder to create the tool in. Must belong to your company. Omit for the root.",
+            "format": "ObjectId"
+          },
           "name": {
             "type": "string",
             "description": "Tool name for identification.",
@@ -8289,6 +8990,20 @@
           }
         }
       },
+      "MoveToolBodyDTO": {
+        "type": "object",
+        "properties": {
+          "folderId": {
+            "type": "string",
+            "nullable": true,
+            "format": "ObjectId",
+            "description": "Target folder id, or null to move the tool to the root."
+          }
+        },
+        "required": [
+          "folderId"
+        ]
+      },
       "CsatToolLocalizedContentBodyDTO": {
         "type": "object",
         "properties": {
@@ -8322,6 +9037,11 @@
       "CreateCsatToolBodyDTO": {
         "type": "object",
         "properties": {
+          "folderId": {
+            "type": "string",
+            "description": "Folder to create the tool in. Must belong to your company. Omit for the root.",
+            "format": "ObjectId"
+          },
           "name": {
             "type": "string",
             "description": "Tool name for identification.",
@@ -8447,6 +9167,11 @@
       "CreateCesToolBodyDTO": {
         "type": "object",
         "properties": {
+          "folderId": {
+            "type": "string",
+            "description": "Folder to create the tool in. Must belong to your company. Omit for the root.",
+            "format": "ObjectId"
+          },
           "name": {
             "type": "string",
             "description": "Tool name for identification.",
@@ -10244,6 +10969,104 @@
         },
         "required": [
           "journeys"
+        ]
+      },
+      "CreateFolderBodyDTO": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 30,
+            "example": "Post-sale"
+          },
+          "parentFolderId": {
+            "type": "string",
+            "format": "ObjectId",
+            "description": "Parent folder. Omit to create the folder at the root."
+          },
+          "color": {
+            "type": "string",
+            "example": "#3498db"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "UpdateFolderBodyDTO": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 30
+          },
+          "color": {
+            "type": "string",
+            "nullable": true,
+            "example": "#3498db",
+            "description": "Hex color, or null to clear it."
+          }
+        }
+      },
+      "MoveFolderBodyDTO": {
+        "type": "object",
+        "properties": {
+          "parentFolderId": {
+            "type": "string",
+            "nullable": true,
+            "format": "ObjectId",
+            "description": "New parent folder, or null to move the folder to the root. A folder cannot move into itself or one of its subfolders."
+          }
+        },
+        "required": [
+          "parentFolderId"
+        ]
+      },
+      "MoveItemDTO": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "woku",
+              "nps",
+              "csat",
+              "ces",
+              "folder"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "format": "ObjectId"
+          }
+        },
+        "required": [
+          "type",
+          "id"
+        ]
+      },
+      "MoveToolItemsBodyDTO": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "maxItems": 200,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MoveItemDTO"
+            }
+          },
+          "folderId": {
+            "type": "string",
+            "format": "ObjectId",
+            "nullable": true,
+            "description": "Destination folder. `null` moves the items to the root."
+          }
+        },
+        "required": [
+          "items",
+          "folderId"
         ]
       },
       "JourneyEntryInfoDto": {

@@ -39,6 +39,8 @@ interface ToolLocalizedContent {
 /** NPS tool definition (curated, no internal fields). */
 export interface NpsTool {
   _id: string;
+  /** Folder the tool lives in, `null` at the root. */
+  folderId?: string | null;
   name: string;
   npsMessage: string;
   audienceType?: string;
@@ -51,6 +53,8 @@ export interface NpsTool {
 /** CSAT tool definition (curated). */
 export interface CsatTool {
   _id: string;
+  /** Folder the tool lives in, `null` at the root. */
+  folderId?: string | null;
   name: string;
   question: string;
   subject?: string;
@@ -63,6 +67,8 @@ export interface CsatTool {
 /** CES tool definition (curated). */
 export interface CesTool {
   _id: string;
+  /** Folder the tool lives in, `null` at the root. */
+  folderId?: string | null;
   name: string;
   question: string;
   action?: string;
@@ -309,3 +315,76 @@ export interface ApiKeyResult {
   secretKey: string;
   [key: string]: unknown;
 }
+
+/** Kinds of item the Tools view mixes. */
+export type ToolType = 'woku' | 'nps' | 'csat' | 'ces';
+
+/** Headline figure of a tool, always in its native scale (scales are never mixed). */
+export interface ToolHeadline {
+  kind: 'stars' | 'nps' | 'csat' | 'ces';
+  /** Stars 1-5, NPS -100..100, CSAT satisfied %, CES mean 1-5. `null` without responses. */
+  value: number | null;
+  scale: string;
+}
+
+/** A woku, NPS, CSAT or CES tool as listed by `tools.list`. */
+export interface ToolItem {
+  type: ToolType;
+  id: string;
+  name: string;
+  folderId: string | null;
+  createdAt: string | null;
+  reviewCount: number;
+  lastResponseAt: string | null;
+  headline: ToolHeadline;
+}
+
+/** Subtree figures of a folder. */
+export interface FolderStats {
+  toolCounts: Record<ToolType, number>;
+  subfolderCount: number;
+  reviewCount: number;
+}
+
+/** A folder with its breadcrumb path and subtree stats. */
+export interface Folder {
+  id: string;
+  name: string;
+  color: string | null;
+  parentFolderId: string | null;
+  /** Breadcrumb from the root, for example `Journeys > Post-sale`. */
+  path: string;
+  createdAt: string | null;
+  stats: FolderStats;
+}
+
+/** One page of `tools.list`: folders, tools, facet counts and the cursor. */
+export interface ToolItemsPageResponse {
+  folders: Folder[];
+  tools: ToolItem[];
+  nextCursor: string | null;
+  facets: { types: Record<ToolType, number> };
+}
+
+/** Headline figures of one tool type for the company or a folder. */
+export interface ToolTypeStats {
+  toolCount: number;
+  reviewCount: number;
+  headline: ToolHeadline;
+  lastResponseAt: string | null;
+  /** NPS only. */
+  distribution?: { promoters: number; passives: number; detractors: number };
+}
+
+/** A type that failed to compute reports `{ error: true }`; the others stay valid. */
+export type ToolsStats = Record<ToolType, ToolTypeStats | { error: true }>;
+
+/** Result of `tools.move` and `folders.move` batches. */
+export interface MoveResult {
+  moved: number;
+  folderId: string | null;
+  items: { type: ToolType | 'folder'; id: string }[];
+}
+
+/** The CSV of a folder: the raw text, one row per response. */
+export type FolderCsv = string;

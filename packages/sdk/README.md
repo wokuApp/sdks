@@ -313,9 +313,59 @@ available if re-enabled later.
 Existing definitions retain their contract; create a new v2 journey to adopt these
 rules. Current participations retain their original definition version.
 
+### Folders and tools
+
+One folder tree holds wokus and NPS, CSAT and CES tools together. Create folders,
+find any tool, read figures per type and move things in batches:
+
+```ts
+const folder = await woku.folders.create({ name: 'Post-sale' });
+
+// Create a tool already inside a folder.
+await woku.csatTools.create({
+  name: 'Delivery',
+  question: 'How satisfied are you with your delivery?',
+  folderId: folder.id,
+});
+
+// One list for every tool type. Iterate across pages with the cursor.
+const page = await woku.tools.list({
+  folderId: folder.id,
+  types: ['csat', 'nps'],
+});
+for await (const tool of page) {
+  console.log(tool.type, tool.name, tool.reviewCount, tool.headline.value);
+}
+const found = await woku.tools.list({ q: 'delivery', scope: 'company' });
+
+// Headline figures per type (native scales, never mixed), company or folder.
+const stats = await woku.tools.stats({ folderId: folder.id });
+
+// Move items of mixed types, or send them to the root with folderId: null.
+await woku.tools.move({
+  items: [
+    { type: 'csat', id: 'csat_tool_id' },
+    { type: 'woku', id: 'woku_id' },
+  ],
+  folderId: folder.id,
+});
+await woku.npsTools.move('nps_tool_id', { folderId: null });
+
+// AI report and CSV over every tool of the folder and its subfolders.
+const report = await woku.folders.report(folder.id, { lang: 'en' });
+const csv: string = await woku.folders.csv(folder.id);
+
+// Deleting a folder never deletes its content: it moves up to the parent.
+await woku.folders.delete(folder.id);
+```
+
+`woku.folders` also has `list`, `get`, `update` and `move`. NPS, CSAT and CES
+tools (`npsTools`, `csatTools`, `cesTools`) accept `folderId` on `create`, expose
+`folderId` on every tool and have `move(id, { folderId })`.
+
 ## Pagination
 
-Paginated resource methods return a `Page` (journey enrollments use the cursor envelope described above). Iterate every item across pages, or walk pages:
+Paginated resource methods return a `Page` (journey enrollments and `tools.list` use a cursor envelope). Iterate every item across pages, or walk pages:
 
 ```ts
 for await (const ticket of await woku.tickets.list({ severity: 'high' })) {
@@ -376,7 +426,7 @@ await woku.npsTools.create(body, { idempotencyKey: 'my-key' });
 `trackers`, `npsTools` / `csatTools` / `cesTools`, `nps` / `csat` / `ces`,
 `wokus`, `forms`, `flows`, `actionPlans`, `actionPlanGroups`, `tickets`,
 `ticketDestinations`, `dispatches`, `reports`, `company`, `quarantines`,
-`journeys`.
+`journeys`, `folders`, `tools`.
 
 ## License
 
