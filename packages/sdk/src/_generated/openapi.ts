@@ -1985,6 +1985,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/journey-folders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the journey folder organization status
+         * @description Whether the company organizes its journeys in folders (Viajes > journey > moment), when the one-off organization finished, whether it is running and how many journeys and tools are still without a folder.
+         */
+        get: operations["V1JourneyFoldersController_getJourneyFolders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/journey-folders/organize": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Organize the journeys in folders
+         * @description Switches the organization on and runs the one-off pass in the background: tools of existing journeys that have no folder move into Viajes > journey > moment, and tools journeys create from now on are placed there. Tools that already have a folder are never touched; moving or renaming the folders never breaks a journey. Check the status for progress.
+         */
+        post: operations["V1JourneyFoldersController_organizeJourneyFolders"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/journey-entries/{journeyId}": {
         parameters: {
             query?: never;
@@ -8524,6 +8564,49 @@ export interface operations {
             };
             /** @description Folder or item not found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1JourneyFoldersController_getJourneyFolders: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Status */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1JourneyFoldersController_organizeJourneyFolders: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Organization started */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Already organizing */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };

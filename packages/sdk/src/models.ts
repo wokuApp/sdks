@@ -346,6 +346,16 @@ export interface FolderStats {
   reviewCount: number;
 }
 
+/**
+ * Kind of a system folder created by woku: the `Viajes` root, one journey, one
+ * journey moment or an integration (Shopify, Pancake). `null` for your own folders.
+ */
+export type FolderOrigin =
+  | 'journeys-root'
+  | 'journey'
+  | 'journey-moment'
+  | 'integration';
+
 /** A folder with its breadcrumb path and subtree stats. */
 export interface Folder {
   id: string;
@@ -354,6 +364,8 @@ export interface Folder {
   parentFolderId: string | null;
   /** Breadcrumb from the root, for example `Journeys > Post-sale`. */
   path: string;
+  /** System folder kind, `null` for a folder you created. */
+  origin: FolderOrigin | null;
   createdAt: string | null;
   stats: FolderStats;
 }
@@ -388,3 +400,14 @@ export interface MoveResult {
 
 /** The CSV of a folder: the raw text, one row per response. */
 export type FolderCsv = string;
+
+/** Whether the company keeps its journeys in folders (`Viajes > journey > moment`). */
+export interface JourneyFoldersStatus {
+  enabled: boolean;
+  enabledAt: string | null;
+  organizedAt: string | null;
+  /** True while the one-off organization is running in the background. */
+  organizing: boolean;
+  /** Journeys and tools still without a folder. */
+  pending: { journeys: number; tools: number };
+}

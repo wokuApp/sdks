@@ -7,3 +7,4 @@ Add `folders` (list, get, create, update, move, delete, report, csv) and `tools`
 headline stats per type, batch move) resources. NPS, CSAT and CES tools accept
 `folderId` on create, expose it on every tool and gain `move(id, { folderId })`.
 Regenerated types from the public OpenAPI.
+Add `journeyFolders` (`status`, `organize`), `folderId` and `momentFolders` on journeys, and `origin` on folders.

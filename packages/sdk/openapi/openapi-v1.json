@@ -6837,6 +6837,51 @@
         ]
       }
     },
+    "/v1/journey-folders": {
+      "get": {
+        "description": "Whether the company organizes its journeys in folders (Viajes > journey > moment), when the one-off organization finished, whether it is running and how many journeys and tools are still without a folder.",
+        "operationId": "V1JourneyFoldersController_getJourneyFolders",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Status"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get the journey folder organization status",
+        "tags": [
+          "v1 - journey-folders"
+        ]
+      }
+    },
+    "/v1/journey-folders/organize": {
+      "post": {
+        "description": "Switches the organization on and runs the one-off pass in the background: tools of existing journeys that have no folder move into Viajes > journey > moment, and tools journeys create from now on are placed there. Tools that already have a folder are never touched; moving or renaming the folders never breaks a journey. Check the status for progress.",
+        "operationId": "V1JourneyFoldersController_organizeJourneyFolders",
+        "parameters": [],
+        "responses": {
+          "202": {
+            "description": "Organization started"
+          },
+          "409": {
+            "description": "Already organizing"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Organize the journeys in folders",
+        "tags": [
+          "v1 - journey-folders"
+        ]
+      }
+    },
     "/v1/journey-entries/{journeyId}": {
       "get": {
         "description": "Public customer endpoint; reading it does not start an evaluation.",

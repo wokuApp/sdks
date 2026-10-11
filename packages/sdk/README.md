@@ -359,6 +359,18 @@ const csv: string = await woku.folders.csv(folder.id);
 await woku.folders.delete(folder.id);
 ```
 
+```ts
+// Keep customer journeys in folders: Viajes > journey > moment.
+const status = await woku.journeyFolders.status(); // { enabled, organizing, pending: { journeys, tools }, ... }
+if (!status.enabled) await woku.journeyFolders.organize(); // 202; rejects with 409 while a pass is running
+
+const journey = await woku.journeys.get('journey_id');
+console.log(journey.folderId, journey.momentFolders); // moment key -> folder id
+```
+
+Folders created by woku (journeys, moments, integrations) report their `origin`
+(`'journeys-root' | 'journey' | 'journey-moment' | 'integration'`); your own folders have `origin: null`.
+
 `woku.folders` also has `list`, `get`, `update` and `move`. NPS, CSAT and CES
 tools (`npsTools`, `csatTools`, `cesTools`) accept `folderId` on `create`, expose
 `folderId` on every tool and have `move(id, { folderId })`.
@@ -426,7 +438,7 @@ await woku.npsTools.create(body, { idempotencyKey: 'my-key' });
 `trackers`, `npsTools` / `csatTools` / `cesTools`, `nps` / `csat` / `ces`,
 `wokus`, `forms`, `flows`, `actionPlans`, `actionPlanGroups`, `tickets`,
 `ticketDestinations`, `dispatches`, `reports`, `company`, `quarantines`,
-`journeys`, `folders`, `tools`.
+`journeys`, `folders`, `tools`, `journeyFolders`.
 
 ## License
 

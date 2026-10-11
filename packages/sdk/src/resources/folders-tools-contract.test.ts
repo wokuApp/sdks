@@ -45,6 +45,7 @@ const folder = {
   color: null,
   parentFolderId: null,
   path: 'Post-sale',
+  origin: null,
   createdAt: null,
   stats: {
     toolCounts: { woku: 0, nps: 1, csat: 0, ces: 0 },
@@ -272,5 +273,59 @@ describe('tool definitions carry folderId', () => {
       'CreateCesToolBodyDTO',
     ])
       expect(schemas[name].properties.folderId).toBeDefined();
+  });
+});
+
+describe('journey folders', () => {
+  it('reads the status and starts the organization', async () => {
+    const status = {
+      enabled: true,
+      enabledAt: '2026-10-11T00:00:00.000Z',
+      organizedAt: null,
+      organizing: true,
+      pending: { journeys: 2, tools: 40 },
+    };
+    const { woku, calls } = client(() => ({ body: status }));
+    expect((await woku.journeyFolders.status()).pending.tools).toBe(40);
+    expect((await woku.journeyFolders.organize()).organizing).toBe(true);
+    expect(calls.map((c) => `${c.method} ${c.url.pathname}`)).toEqual([
+      'GET /v1/journey-folders',
+      'POST /v1/journey-folders/organize',
+    ]);
+  });
+
+  it('organize surfaces the 409 of a pass already running', async () => {
+    const { woku } = client(() => ({
+      status: 409,
+      body: { message: 'Already organizing' },
+    }));
+    await expect(woku.journeyFolders.organize()).rejects.toMatchObject({
+      status: 409,
+    });
+  });
+
+  it('journeys expose folderId and momentFolders', async () => {
+    const { woku } = client(() => ({
+      body: [
+        {
+          id: 'j1',
+          enabled: true,
+          version: 1,
+          moments: [],
+          folderId: 'f1',
+          momentFolders: { sale: 'f2' },
+        },
+      ],
+    }));
+    const [journey] = await woku.journeys.list();
+    expect(journey.folderId).toBe('f1');
+    expect(journey.momentFolders?.sale).toBe('f2');
+  });
+
+  it('folders carry their origin', async () => {
+    const { woku } = client(() => ({
+      body: [{ ...folder, origin: 'journey' }],
+    }));
+    expect((await woku.folders.list())[0].origin).toBe('journey');
   });
 });
