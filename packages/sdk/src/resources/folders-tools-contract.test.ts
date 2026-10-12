@@ -111,6 +111,13 @@ const cases: [string, string, string, string, (w: Woku) => Promise<unknown>][] =
       (w) => w.folders.report('f1', { lang: 'es' }),
     ],
     [
+      'folders.metrics',
+      'GET',
+      '/v1/folders/f1/metrics',
+      '/v1/folders/{id}/metrics',
+      (w) => w.folders.metrics('f1', { days: 7 }),
+    ],
+    [
       'folders.csv',
       'GET',
       '/v1/folders/f1/csv',
@@ -230,9 +237,40 @@ describe('folders', () => {
     await expect(woku.folders.pdf('nope')).rejects.toThrow();
   });
 
+  it('metrics sends the period as days and returns the per-tool figures', async () => {
+    const reply = {
+      days: 0,
+      tools: [],
+      daily: [],
+      distribution: { woku: [], nps: [], csat: [], ces: [] },
+    };
+    const { woku, calls } = client(() => ({ body: reply }));
+    expect(await woku.folders.metrics('f1', { days: 0 })).toEqual(reply);
+    expect(calls[0].url.searchParams.get('days')).toBe('0');
+  });
+
   it('csv returns the raw text', async () => {
     const { woku } = client(() => ({ body: 'Carpeta,Tipo\nViajes,NPS' }));
     expect(await woku.folders.csv('f1')).toBe('Carpeta,Tipo\nViajes,NPS');
+  });
+});
+
+describe('tools.list with trackers', () => {
+  it('sends every tracker chip as a repeated trackers parameter', async () => {
+    const { woku, calls } = client(() => ({
+      body: {
+        folders: [],
+        foldersNextCursor: null,
+        tools: [],
+        nextCursor: null,
+        facets: { types: { woku: 0, nps: 0, csat: 0, ces: 0 } },
+      },
+    }));
+    await woku.tools.list({ trackers: ['TRR:00482', 'OC:2024'] });
+    expect(calls[0].url.searchParams.getAll('trackers')).toEqual([
+      'TRR:00482',
+      'OC:2024',
+    ]);
   });
 });
 

@@ -363,6 +363,8 @@ for await (const tool of page) {
   console.log(tool.type, tool.name, tool.reviewCount, tool.headline.value);
 }
 const found = await woku.tools.list({ q: 'delivery', scope: 'company' });
+// Tracker chips (`name:value`): a tool matches when it has every one. Company-wide.
+const tagged = await woku.tools.list({ trackers: ['TRR:00482'] });
 
 // "See more" for folders: foldersLimit pages the folders of the level (omit it
 // to receive all of them). The tools keep their own cursor.
@@ -390,6 +392,18 @@ const report = await woku.folders.report(folder.id, { lang: 'en' });
 const csv: string = await woku.folders.csv(folder.id);
 // PDF of that report with a breakdown per type (bytes, e.g. write them to a file).
 const pdf: Uint8Array = await woku.folders.pdf(folder.id, { lang: 'en' });
+
+// Per-tool figures for a period against the one before it (7, 30 or 90 days, or
+// 0 for the whole history), with the daily sums and the histogram of scores.
+// Every type keeps its own scale: NPS -100..100, CSAT %, CES and stars 1-5.
+const metrics = await woku.folders.metrics(folder.id, { days: 30 });
+for (const tool of metrics.tools) {
+  console.log(
+    tool.name,
+    tool.current.headline.value,
+    tool.previous.headline.value,
+  );
+}
 
 // WhatsApp numbers alerted when a comment on any tool of the folder is an
 // improvement (wokus, NPS, CSAT and CES). The list replaces the previous one.

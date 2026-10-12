@@ -6701,6 +6701,55 @@
         ]
       }
     },
+    "/v1/folders/{id}/metrics": {
+      "get": {
+        "description": "Figures of every woku, NPS, CSAT and CES tool of the folder and its subfolders for a period (`days` 7, 30 or 90, or 0 for the whole history, default 30) against the period before it: per tool, the responses, the native-scale headline and the share of positive and negative responses; the daily sums of both periods (UTC) and the histogram of scores of the period (NPS 0-10, the rest 1-5). Scales are never mixed across types.",
+        "operationId": "V1FoldersController_getFolderMetrics",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          },
+          {
+            "name": "days",
+            "required": false,
+            "in": "query",
+            "description": "Period in days: 7, 30 or 90, or 0 for the whole history. Defaults to 30.",
+            "schema": {
+              "type": "number",
+              "enum": [
+                0,
+                7,
+                30,
+                90
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Folder tool metrics"
+          },
+          "404": {
+            "description": "Folder not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get the metrics of the tools of a folder",
+        "tags": [
+          "v1 - folders"
+        ]
+      }
+    },
     "/v1/folders/{id}/csv": {
       "get": {
         "description": "One row per response of every woku, NPS, CSAT and CES tool of the folder and its subfolders, with the native scale next to each score.",
@@ -6908,6 +6957,18 @@
             "schema": {
               "format": "date-time",
               "type": "string"
+            }
+          },
+          {
+            "name": "trackers",
+            "required": false,
+            "in": "query",
+            "description": "Tracker chips, repeatable (`?trackers=TRR:00482&trackers=OC:2024`). A tool matches when it has every one. Like a search, it is company-wide and lists no folders.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           },
           {

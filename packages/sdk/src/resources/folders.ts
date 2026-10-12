@@ -1,7 +1,13 @@
 import type { WokuClient } from '../core/client';
 import type { RequestOptions } from '../core/options';
 import type { CreateFolderParams, UpdateFolderParams } from '../types';
-import type { DeletedResult, Folder, FolderCsv, WokuRecord } from '../models';
+import type {
+  DeletedResult,
+  Folder,
+  FolderCsv,
+  FolderToolMetrics,
+  WokuRecord,
+} from '../models';
 
 /**
  * Folders that organize wokus and NPS, CSAT and CES tools (`/v1/folders`).
@@ -93,6 +99,24 @@ export class Folders {
     return this.client.request<WokuRecord>(
       'get',
       `/v1/folders/${encodeURIComponent(id)}/report`,
+      { ...opts, query: { ...params, ...opts?.query } },
+    );
+  }
+
+  /**
+   * Per-tool figures of the woku, NPS, CSAT and CES tools of the folder and its
+   * subfolders for a period against the one before it, with the daily sums and
+   * the histogram of scores. `days` is 7, 30 (default) or 90, or 0 for the whole
+   * history. Scales are never mixed across types.
+   */
+  metrics(
+    id: string,
+    params?: { days?: 0 | 7 | 30 | 90 },
+    opts?: RequestOptions,
+  ): Promise<FolderToolMetrics> {
+    return this.client.request<FolderToolMetrics>(
+      'get',
+      `/v1/folders/${encodeURIComponent(id)}/metrics`,
       { ...opts, query: { ...params, ...opts?.query } },
     );
   }

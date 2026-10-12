@@ -1914,6 +1914,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/folders/{id}/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the metrics of the tools of a folder
+         * @description Figures of every woku, NPS, CSAT and CES tool of the folder and its subfolders for a period (`days` 7, 30 or 90, or 0 for the whole history, default 30) against the period before it: per tool, the responses, the native-scale headline and the share of positive and negative responses; the daily sums of both periods (UTC) and the histogram of scores of the period (NPS 0-10, the rest 1-5). Scales are never mixed across types.
+         */
+        get: operations["V1FoldersController_getFolderMetrics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/folders/{id}/csv": {
         parameters: {
             query?: never;
@@ -8590,6 +8610,36 @@ export interface operations {
             };
         };
     };
+    V1FoldersController_getFolderMetrics: {
+        parameters: {
+            query?: {
+                /** @description Period in days: 7, 30 or 90, or 0 for the whole history. Defaults to 30. */
+                days?: 0 | 7 | 30 | 90;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Folder tool metrics */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Folder not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     V1FoldersController_getFolderCsv: {
         parameters: {
             query?: never;
@@ -8680,6 +8730,8 @@ export interface operations {
                 createdFrom?: string;
                 /** @description Only tools created on or before this date (ISO 8601). */
                 createdTo?: string;
+                /** @description Tracker chips, repeatable (`?trackers=TRR:00482&trackers=OC:2024`). A tool matches when it has every one. Like a search, it is company-wide and lists no folders. */
+                trackers?: string[];
                 /** @description Folder whose direct content is listed. Omit for the root. Ignored when `scope=company` or when searching. */
                 folderId?: string;
             };

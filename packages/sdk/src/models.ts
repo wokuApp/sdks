@@ -375,6 +375,8 @@ export interface Folder {
   path: string;
   /** System folder kind, `null` for a folder you created. */
   origin: FolderOrigin | null;
+  /** Provider of an integration folder (`shopify`, `pancake`), otherwise `null`. */
+  integrationProvider?: string | null;
   /** WhatsApp numbers alerted when a comment of any tool in the folder is an improvement. */
   whatsappAlertRecipients: WhatsappAlertRecipient[];
   createdAt: string | null;
@@ -403,6 +405,49 @@ export interface ToolTypeStats {
 
 /** A type that failed to compute reports `{ error: true }`; the others stay valid. */
 export type ToolsStats = Record<ToolType, ToolTypeStats | { error: true }>;
+
+/** One window (the period, or the one before it) of one tool. */
+export interface ToolWindow {
+  count: number;
+  headline: ToolHeadline;
+  /** Share (0-100) of positive responses: 4-5, or NPS promoters; `null` with no responses. */
+  positive: number | null;
+  /** Share (0-100) of negative responses: 1-2, or NPS detractors; `null` with no responses. */
+  negative: number | null;
+}
+
+/** Per-tool figures of `folders.metrics`: the period against the one before it. */
+export interface ToolMetrics {
+  type: ToolType;
+  id: string;
+  name: string;
+  /** Responses ever received. */
+  totalResponses: number;
+  lastResponseAt: string | null;
+  current: ToolWindow;
+  previous: ToolWindow;
+}
+
+/** Sums of one day (UTC) and tool type, enough to rebuild any score on any bucket. */
+export interface DailyPoint {
+  date: string;
+  type: ToolType;
+  count: number;
+  scoreSum: number;
+  positive: number;
+  negative: number;
+}
+
+/** Result of `folders.metrics`. */
+export interface FolderToolMetrics {
+  /** Period in days; `0` is the whole history (then every `previous` window is empty). */
+  days: number;
+  tools: ToolMetrics[];
+  /** Daily sums of both windows (2 x `days`). */
+  daily: DailyPoint[];
+  /** Responses per score in the period: 0-10 for NPS, 1-5 for the rest. */
+  distribution: Record<ToolType, number[]>;
+}
 
 /** Result of `tools.move` and `folders.move` batches. */
 export interface MoveResult {

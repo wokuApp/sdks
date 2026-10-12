@@ -27,6 +27,11 @@ export interface ListToolsParams {
   foldersLimit?: number;
   createdFrom?: string;
   createdTo?: string;
+  /**
+   * Tracker chips as `name:value` (for example `TRR:00482`); a tool matches when
+   * it has every one. Like a search it is company-wide and lists no folders.
+   */
+  trackers?: string[];
 }
 
 /**

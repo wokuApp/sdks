@@ -11,3 +11,4 @@ Add `journeyFolders` (`status`, `organize`), `folderId` and `momentFolders` on j
 Folders expose `whatsappAlertRecipients` (settable on `folders.update`): the WhatsApp numbers alerted when a comment on any wokus, NPS, CSAT or CES tool of the folder is an improvement, with `sources` per number.
 Flows are no longer read-only: `flows.create`, `update` and `delete`, and `steps` (woku, NPS, CSAT and CES) on every flow.
 Add `folders.pdf` (the folder report as PDF bytes) and folder paging on `tools.list` (`foldersLimit`, `foldersNextCursor`, `page.hasMoreFolders()` and `page.getMoreFolders()`).
+Add `folders.metrics` (per-tool figures for a period against the one before it, daily sums and the histogram of scores), `trackers` on `tools.list` and `integrationProvider` on folders.
