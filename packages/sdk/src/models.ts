@@ -39,6 +39,8 @@ interface ToolLocalizedContent {
 /** NPS tool definition (curated, no internal fields). */
 export interface NpsTool {
   _id: string;
+  /** Folder the tool lives in, `null` at the root. */
+  folderId?: string | null;
   name: string;
   npsMessage: string;
   audienceType?: string;
@@ -51,6 +53,8 @@ export interface NpsTool {
 /** CSAT tool definition (curated). */
 export interface CsatTool {
   _id: string;
+  /** Folder the tool lives in, `null` at the root. */
+  folderId?: string | null;
   name: string;
   question: string;
   subject?: string;
@@ -63,6 +67,8 @@ export interface CsatTool {
 /** CES tool definition (curated). */
 export interface CesTool {
   _id: string;
+  /** Folder the tool lives in, `null` at the root. */
+  folderId?: string | null;
   name: string;
   question: string;
   action?: string;
@@ -308,4 +314,183 @@ export interface TestConnectionResult {
 export interface ApiKeyResult {
   secretKey: string;
   [key: string]: unknown;
+}
+
+/** Kinds of item the Tools view mixes. */
+export type ToolType = 'woku' | 'nps' | 'csat' | 'ces';
+
+/** Headline figure of a tool, always in its native scale (scales are never mixed). */
+export interface ToolHeadline {
+  kind: 'stars' | 'nps' | 'csat' | 'ces';
+  /** Stars 1-5, NPS -100..100, CSAT satisfied %, CES mean 1-5. `null` without responses. */
+  value: number | null;
+  scale: string;
+}
+
+/** A woku, NPS, CSAT or CES tool as listed by `tools.list`. */
+export interface ToolItem {
+  type: ToolType;
+  id: string;
+  name: string;
+  folderId: string | null;
+  createdAt: string | null;
+  reviewCount: number;
+  lastResponseAt: string | null;
+  headline: ToolHeadline;
+}
+
+/** Subtree figures of a folder. */
+export interface FolderStats {
+  toolCounts: Record<ToolType, number>;
+  subfolderCount: number;
+  reviewCount: number;
+}
+
+/**
+ * Kind of a system folder created by woku: the `Viajes` root, one journey, one
+ * journey moment or an integration (Shopify, Pancake). `null` for your own folders.
+ */
+export type FolderOrigin =
+  | 'journeys-root'
+  | 'journey'
+  | 'journey-moment'
+  | 'integration';
+
+/** A WhatsApp number that receives improvement alerts of a folder. */
+export interface WhatsappAlertRecipient {
+  /** E.164 phone number without the leading +. */
+  whatsappId: string;
+  name: string;
+  /** Kinds of comment that alert this number (numbers created before this feature only get `woku`). */
+  sources: ToolType[];
+}
+
+/** A folder with its breadcrumb path and subtree stats. */
+export interface Folder {
+  id: string;
+  name: string;
+  color: string | null;
+  parentFolderId: string | null;
+  /** Breadcrumb from the root, for example `Journeys > Post-sale`. */
+  path: string;
+  /** System folder kind, `null` for a folder you created. */
+  origin: FolderOrigin | null;
+  /** Provider of an integration folder (`shopify`, `pancake`), otherwise `null`. */
+  integrationProvider?: string | null;
+  /** WhatsApp numbers alerted when a comment of any tool in the folder is an improvement. */
+  whatsappAlertRecipients: WhatsappAlertRecipient[];
+  createdAt: string | null;
+  stats: FolderStats;
+}
+
+/** One page of `tools.list`: folders, tools, facet counts and the cursor. */
+export interface ToolItemsPageResponse {
+  folders: Folder[];
+  /** Cursor of the next page of folders; null when they were all returned. */
+  foldersNextCursor: string | null;
+  tools: ToolItem[];
+  nextCursor: string | null;
+  facets: { types: Record<ToolType, number> };
+}
+
+/** Headline figures of one tool type for the company or a folder. */
+export interface ToolTypeStats {
+  toolCount: number;
+  reviewCount: number;
+  headline: ToolHeadline;
+  lastResponseAt: string | null;
+  /** NPS only. */
+  distribution?: { promoters: number; passives: number; detractors: number };
+}
+
+/** A type that failed to compute reports `{ error: true }`; the others stay valid. */
+export type ToolsStats = Record<ToolType, ToolTypeStats | { error: true }>;
+
+/** One window (the period, or the one before it) of one tool. */
+export interface ToolWindow {
+  count: number;
+  headline: ToolHeadline;
+  /** Share (0-100) of positive responses: 4-5, or NPS promoters; `null` with no responses. */
+  positive: number | null;
+  /** Share (0-100) of negative responses: 1-2, or NPS detractors; `null` with no responses. */
+  negative: number | null;
+  /** The raw counts and score sum behind the shares, to combine tools without rounding drift. */
+  positiveCount: number;
+  negativeCount: number;
+  scoreSum: number;
+}
+
+/** Per-tool figures of `folders.metrics`: the period against the one before it. */
+export interface ToolMetrics {
+  type: ToolType;
+  id: string;
+  name: string;
+  /** Responses ever received. */
+  totalResponses: number;
+  lastResponseAt: string | null;
+  current: ToolWindow;
+  previous: ToolWindow;
+}
+
+/** Sums of one day (UTC) and tool type, enough to rebuild any score on any bucket. */
+export interface DailyPoint {
+  date: string;
+  type: ToolType;
+  count: number;
+  scoreSum: number;
+  positive: number;
+  negative: number;
+}
+
+/** Result of `folders.metrics`. */
+export interface FolderToolMetrics {
+  /** Period in days; `0` is the whole history (then every `previous` window is empty). */
+  days: number;
+  tools: ToolMetrics[];
+  /** Daily sums of both windows (2 x `days`). */
+  daily: DailyPoint[];
+  /** Responses per score in the period: 0-10 for NPS, 1-5 for the rest. */
+  distribution: Record<ToolType, number[]>;
+}
+
+/** Result of `tools.move` and `folders.move` batches. */
+export interface MoveResult {
+  moved: number;
+  folderId: string | null;
+  items: { type: ToolType | 'folder'; id: string }[];
+}
+
+/** The CSV of a folder: the raw text, one row per response. */
+export type FolderCsv = string;
+
+/** Whether the company keeps its journeys in folders (`Viajes > journey > moment`). */
+export interface JourneyFoldersStatus {
+  enabled: boolean;
+  enabledAt: string | null;
+  organizedAt: string | null;
+  /** True while the one-off organization is running in the background. */
+  organizing: boolean;
+  /** Journeys and tools still without a folder. */
+  pending: { journeys: number; tools: number };
+}
+
+/** One step of a flow: the tool the respondent answers at that point. */
+export interface FlowStep {
+  type: ToolType;
+  /** Tool id. For an `nps` step, your company id means the company-level NPS. */
+  toolId: string;
+}
+
+/** A survey flow: an ordered sequence of woku, NPS, CSAT and CES steps. */
+export interface Flow {
+  _id: string;
+  name: string;
+  /** Ordered steps. Flows live outside folders. */
+  steps: FlowStep[];
+  /** Woku ids of the `woku` steps, in order (kept for compatibility). */
+  wokusIds?: string[];
+  npsToolId?: string | null;
+  companyIdNps?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
 }

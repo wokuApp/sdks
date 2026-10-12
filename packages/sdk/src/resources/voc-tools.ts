@@ -53,6 +53,19 @@ export class NpsTools {
     );
   }
 
+  /** Move the tool into a folder, or to the root with `folderId: null`. */
+  move(
+    id: string,
+    body: { folderId: string | null },
+    opts?: RequestOptions,
+  ): Promise<NpsTool> {
+    return this.client.request<NpsTool>(
+      'patch',
+      `/v1/nps-tools/${encodeURIComponent(id)}/move`,
+      { ...opts, body },
+    );
+  }
+
   delete(id: string, opts?: RequestOptions): Promise<DeletedResult> {
     return this.client.request<DeletedResult>(
       'delete',
@@ -104,6 +117,19 @@ export class CsatTools {
     );
   }
 
+  /** Move the tool into a folder, or to the root with `folderId: null`. */
+  move(
+    id: string,
+    body: { folderId: string | null },
+    opts?: RequestOptions,
+  ): Promise<CsatTool> {
+    return this.client.request<CsatTool>(
+      'patch',
+      `/v1/csat-tools/${encodeURIComponent(id)}/move`,
+      { ...opts, body },
+    );
+  }
+
   delete(id: string, opts?: RequestOptions): Promise<DeletedResult> {
     return this.client.request<DeletedResult>(
       'delete',
@@ -152,6 +178,19 @@ export class CesTools {
         ...opts,
         body,
       },
+    );
+  }
+
+  /** Move the tool into a folder, or to the root with `folderId: null`. */
+  move(
+    id: string,
+    body: { folderId: string | null },
+    opts?: RequestOptions,
+  ): Promise<CesTool> {
+    return this.client.request<CesTool>(
+      'patch',
+      `/v1/ces-tools/${encodeURIComponent(id)}/move`,
+      { ...opts, body },
     );
   }
 

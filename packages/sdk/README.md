@@ -313,9 +313,127 @@ available if re-enabled later.
 Existing definitions retain their contract; create a new v2 journey to adopt these
 rules. Current participations retain their original definition version.
 
+### Flows
+
+A flow is an ordered sequence of steps, each a woku or an NPS, CSAT or CES tool,
+that a respondent answers one after the other. Flows live outside folders.
+
+```ts
+const flow = await woku.flows.create({
+  name: 'Post-purchase',
+  steps: [
+    { type: 'nps', toolId: 'nps_tool_id' },
+    { type: 'csat', toolId: 'csat_tool_id' },
+    { type: 'woku', toolId: 'woku_id' },
+  ],
+});
+await woku.flows.update(flow._id, {
+  steps: [{ type: 'csat', toolId: 'csat_tool_id' }],
+});
+for await (const f of await woku.flows.list())
+  console.log(f.name, f.steps.length);
+await woku.flows.delete(flow._id); // its tools and responses stay
+```
+
+Use 1 to 20 steps, each tool once and all of your company. For an `nps` step,
+your company id as `toolId` means the company-level NPS. `flows.get(id)` returns
+the flow data (steps with their tools, wokus and branding).
+
+### Folders and tools
+
+One folder tree holds wokus and NPS, CSAT and CES tools together. Create folders,
+find any tool, read figures per type and move things in batches:
+
+```ts
+const folder = await woku.folders.create({ name: 'Post-sale' });
+
+// Create a tool already inside a folder.
+await woku.csatTools.create({
+  name: 'Delivery',
+  question: 'How satisfied are you with your delivery?',
+  folderId: folder.id,
+});
+
+// One list for every tool type. Iterate across pages with the cursor.
+const page = await woku.tools.list({
+  folderId: folder.id,
+  types: ['csat', 'nps'],
+});
+for await (const tool of page) {
+  console.log(tool.type, tool.name, tool.reviewCount, tool.headline.value);
+}
+const found = await woku.tools.list({ q: 'delivery', scope: 'company' });
+// Tracker chips (`name:value`): a tool matches when it has every one. Company-wide.
+const tagged = await woku.tools.list({ trackers: ['TRR:00482'] });
+
+// "See more" for folders: foldersLimit pages the folders of the level (omit it
+// to receive all of them). The tools keep their own cursor.
+const first = await woku.tools.list({ foldersLimit: 12 });
+if (first.hasMoreFolders()) {
+  const more = await first.getMoreFolders(); // only the next folders, no tools
+  console.log(more.folders.length);
+}
+
+// Headline figures per type (native scales, never mixed), company or folder.
+const stats = await woku.tools.stats({ folderId: folder.id });
+
+// Move items of mixed types, or send them to the root with folderId: null.
+await woku.tools.move({
+  items: [
+    { type: 'csat', id: 'csat_tool_id' },
+    { type: 'woku', id: 'woku_id' },
+  ],
+  folderId: folder.id,
+});
+await woku.npsTools.move('nps_tool_id', { folderId: null });
+
+// AI report and CSV over every tool of the folder and its subfolders.
+const report = await woku.folders.report(folder.id, { lang: 'en' });
+const csv: string = await woku.folders.csv(folder.id);
+// PDF of that report with a breakdown per type (bytes, e.g. write them to a file).
+const pdf: Uint8Array = await woku.folders.pdf(folder.id, { lang: 'en' });
+
+// Per-tool figures for a period against the one before it (7, 30 or 90 days, or
+// 0 for the whole history), with the daily sums and the histogram of scores.
+// Every type keeps its own scale: NPS -100..100, CSAT %, CES and stars 1-5.
+const metrics = await woku.folders.metrics(folder.id, { days: 30 });
+for (const tool of metrics.tools) {
+  console.log(
+    tool.name,
+    tool.current.headline.value,
+    tool.previous.headline.value,
+  );
+}
+
+// WhatsApp numbers alerted when a comment on any tool of the folder is an
+// improvement (wokus, NPS, CSAT and CES). The list replaces the previous one.
+await woku.folders.update(folder.id, {
+  whatsappAlertRecipients: [{ whatsappId: '56912345678', name: 'Ana' }],
+});
+
+// Deleting a folder never deletes its content: it moves up to the parent.
+await woku.folders.delete(folder.id);
+```
+
+```ts
+// Keep customer journeys in folders: Viajes > journey > moment.
+const status = await woku.journeyFolders.status(); // { enabled, organizing, pending: { journeys, tools }, ... }
+if (!status.enabled) await woku.journeyFolders.organize(); // 202; rejects with 409 while a pass is running
+
+const journey = await woku.journeys.get('journey_id');
+console.log(journey.folderId, journey.momentFolders); // moment key -> folder id
+```
+
+Folders created by woku (journeys, moments, integrations) report their `origin`
+(`'journeys-root' | 'journey' | 'journey-moment' | 'integration'`); your own folders have `origin: null`.
+
+`woku.folders` also has `list`, `get`, `update` and `move`. NPS, CSAT and CES
+tools (`npsTools`, `csatTools`, `cesTools`) accept `folderId` on `create`, expose
+`folderId` on every tool and have `move(id, { folderId })`.
+
 ## Pagination
 
-Paginated resource methods return a `Page` (journey enrollments use the cursor envelope described above). Iterate every item across pages, or walk pages:
+Paginated resource methods return a `Page` (journey enrollments and `tools.list` use a cursor envelope). Iterate every item across pages, or walk pages:
 
 ```ts
 for await (const ticket of await woku.tickets.list({ severity: 'high' })) {
@@ -376,7 +494,7 @@ await woku.npsTools.create(body, { idempotencyKey: 'my-key' });
 `trackers`, `npsTools` / `csatTools` / `cesTools`, `nps` / `csat` / `ces`,
 `wokus`, `forms`, `flows`, `actionPlans`, `actionPlanGroups`, `tickets`,
 `ticketDestinations`, `dispatches`, `reports`, `company`, `quarantines`,
-`journeys`.
+`journeys`, `folders`, `tools`, `journeyFolders`.
 
 ## License
 

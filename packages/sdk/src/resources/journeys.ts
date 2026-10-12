@@ -15,7 +15,16 @@ export type JourneyMomentPreview = Schemas['V1JourneyPreviewResponseDto'];
 export type JourneyMomentTrigger = Schemas['V1JourneyTriggerDto'];
 export type JourneyMoment = Schemas['V1JourneyMomentDto'];
 export type JourneyInput = Schemas['V1UpdateJourneyBodyDto'];
-export type Journey = Schemas['V1JourneyResponseDto'];
+/**
+ * A journey as returned by `/v1/journeys`. `folderId` and `momentFolders`
+ * (moment key to folder id) point at the folders that hold the journey's tools
+ * once the company organized its journeys in folders; they are `null` and `{}`
+ * before that. Reads only: they are not part of the journey definition.
+ */
+export type Journey = Schemas['V1JourneyResponseDto'] & {
+  folderId?: string | null;
+  momentFolders?: Record<string, string>;
+};
 export type CreatedJourney = Schemas['V1CreatedJourneyResponseDto'];
 export type JourneyEnrollment = Schemas['V1JourneyParticipationDto'];
 export type JourneyEnrollmentPage = Schemas['V1JourneyParticipationPageDto'];

@@ -1284,7 +1284,11 @@ export interface paths {
         /** List the flows of the caller company (paginated) */
         get: operations["V1FlowsController_listFlows"];
         put?: never;
-        post?: never;
+        /**
+         * Create a flow of ordered steps
+         * @description Steps can be wokus and NPS, CSAT or CES tools of your company, in any order, each at most once (maximum 20). A flow lives outside folders.
+         */
+        post: operations["V1FlowsController_createFlow"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1298,14 +1302,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get the data of a flow (wokus in order, branding, linked NPS) */
+        /** Get the data of a flow (ordered steps with their tools, wokus, branding) */
         get: operations["V1FlowsController_getFlow"];
         put?: never;
         post?: never;
-        delete?: never;
+        /** Delete a flow (its tools and responses stay) */
+        delete: operations["V1FlowsController_deleteFlow"];
         options?: never;
         head?: never;
-        patch?: never;
+        /** Rename a flow or replace its steps */
+        patch: operations["V1FlowsController_updateFlow"];
         trace?: never;
     };
     "/v1/nps-tools": {
@@ -1434,6 +1440,23 @@ export interface paths {
         patch: operations["V1NpsToolsController_updateNpsTool"];
         trace?: never;
     };
+    "/v1/nps-tools/{id}/move": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Move a NPS tool into a folder, or to the root (folderId: null) */
+        patch: operations["V1NpsToolsController_moveNpsTool"];
+        trace?: never;
+    };
     "/v1/csat-tools/{id}": {
         parameters: {
             query?: never;
@@ -1452,6 +1475,23 @@ export interface paths {
         patch: operations["V1CsatToolsController_updateCsatTool"];
         trace?: never;
     };
+    "/v1/csat-tools/{id}/move": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Move a Csat tool into a folder, or to the root (folderId: null) */
+        patch: operations["V1CsatToolsController_moveCsatTool"];
+        trace?: never;
+    };
     "/v1/ces-tools/{id}": {
         parameters: {
             query?: never;
@@ -1468,6 +1508,23 @@ export interface paths {
         head?: never;
         /** Update a CES tool definition (only if it has no responses) */
         patch: operations["V1CesToolsController_updateCesTool"];
+        trace?: never;
+    };
+    "/v1/ces-tools/{id}/move": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Move a Ces tool into a folder, or to the root (folderId: null) */
+        patch: operations["V1CesToolsController_moveCesTool"];
         trace?: never;
     };
     "/v1/tickets": {
@@ -1768,6 +1825,246 @@ export interface paths {
          * @description Eligible journeys whose moments listen for that name react. Operator-led v2 journeys require an open enrollment for that subject. Names starting with `journey.` are reserved.
          */
         post: operations["V1JourneyEventsController_emit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/folders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List folders
+         * @description Every folder of the company, or only the direct subfolders of `parentFolderId`. Each folder carries its breadcrumb `path` and subtree stats (tools per type, subfolders, reviews).
+         */
+        get: operations["V1FoldersController_listFolders"];
+        put?: never;
+        /** Create a folder */
+        post: operations["V1FoldersController_createFolder"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/folders/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a folder with its stats */
+        get: operations["V1FoldersController_getFolder"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete a folder
+         * @description The folder is removed; its subfolders, wokus and NPS, CSAT and CES tools move up to the parent folder (or the root). Nothing inside is deleted.
+         */
+        delete: operations["V1FoldersController_deleteFolder"];
+        options?: never;
+        head?: never;
+        /** Rename or recolor a folder */
+        patch: operations["V1FoldersController_updateFolder"];
+        trace?: never;
+    };
+    "/v1/folders/{id}/report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the folder report
+         * @description AI report over every woku, NPS, CSAT and CES tool of the folder and its subfolders (recognitions, improvements, word cloud and summary). Rating scales differ per type, so no rating distribution is returned. A folder with no tools or fewer than two commented responses returns an empty report, not an error.
+         */
+        get: operations["V1FoldersController_getFolderReport"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/folders/{id}/pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Download the folder report as PDF
+         * @description PDF of the folder report over every woku, NPS, CSAT and CES tool of the folder and its subfolders, with a per-type breakdown on each native scale (no mixed rating distribution).
+         */
+        get: operations["V1FoldersController_getFolderPdf"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/folders/{id}/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the metrics of the tools of a folder
+         * @description Figures of every woku, NPS, CSAT and CES tool of the folder and its subfolders for a period (`days` 7, 30 or 90, or 0 for the whole history, default 30) against the period before it: per tool, the responses, the native-scale headline and the share of positive and negative responses; the daily sums of both periods (UTC) and the histogram of scores of the period (NPS 0-10, the rest 1-5). Scales are never mixed across types.
+         */
+        get: operations["V1FoldersController_getFolderMetrics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/folders/{id}/csv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Download the folder responses as CSV
+         * @description One row per response of every woku, NPS, CSAT and CES tool of the folder and its subfolders, with the native scale next to each score.
+         */
+        get: operations["V1FoldersController_getFolderCsv"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/folders/{id}/move": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Move a folder under another folder, or to the root */
+        patch: operations["V1FoldersController_moveFolder"];
+        trace?: never;
+    };
+    "/v1/tools": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List and search tools and folders
+         * @description Lists one folder level (`folderId`, root by default) or the whole company (`scope=company`). A search (`q`) is company-wide and also returns matching folders. Items of every type (woku, nps, csat, ces) come in one cursor-paginated list, with facet counts per type.
+         */
+        get: operations["V1ToolsController_listTools"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/tools/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Headline figures per tool type
+         * @description Reviews and the native-scale headline of each type (woku stars, NPS score, CSAT satisfied %, CES mean) for the whole company or one folder and its subfolders. Scales are never mixed. A type that fails to compute reports `{ error: true }` and the others stay valid.
+         */
+        get: operations["V1ToolsController_getToolsStats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/tools/move": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Move tools and folders into a folder, or to the root
+         * @description Moves items of mixed types (woku, nps, csat, ces, folder) in one call. It is idempotent: moving items to where they already are succeeds. Nothing moves if one item is missing.
+         */
+        post: operations["V1ToolsController_moveTools"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/journey-folders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the journey folder organization status
+         * @description Whether the company organizes its journeys in folders (Viajes > journey > moment), when the one-off organization finished, whether it is running and how many journeys and tools are still without a folder.
+         */
+        get: operations["V1JourneyFoldersController_getJourneyFolders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/journey-folders/organize": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Organize the journeys in folders
+         * @description Switches the organization on and runs the one-off pass in the background: tools of existing journeys that have no folder move into Viajes > journey > moment, and tools journeys create from now on are placed there. Tools that already have a folder are never touched; moving or renaming the folders never breaks a journey. Check the status for progress.
+         */
+        post: operations["V1JourneyFoldersController_organizeJourneyFolders"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2671,6 +2968,29 @@ export interface components {
              */
             dispatchToken?: string;
         };
+        FlowStepBodyDTO: {
+            /**
+             * @description Kind of tool the respondent answers in this step.
+             * @enum {string}
+             */
+            type: "woku" | "nps" | "csat" | "ces";
+            /**
+             * Format: ObjectId
+             * @description Tool id (woku, NPS tool, CSAT tool or CES tool). For an nps step, your company id means the company-level NPS.
+             */
+            toolId: string;
+        };
+        CreateFlowBodyDTO: {
+            /** @example Post-purchase journey */
+            name: string;
+            /** @description Ordered steps. A tool can appear once. Flows live outside folders. */
+            steps: components["schemas"]["FlowStepBodyDTO"][];
+        };
+        UpdateFlowBodyDTO: {
+            name?: string;
+            /** @description The new full ordered list of steps. */
+            steps?: components["schemas"]["FlowStepBodyDTO"][];
+        };
         NpsToolLocalizedContentBodyDTO: {
             /**
              * @example en
@@ -2689,6 +3009,11 @@ export interface components {
             audienceType?: string;
         };
         CreateNpsToolBodyDTO: {
+            /**
+             * Format: ObjectId
+             * @description Folder to create the tool in. Must belong to your company. Omit for the root.
+             */
+            folderId?: string;
             /**
              * @description Tool name for identification.
              * @example Post-Purchase Survey
@@ -2743,6 +3068,13 @@ export interface components {
             defaultLocale?: "es" | "en";
             localizedContent?: components["schemas"]["NpsToolLocalizedContentBodyDTO"][];
         };
+        MoveToolBodyDTO: {
+            /**
+             * Format: ObjectId
+             * @description Target folder id, or null to move the tool to the root.
+             */
+            folderId: string | null;
+        };
         CsatToolLocalizedContentBodyDTO: {
             /**
              * @example en
@@ -2761,6 +3093,11 @@ export interface components {
             subject?: string;
         };
         CreateCsatToolBodyDTO: {
+            /**
+             * Format: ObjectId
+             * @description Folder to create the tool in. Must belong to your company. Omit for the root.
+             */
+            folderId?: string;
             /**
              * @description Tool name for identification.
              * @example Post-Purchase CSAT
@@ -2825,6 +3162,11 @@ export interface components {
             action?: string;
         };
         CreateCesToolBodyDTO: {
+            /**
+             * Format: ObjectId
+             * @description Folder to create the tool in. Must belong to your company. Omit for the root.
+             */
+            folderId?: string;
             /**
              * @description Tool name for identification.
              * @example Post-Purchase Effort
@@ -3440,6 +3782,59 @@ export interface components {
         };
         V1JourneyEventResponseDto: {
             journeys: number;
+        };
+        CreateFolderBodyDTO: {
+            /** @example Post-sale */
+            name: string;
+            /**
+             * Format: ObjectId
+             * @description Parent folder. Omit to create the folder at the root.
+             */
+            parentFolderId?: string;
+            /** @example #3498db */
+            color?: string;
+        };
+        WhatsappAlertRecipientDTO: {
+            /**
+             * @description E.164 phone number without the leading +.
+             * @example 56912345678
+             */
+            whatsappId: string;
+            /** @example Ana (support) */
+            name: string;
+            /** @description Kinds of comment that alert this number. Defaults to all four. */
+            sources?: ("woku" | "nps" | "csat" | "ces")[];
+        };
+        UpdateFolderBodyDTO: {
+            name?: string;
+            /**
+             * @description Hex color, or null to clear it.
+             * @example #3498db
+             */
+            color?: string | null;
+            /** @description Replaces the WhatsApp numbers alerted when a comment of any tool in this folder is an improvement (wokus, NPS, CSAT, CES). Send [] to clear. */
+            whatsappAlertRecipients?: components["schemas"]["WhatsappAlertRecipientDTO"][];
+        };
+        MoveFolderBodyDTO: {
+            /**
+             * Format: ObjectId
+             * @description New parent folder, or null to move the folder to the root. A folder cannot move into itself or one of its subfolders.
+             */
+            parentFolderId: string | null;
+        };
+        MoveItemDTO: {
+            /** @enum {string} */
+            type: "woku" | "nps" | "csat" | "ces" | "folder";
+            /** Format: ObjectId */
+            id: string;
+        };
+        MoveToolItemsBodyDTO: {
+            items: components["schemas"]["MoveItemDTO"][];
+            /**
+             * Format: ObjectId
+             * @description Destination folder. `null` moves the items to the root.
+             */
+            folderId: string | null;
         };
         JourneyEntryInfoDto: {
             name?: string;
@@ -6325,6 +6720,40 @@ export interface operations {
             };
         };
     };
+    V1FlowsController_createFlow: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Client-generated key to make the create safe to retry. A retry with the same key returns the original result instead of creating again. */
+                "X-Woku-Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateFlowBodyDTO"];
+            };
+        };
+        responses: {
+            /** @description Flow created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation error or a step is not a tool of your company */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+        };
+    };
     V1FlowsController_getFlow: {
         parameters: {
             query?: never;
@@ -6346,6 +6775,64 @@ export interface operations {
             };
             /** @description Flow does not belong to the caller company */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Flow not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1FlowsController_deleteFlow: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Flow deleted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Flow not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1FlowsController_updateFlow: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateFlowBodyDTO"];
+            };
+        };
+        responses: {
+            /** @description Flow updated */
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6701,6 +7188,37 @@ export interface operations {
             };
         };
     };
+    V1NpsToolsController_moveNpsTool: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MoveToolBodyDTO"];
+            };
+        };
+        responses: {
+            /** @description NPS tool moved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Tool or folder not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     V1CsatToolsController_deleteCsatTool: {
         parameters: {
             query?: never;
@@ -6768,6 +7286,37 @@ export interface operations {
             };
         };
     };
+    V1CsatToolsController_moveCsatTool: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MoveToolBodyDTO"];
+            };
+        };
+        responses: {
+            /** @description Csat tool moved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Tool or folder not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     V1CesToolsController_deleteCesTool: {
         parameters: {
             query?: never;
@@ -6827,6 +7376,37 @@ export interface operations {
                 };
             };
             /** @description CES tool not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1CesToolsController_moveCesTool: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MoveToolBodyDTO"];
+            };
+        };
+        responses: {
+            /** @description Ces tool moved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Tool or folder not found */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -7810,6 +8390,465 @@ export interface operations {
             };
             /** @description Idempotency key reused for a different operation */
             422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1FoldersController_listFolders: {
+        parameters: {
+            query?: {
+                /** @description List only the direct subfolders of this folder. Omit to list every folder of the company. */
+                parentFolderId?: string;
+                /** @description Case and accent insensitive match on the folder name. */
+                q?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Folders */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1FoldersController_createFolder: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Client-generated key to make the create safe to retry. A retry with the same key returns the original result instead of creating again. */
+                "X-Woku-Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateFolderBodyDTO"];
+            };
+        };
+        responses: {
+            /** @description Folder created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Parent folder not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1FoldersController_getFolder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Folder */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Folder not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1FoldersController_deleteFolder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Folder deleted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Folder not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1FoldersController_updateFolder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateFolderBodyDTO"];
+            };
+        };
+        responses: {
+            /** @description Folder updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Folder not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1FoldersController_getFolderReport: {
+        parameters: {
+            query?: {
+                /** @description Regenerate the report even if the number of reviews did not change. */
+                regenerate?: boolean;
+                /** @description Language of the report narrative. */
+                lang?: "es" | "en";
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Folder report */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Folder not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1FoldersController_getFolderPdf: {
+        parameters: {
+            query?: {
+                /** @description Language of the PDF. Defaults to the report language. */
+                lang?: "es" | "en";
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description PDF file */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                };
+            };
+            /** @description Folder not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1FoldersController_getFolderMetrics: {
+        parameters: {
+            query?: {
+                /** @description Period in days: 7, 30 or 90, or 0 for the whole history. Defaults to 30. */
+                days?: 0 | 7 | 30 | 90;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Folder tool metrics */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Folder not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1FoldersController_getFolderCsv: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description CSV file */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": string;
+                };
+            };
+            /** @description Folder not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1FoldersController_moveFolder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MoveFolderBodyDTO"];
+            };
+        };
+        responses: {
+            /** @description Folder moved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description A folder cannot move into itself or one of its subfolders */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Folder not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1ToolsController_listTools: {
+        parameters: {
+            query?: {
+                /** @description `level` (default) lists one folder level; `company` is a flat list of every tool of the company. */
+                scope?: "level" | "company";
+                /** @description Comma separated tool types: woku, nps, csat, ces. */
+                types?: string[];
+                /** @description Case and accent insensitive search over names and questions. A search is company-wide and also matches folder names. */
+                q?: string;
+                sort?: "name" | "-name" | "created" | "-created";
+                /** @description Opaque `nextCursor` of the previous page. */
+                cursor?: string;
+                limit?: number;
+                /** @description Folders per page ("see more"). Omitted returns every folder of the level. */
+                foldersLimit?: number;
+                /** @description Opaque `foldersNextCursor` of a previous page. Returns only that page of folders, without tools. */
+                foldersCursor?: string;
+                /** @description Only tools created on or after this date (ISO 8601). */
+                createdFrom?: string;
+                /** @description Only tools created on or before this date (ISO 8601). */
+                createdTo?: string;
+                /** @description Tracker chips as `name:value`, repeatable (`?trackers=TRR:00482&trackers=OC:2024`, up to 10). A tool matches when it has every one: the tracker name is matched exactly, the value partially and ignoring case (`482` also matches `00482`). Like a search, it is company-wide and lists no folders. A chip without name or value is a 400. */
+                trackers?: string[];
+                /** @description Folder whose direct content is listed. Omit for the root. Ignored when `scope=company` or when searching. */
+                folderId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Folders, tools and facets */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1ToolsController_getToolsStats: {
+        parameters: {
+            query?: {
+                /** @description Scope the figures to this folder and its subfolders. Omit for the whole company. */
+                folderId?: string;
+                /** @description Only responses on or after this date (ISO 8601). */
+                from?: string;
+                /** @description Only responses on or before this date (ISO 8601). */
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Figures per type */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1ToolsController_moveTools: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MoveToolItemsBodyDTO"];
+            };
+        };
+        responses: {
+            /** @description Items moved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid move (for example a folder into its own subtree) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Folder or item not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1JourneyFoldersController_getJourneyFolders: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Status */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1JourneyFoldersController_organizeJourneyFolders: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Organization started */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Already organizing */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
