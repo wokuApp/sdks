@@ -107,7 +107,9 @@ export class Folders {
    * Per-tool figures of the woku, NPS, CSAT and CES tools of the folder and its
    * subfolders for a period against the one before it, with the daily sums and
    * the histogram of scores. `days` is 7, 30 (default) or 90, or 0 for the whole
-   * history. Scales are never mixed across types.
+   * history (every `previous` window is then empty). The period is the last
+   * `days` calendar days in UTC, today included. Scales are never mixed across
+   * types.
    */
   metrics(
     id: string,

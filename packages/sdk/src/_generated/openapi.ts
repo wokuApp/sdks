@@ -8730,7 +8730,7 @@ export interface operations {
                 createdFrom?: string;
                 /** @description Only tools created on or before this date (ISO 8601). */
                 createdTo?: string;
-                /** @description Tracker chips, repeatable (`?trackers=TRR:00482&trackers=OC:2024`). A tool matches when it has every one. Like a search, it is company-wide and lists no folders. */
+                /** @description Tracker chips as `name:value`, repeatable (`?trackers=TRR:00482&trackers=OC:2024`, up to 10). A tool matches when it has every one: the tracker name is matched exactly, the value partially and ignoring case (`482` also matches `00482`). Like a search, it is company-wide and lists no folders. A chip without name or value is a 400. */
                 trackers?: string[];
                 /** @description Folder whose direct content is listed. Omit for the root. Ignored when `scope=company` or when searching. */
                 folderId?: string;

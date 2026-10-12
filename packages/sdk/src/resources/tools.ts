@@ -28,8 +28,10 @@ export interface ListToolsParams {
   createdFrom?: string;
   createdTo?: string;
   /**
-   * Tracker chips as `name:value` (for example `TRR:00482`); a tool matches when
-   * it has every one. Like a search it is company-wide and lists no folders.
+   * Tracker chips as `name:value` (for example `TRR:00482`, up to 10); a tool
+   * matches when it has every one: the tracker name is matched exactly, the value
+   * partially and ignoring case (`482` also matches `00482`). Like a search it is
+   * company-wide and lists no folders. A chip without name or value is a 400.
    */
   trackers?: string[];
 }

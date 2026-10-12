@@ -414,6 +414,10 @@ export interface ToolWindow {
   positive: number | null;
   /** Share (0-100) of negative responses: 1-2, or NPS detractors; `null` with no responses. */
   negative: number | null;
+  /** The raw counts and score sum behind the shares, to combine tools without rounding drift. */
+  positiveCount: number;
+  negativeCount: number;
+  scoreSum: number;
 }
 
 /** Per-tool figures of `folders.metrics`: the period against the one before it. */
