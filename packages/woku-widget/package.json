@@ -1,6 +1,6 @@
 {
   "name": "@wokuapp/woku-widget",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "private": false,
   "description": "Ambivalent web widget micro-app (woku 1-5 + NPS 0-10), distributed via CDN iframe + lightweight loader script.",
   "keywords": [

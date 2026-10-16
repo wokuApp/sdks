@@ -1,5 +1,17 @@
 # @wokuapp/sdk
 
+## 0.6.0
+
+### Minor Changes
+
+- baa11c8: `folders.metrics` accepts a custom `from`/`to` range of UTC days (`YYYY-MM-DD`,
+  both inclusive, up to 731 days), as the admin custom period, and its result
+  carries `from` and `to` when one was asked for.
+- 52b0ba4: Remove `quarantines.check()` from the management SDK: the public API no longer
+  exposes `GET /v1/quarantines/check` (quarantines are not managed from the admin
+  anymore). Existing quarantines are still enforced when a respondent answers.
+  The widget loader stops calling that endpoint before registering its triggers.
+
 ## 0.5.0
 
 ### Minor Changes
