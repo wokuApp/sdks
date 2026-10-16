@@ -108,12 +108,13 @@ export class Folders {
    * subfolders for a period against the one before it, with the daily sums and
    * the histogram of scores. `days` is 7, 30 (default) or 90, or 0 for the whole
    * history (every `previous` window is then empty). The period is the last
-   * `days` calendar days in UTC, today included. Scales are never mixed across
-   * types.
+   * `days` calendar days in UTC, today included. Or a custom range with `from`
+   * and `to` (`YYYY-MM-DD` UTC days, both inclusive, up to 731 days), which
+   * replaces `days`. Scales are never mixed across types.
    */
   metrics(
     id: string,
-    params?: { days?: 0 | 7 | 30 | 90 },
+    params?: { days?: 0 | 7 | 30 | 90; from?: string; to?: string },
     opts?: RequestOptions,
   ): Promise<FolderToolMetrics> {
     return this.client.request<FolderToolMetrics>(
