@@ -493,8 +493,8 @@ await woku.npsTools.create(body, { idempotencyKey: 'my-key' });
 
 `trackers`, `npsTools` / `csatTools` / `cesTools`, `nps` / `csat` / `ces`,
 `wokus`, `forms`, `flows`, `actionPlans`, `actionPlanGroups`, `tickets`,
-`ticketDestinations`, `dispatches`, `reports`, `company`, `quarantines`,
-`journeys`, `folders`, `tools`, `journeyFolders`.
+`ticketDestinations`, `dispatches`, `reports`, `company`, `journeys`,
+`folders`, `tools`, `journeyFolders`.
 
 ## License
 

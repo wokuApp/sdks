@@ -167,7 +167,6 @@ Host page
   └── <script src=".../loader.js"> (2.5 KB gz)
         ├── WokuWidget.init(config)
         ├── URL-rules check
-        ├── quarantine check → GET /v1/quarantines/check
         ├── trigger registration (time/scroll/exit-intent/event/selector)
         └── on fire → injects <iframe src=".../index.html?...">
                           postMessage: woku:ready / woku:config

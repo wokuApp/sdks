@@ -1102,23 +1102,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/quarantines/check": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Check whether a respondent is currently quarantined */
-        get: operations["V1QuarantinesController_check"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/v1/nps/invitations": {
         parameters: {
             query?: never;
@@ -1611,7 +1594,7 @@ export interface paths {
         };
         /**
          * Response-rate metrics over the invitation dispatches
-         * @description responseRate = (responded + partially_responded) / total, or null when there are no dispatches in scope.
+         * @description total counts the invitations that went out. Invitations that never went out (status skipped, or failed when the provider rejected the send) are counted in byStatus and bySkipReason and stay out of the rate. responseRate = (responded + partially_responded) / total, or null when no invitation in scope went out. byDay is a daily series (America/Santiago).
          */
         get: operations["V1DispatchesController_stats"];
         put?: never;
@@ -1923,7 +1906,7 @@ export interface paths {
         };
         /**
          * Get the metrics of the tools of a folder
-         * @description Figures of every woku, NPS, CSAT and CES tool of the folder and its subfolders for a period (`days` 7, 30 or 90, or 0 for the whole history, default 30) against the period before it: per tool, the responses, the native-scale headline and the share of positive and negative responses; the daily sums of both periods (UTC) and the histogram of scores of the period (NPS 0-10, the rest 1-5). Scales are never mixed across types.
+         * @description Figures of every woku, NPS, CSAT and CES tool of the folder and its subfolders for a period (`days` 7, 30 or 90, or 0 for the whole history, default 30; or a custom `from`/`to` range of whole UTC days) against the period before it: per tool, the responses, the native-scale headline and the share of positive and negative responses; the daily sums of both periods (UTC) and the histogram of scores of the period (NPS 0-10, the rest 1-5). Scales are never mixed across types.
          */
         get: operations["V1FoldersController_getFolderMetrics"];
         put?: never;
@@ -6287,34 +6270,6 @@ export interface operations {
             };
         };
     };
-    V1QuarantinesController_check: {
-        parameters: {
-            query?: {
-                email?: string;
-                phone?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Quarantine status for the respondent */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description email or phone is required */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
     V1InvitationsController_sendNpsInvitations: {
         parameters: {
             query?: never;
@@ -7568,7 +7523,7 @@ export interface operations {
                 /** @description Upper bound for createdAt (ISO 8601). */
                 createdTo?: string;
                 /** @description Lifecycle status of the whole invitation. */
-                status?: "invited" | "partially_responded" | "responded" | "failed";
+                status?: "invited" | "partially_responded" | "responded" | "failed" | "skipped";
                 page?: number;
                 limit?: number;
             };
@@ -8615,6 +8570,10 @@ export interface operations {
             query?: {
                 /** @description Period in days: 7, 30 or 90, or 0 for the whole history. Defaults to 30. */
                 days?: 0 | 7 | 30 | 90;
+                /** @description Custom period start (YYYY-MM-DD, UTC day, inclusive). With `to`, replaces `days`. */
+                from?: string;
+                /** @description Custom period end (YYYY-MM-DD, UTC day, inclusive). */
+                to?: string;
             };
             header?: never;
             path: {
