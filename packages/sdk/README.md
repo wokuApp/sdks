@@ -397,6 +397,11 @@ const pdf: Uint8Array = await woku.folders.pdf(folder.id, { lang: 'en' });
 // 0 for the whole history), with the daily sums and the histogram of scores.
 // Every type keeps its own scale: NPS -100..100, CSAT %, CES and stars 1-5.
 const metrics = await woku.folders.metrics(folder.id, { days: 30 });
+// Or a custom range of UTC days (both inclusive), as the admin custom period.
+const september = await woku.folders.metrics(folder.id, {
+  from: '2026-09-01',
+  to: '2026-09-30',
+});
 for (const tool of metrics.tools) {
   console.log(
     tool.name,
@@ -493,8 +498,8 @@ await woku.npsTools.create(body, { idempotencyKey: 'my-key' });
 
 `trackers`, `npsTools` / `csatTools` / `cesTools`, `nps` / `csat` / `ces`,
 `wokus`, `forms`, `flows`, `actionPlans`, `actionPlanGroups`, `tickets`,
-`ticketDestinations`, `dispatches`, `reports`, `company`, `quarantines`,
-`journeys`, `folders`, `tools`, `journeyFolders`.
+`ticketDestinations`, `dispatches`, `reports`, `company`, `journeys`,
+`folders`, `tools`, `journeyFolders`.
 
 ## License
 

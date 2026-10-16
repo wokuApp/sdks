@@ -446,6 +446,9 @@ export interface DailyPoint {
 export interface FolderToolMetrics {
   /** Period in days; `0` is the whole history (then every `previous` window is empty). */
   days: number;
+  /** Custom period (`YYYY-MM-DD`, both inclusive) when one was asked for. */
+  from?: string;
+  to?: string;
   tools: ToolMetrics[];
   /** Daily sums of both windows (2 x `days`). */
   daily: DailyPoint[];

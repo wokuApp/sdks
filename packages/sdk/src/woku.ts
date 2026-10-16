@@ -13,7 +13,6 @@ import { Dispatches } from './resources/dispatches';
 import { Reports } from './resources/reports';
 import { Company } from './resources/company';
 import { Journeys } from './resources/journeys';
-import { Quarantines } from './resources/quarantines';
 import { Folders } from './resources/folders';
 import { Tools } from './resources/tools';
 import { JourneyFolders } from './resources/journey-folders';
@@ -54,7 +53,6 @@ export class Woku {
   readonly company: Company;
   /** Customer journeys: moments, their tools and how each one starts. */
   readonly journeys: Journeys;
-  readonly quarantines: Quarantines;
   /** Folders that organize wokus and NPS, CSAT and CES tools. */
   readonly folders: Folders;
   /** Unified search, headline figures and batch moves across every tool type. */
@@ -90,6 +88,5 @@ export class Woku {
     this.folders = new Folders(this.client);
     this.tools = new Tools(this.client);
     this.journeyFolders = new JourneyFolders(this.client);
-    this.quarantines = new Quarantines(this.client);
   }
 }

@@ -3459,46 +3459,6 @@
         ]
       }
     },
-    "/v1/quarantines/check": {
-      "get": {
-        "operationId": "V1QuarantinesController_check",
-        "parameters": [
-          {
-            "name": "email",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "phone",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Quarantine status for the respondent"
-          },
-          "400": {
-            "description": "email or phone is required"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Check whether a respondent is currently quarantined",
-        "tags": [
-          "v1 - quarantines"
-        ]
-      }
-    },
     "/v1/nps/invitations": {
       "post": {
         "description": "Dispatches the NPS survey (company-level, or tool-specific via npsToolId) to a list of recipients. Sends are asynchronous: the response reports per-recipient acceptance, including quarantine and WhatsApp credit rejections.",
@@ -5308,7 +5268,8 @@
                 "invited",
                 "partially_responded",
                 "responded",
-                "failed"
+                "failed",
+                "skipped"
               ]
             }
           },
@@ -5361,7 +5322,7 @@
     },
     "/v1/dispatches/stats": {
       "get": {
-        "description": "responseRate = (responded + partially_responded) / total, or null when there are no dispatches in scope.",
+        "description": "total counts the invitations that went out. Invitations that never went out (status skipped, or failed when the provider rejected the send) are counted in byStatus and bySkipReason and stay out of the rate. responseRate = (responded + partially_responded) / total, or null when no invitation in scope went out. byDay is a daily series (America/Santiago).",
         "operationId": "V1DispatchesController_stats",
         "parameters": [
           {
@@ -6703,7 +6664,7 @@
     },
     "/v1/folders/{id}/metrics": {
       "get": {
-        "description": "Figures of every woku, NPS, CSAT and CES tool of the folder and its subfolders for a period (`days` 7, 30 or 90, or 0 for the whole history, default 30) against the period before it: per tool, the responses, the native-scale headline and the share of positive and negative responses; the daily sums of both periods (UTC) and the histogram of scores of the period (NPS 0-10, the rest 1-5). Scales are never mixed across types.",
+        "description": "Figures of every woku, NPS, CSAT and CES tool of the folder and its subfolders for a period (`days` 7, 30 or 90, or 0 for the whole history, default 30; or a custom `from`/`to` range of whole UTC days) against the period before it: per tool, the responses, the native-scale headline and the share of positive and negative responses; the daily sums of both periods (UTC) and the histogram of scores of the period (NPS 0-10, the rest 1-5). Scales are never mixed across types.",
         "operationId": "V1FoldersController_getFolderMetrics",
         "parameters": [
           {
@@ -6728,6 +6689,26 @@
                 30,
                 90
               ]
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "description": "Custom period start (YYYY-MM-DD, UTC day, inclusive). With `to`, replaces `days`.",
+            "schema": {
+              "example": "2026-09-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "description": "Custom period end (YYYY-MM-DD, UTC day, inclusive).",
+            "schema": {
+              "example": "2026-09-30",
+              "type": "string"
             }
           }
         ],

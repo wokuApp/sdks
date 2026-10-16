@@ -17,7 +17,6 @@
  */
 
 import { passesUrlRules } from './url-rules';
-import { isInQuarantine } from './quarantine';
 import { registerTriggers } from './triggers';
 import { createIframeManager } from './iframe';
 import type {
@@ -67,21 +66,10 @@ function init(config: WokuWidgetConfig): void {
   // Gate 1: URL rules
   if (!passesUrlRules(_config.urlRules)) return;
 
-  // Gate 2: quarantine (async — fire triggers only if not quarantined)
-  const initializedConfig = _config;
-  const apiBase = initializedConfig.apiBaseUrl ?? DEFAULT_API_BASE;
-
-  void isInQuarantine(
-    apiBase,
-    initializedConfig.companyId,
-    initializedConfig.publishableKey,
-  ).then((quarantined) => {
-    if (quarantined || _config !== initializedConfig) return;
-
-    // Register triggers — fire will inject the iframe
-    _cleanupTriggers = registerTriggers(_config.triggers, () => {
-      void injectAndShow();
-    });
+  // Register triggers: fire will inject the iframe. Quarantined respondents
+  // are rejected by the API when they submit.
+  _cleanupTriggers = registerTriggers(_config.triggers, () => {
+    void injectAndShow();
   });
 }
 
