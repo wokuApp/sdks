@@ -1,5 +1,14 @@
 # @wokuapp/woku-widget
 
+## 0.3.1
+
+### Patch Changes
+
+- 52b0ba4: Remove `quarantines.check()` from the management SDK: the public API no longer
+  exposes `GET /v1/quarantines/check` (quarantines are not managed from the admin
+  anymore). Existing quarantines are still enforced when a respondent answers.
+  The widget loader stops calling that endpoint before registering its triggers.
+
 ## 0.3.0
 
 ### Minor Changes
