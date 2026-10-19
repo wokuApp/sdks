@@ -363,6 +363,8 @@ export interface WhatsappAlertRecipient {
   name: string;
   /** Kinds of comment that alert this number (numbers created before this feature only get `woku`). */
   sources: ToolType[];
+  /** `true`: every review of those kinds (recognitions too). `false`: improvements only (default). */
+  allReviews: boolean;
 }
 
 /** A folder with its breadcrumb path and subtree stats. */
@@ -377,7 +379,7 @@ export interface Folder {
   origin: FolderOrigin | null;
   /** Provider of an integration folder (`shopify`, `pancake`), otherwise `null`. */
   integrationProvider?: string | null;
-  /** WhatsApp numbers alerted when a comment of any tool in the folder is an improvement. */
+  /** WhatsApp numbers alerted when a comment of any tool in the folder is an improvement (or any review, with `allReviews`). */
   whatsappAlertRecipients: WhatsappAlertRecipient[];
   createdAt: string | null;
   stats: FolderStats;

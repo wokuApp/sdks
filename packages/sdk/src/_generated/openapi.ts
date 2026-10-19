@@ -3787,6 +3787,11 @@ export interface components {
             name: string;
             /** @description Kinds of comment that alert this number. Defaults to all four. */
             sources?: ("woku" | "nps" | "csat" | "ces")[];
+            /**
+             * @description true alerts every review of those kinds (recognitions too); false or absent alerts improvements only.
+             * @default false
+             */
+            allReviews: boolean;
         };
         UpdateFolderBodyDTO: {
             name?: string;

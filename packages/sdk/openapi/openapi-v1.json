@@ -11367,6 +11367,11 @@
                 "ces"
               ]
             }
+          },
+          "allReviews": {
+            "type": "boolean",
+            "description": "true alerts every review of those kinds (recognitions too); false or absent alerts improvements only.",
+            "default": false
           }
         },
         "required": [
