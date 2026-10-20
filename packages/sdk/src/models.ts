@@ -47,6 +47,10 @@ export interface NpsTool {
   availableLocales?: string[];
   defaultLocale?: string;
   localizedContent?: ToolLocalizedContent[];
+  /** Only identified answers (email or phone) are accepted. */
+  anonymousDisabled?: boolean;
+  /** Each identified client can answer once; anonymous answers never count. */
+  onlyOneResponsePerClient?: boolean;
   createdAt?: string;
 }
 
@@ -61,6 +65,10 @@ export interface CsatTool {
   availableLocales?: string[];
   defaultLocale?: string;
   localizedContent?: ToolLocalizedContent[];
+  /** Only identified answers (email or phone) are accepted. */
+  anonymousDisabled?: boolean;
+  /** Each identified client can answer once; anonymous answers never count. */
+  onlyOneResponsePerClient?: boolean;
   createdAt?: string;
 }
 
@@ -75,6 +83,10 @@ export interface CesTool {
   availableLocales?: string[];
   defaultLocale?: string;
   localizedContent?: ToolLocalizedContent[];
+  /** Only identified answers (email or phone) are accepted. */
+  anonymousDisabled?: boolean;
+  /** Each identified client can answer once; anonymous answers never count. */
+  onlyOneResponsePerClient?: boolean;
   createdAt?: string;
 }
 

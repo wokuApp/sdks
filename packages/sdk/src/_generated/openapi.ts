@@ -2992,6 +2992,10 @@ export interface components {
             audienceType?: string;
         };
         CreateNpsToolBodyDTO: {
+            /** @description Require an identified response (email or phone) */
+            anonymousDisabled?: boolean;
+            /** @description Accept one response per identified client; anonymous answers never count */
+            onlyOneResponsePerClient?: boolean;
             /**
              * Format: ObjectId
              * @description Folder to create the tool in. Must belong to your company. Omit for the root.
@@ -3029,6 +3033,10 @@ export interface components {
             localizedContent?: components["schemas"]["NpsToolLocalizedContentBodyDTO"][];
         };
         UpdateNpsToolBodyDTO: {
+            /** @description Require an identified response (email or phone) */
+            anonymousDisabled?: boolean;
+            /** @description Accept one response per identified client; anonymous answers never count */
+            onlyOneResponsePerClient?: boolean;
             name?: string;
             /**
              * @description Recommended company/product/service fragment (e.g. "our company"), NOT the full question.
@@ -3076,6 +3084,10 @@ export interface components {
             subject?: string;
         };
         CreateCsatToolBodyDTO: {
+            /** @description Require an identified response (email or phone) */
+            anonymousDisabled?: boolean;
+            /** @description Accept one response per identified client; anonymous answers never count */
+            onlyOneResponsePerClient?: boolean;
             /**
              * Format: ObjectId
              * @description Folder to create the tool in. Must belong to your company. Omit for the root.
@@ -3113,6 +3125,10 @@ export interface components {
             localizedContent?: components["schemas"]["CsatToolLocalizedContentBodyDTO"][];
         };
         UpdateCsatToolBodyDTO: {
+            /** @description Require an identified response (email or phone) */
+            anonymousDisabled?: boolean;
+            /** @description Accept one response per identified client; anonymous answers never count */
+            onlyOneResponsePerClient?: boolean;
             name?: string;
             question?: string;
             subject?: string;
@@ -3145,6 +3161,10 @@ export interface components {
             action?: string;
         };
         CreateCesToolBodyDTO: {
+            /** @description Require an identified response (email or phone) */
+            anonymousDisabled?: boolean;
+            /** @description Accept one response per identified client; anonymous answers never count */
+            onlyOneResponsePerClient?: boolean;
             /**
              * Format: ObjectId
              * @description Folder to create the tool in. Must belong to your company. Omit for the root.
@@ -3182,6 +3202,10 @@ export interface components {
             localizedContent?: components["schemas"]["CesToolLocalizedContentBodyDTO"][];
         };
         UpdateCesToolBodyDTO: {
+            /** @description Require an identified response (email or phone) */
+            anonymousDisabled?: boolean;
+            /** @description Accept one response per identified client; anonymous answers never count */
+            onlyOneResponsePerClient?: boolean;
             name?: string;
             question?: string;
             action?: string;

@@ -566,3 +566,45 @@ describe('flows with steps', () => {
     expect(page.data[0].steps).toHaveLength(3);
   });
 });
+
+describe('survey tools carry response settings (P-18)', () => {
+  it('create and update bodies accept both settings in the generated contract', () => {
+    const schemas = spec.components.schemas as Record<
+      string,
+      { properties: Record<string, unknown> }
+    >;
+    for (const name of [
+      'CreateNpsToolBodyDTO',
+      'UpdateNpsToolBodyDTO',
+      'CreateCsatToolBodyDTO',
+      'UpdateCsatToolBodyDTO',
+      'CreateCesToolBodyDTO',
+      'UpdateCesToolBodyDTO',
+    ]) {
+      expect(schemas[name].properties.anonymousDisabled).toBeDefined();
+      expect(schemas[name].properties.onlyOneResponsePerClient).toBeDefined();
+    }
+  });
+
+  it('sends a settings-only update and reads the settings back', async () => {
+    const { calls, woku } = client(() => ({
+      body: {
+        _id: 'nt1',
+        name: 'Post-sale',
+        npsMessage: 'our company',
+        anonymousDisabled: false,
+        onlyOneResponsePerClient: true,
+      },
+    }));
+
+    const updated = await woku.npsTools.update('nt1', {
+      onlyOneResponsePerClient: true,
+    });
+
+    expect(calls[0].method).toBe('PATCH');
+    expect(calls[0].url.pathname).toBe('/v1/nps-tools/nt1');
+    expect(calls[0].body).toEqual({ onlyOneResponsePerClient: true });
+    expect(updated.onlyOneResponsePerClient).toBe(true);
+    expect(updated.anonymousDisabled).toBe(false);
+  });
+});

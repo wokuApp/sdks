@@ -9237,6 +9237,14 @@
       "CreateNpsToolBodyDTO": {
         "type": "object",
         "properties": {
+          "anonymousDisabled": {
+            "type": "boolean",
+            "description": "Require an identified response (email or phone)"
+          },
+          "onlyOneResponsePerClient": {
+            "type": "boolean",
+            "description": "Accept one response per identified client; anonymous answers never count"
+          },
           "folderId": {
             "type": "string",
             "description": "Folder to create the tool in. Must belong to your company. Omit for the root.",
@@ -9296,6 +9304,14 @@
       "UpdateNpsToolBodyDTO": {
         "type": "object",
         "properties": {
+          "anonymousDisabled": {
+            "type": "boolean",
+            "description": "Require an identified response (email or phone)"
+          },
+          "onlyOneResponsePerClient": {
+            "type": "boolean",
+            "description": "Accept one response per identified client; anonymous answers never count"
+          },
           "name": {
             "type": "string",
             "maxLength": 140
@@ -9385,6 +9401,14 @@
       "CreateCsatToolBodyDTO": {
         "type": "object",
         "properties": {
+          "anonymousDisabled": {
+            "type": "boolean",
+            "description": "Require an identified response (email or phone)"
+          },
+          "onlyOneResponsePerClient": {
+            "type": "boolean",
+            "description": "Accept one response per identified client; anonymous answers never count"
+          },
           "folderId": {
             "type": "string",
             "description": "Folder to create the tool in. Must belong to your company. Omit for the root.",
@@ -9444,6 +9468,14 @@
       "UpdateCsatToolBodyDTO": {
         "type": "object",
         "properties": {
+          "anonymousDisabled": {
+            "type": "boolean",
+            "description": "Require an identified response (email or phone)"
+          },
+          "onlyOneResponsePerClient": {
+            "type": "boolean",
+            "description": "Accept one response per identified client; anonymous answers never count"
+          },
           "name": {
             "type": "string",
             "maxLength": 140
@@ -9515,6 +9547,14 @@
       "CreateCesToolBodyDTO": {
         "type": "object",
         "properties": {
+          "anonymousDisabled": {
+            "type": "boolean",
+            "description": "Require an identified response (email or phone)"
+          },
+          "onlyOneResponsePerClient": {
+            "type": "boolean",
+            "description": "Accept one response per identified client; anonymous answers never count"
+          },
           "folderId": {
             "type": "string",
             "description": "Folder to create the tool in. Must belong to your company. Omit for the root.",
@@ -9574,6 +9614,14 @@
       "UpdateCesToolBodyDTO": {
         "type": "object",
         "properties": {
+          "anonymousDisabled": {
+            "type": "boolean",
+            "description": "Require an identified response (email or phone)"
+          },
+          "onlyOneResponsePerClient": {
+            "type": "boolean",
+            "description": "Accept one response per identified client; anonymous answers never count"
+          },
           "name": {
             "type": "string",
             "maxLength": 140

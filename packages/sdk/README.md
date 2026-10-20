@@ -440,6 +440,17 @@ Folders created by woku (journeys, moments, integrations) report their `origin`
 tools (`npsTools`, `csatTools`, `cesTools`) accept `folderId` on `create`, expose
 `folderId` on every tool and have `move(id, { folderId })`.
 
+NPS, CSAT and CES tools also take two response settings on `create` and
+`update`: `anonymousDisabled` (only identified answers) and
+`onlyOneResponsePerClient` (each identified client answers once; a repeat
+answer is rejected with HTTP 409 and the code `ALREADY_RESPONDED`). Both come
+back on every tool and can change even after the tool has responses, while its
+copy stays frozen:
+
+```ts
+await woku.npsTools.update('nps_tool_id', { onlyOneResponsePerClient: true });
+```
+
 ## Pagination
 
 Paginated resource methods return a `Page` (journey enrollments and `tools.list` use a cursor envelope). Iterate every item across pages, or walk pages:
