@@ -1,5 +1,13 @@
 # @wokuapp/sdk
 
+## 0.7.0
+
+### Minor Changes
+
+- c035cc2: `whatsappAlertRecipients` numbers take `allReviews`: `true` alerts every review
+  (recognitions too), `false` or absent keeps improvement alerts only. Folders
+  return it on every recipient.
+
 ## 0.6.0
 
 ### Minor Changes
