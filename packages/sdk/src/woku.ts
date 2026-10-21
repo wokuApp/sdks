@@ -16,6 +16,8 @@ import { Journeys } from './resources/journeys';
 import { Folders } from './resources/folders';
 import { Tools } from './resources/tools';
 import { JourneyFolders } from './resources/journey-folders';
+import { ReportSubscriptions } from './resources/report-subscriptions';
+import { FolderParticipants } from './resources/folder-participants';
 
 /**
  * Entry point to the Woku management API.
@@ -55,6 +57,10 @@ export class Woku {
   readonly journeys: Journeys;
   /** Folders that organize wokus and NPS, CSAT and CES tools. */
   readonly folders: Folders;
+  /** The participant list of a folder and who of it answered each tool. */
+  readonly folderParticipants: FolderParticipants;
+  /** Reports emailed on a schedule (monthly, every two weeks, weekly or once). */
+  readonly reportSubscriptions: ReportSubscriptions;
   /** Unified search, headline figures and batch moves across every tool type. */
   readonly tools: Tools;
   /** Keep journeys and their moments in folders (`Viajes > journey > moment`). */
@@ -86,6 +92,8 @@ export class Woku {
     this.company = new Company(this.client);
     this.journeys = new Journeys(this.client);
     this.folders = new Folders(this.client);
+    this.folderParticipants = new FolderParticipants(this.client);
+    this.reportSubscriptions = new ReportSubscriptions(this.client);
     this.tools = new Tools(this.client);
     this.journeyFolders = new JourneyFolders(this.client);
   }

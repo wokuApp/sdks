@@ -20,7 +20,14 @@ export interface ListToolsParams {
   types?: ToolType[];
   /** Case and accent insensitive search (company-wide, also matches folders). */
   q?: string;
-  sort?: 'name' | '-name' | 'created' | '-created';
+  /** `lastResponse` orders by the latest response; tools without one sort as the oldest. */
+  sort?:
+    | 'name'
+    | '-name'
+    | 'created'
+    | '-created'
+    | 'lastResponse'
+    | '-lastResponse';
   /** Page size, 1-100 (default 50). */
   limit?: number;
   /** Folders per page, 1-100 (omit to receive every folder of the level). */

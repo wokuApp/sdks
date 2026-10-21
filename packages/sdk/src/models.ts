@@ -511,3 +511,117 @@ export interface Flow {
   createdAt?: string;
   updatedAt?: string;
 }
+
+/** What a scheduled report covers: a folder (every tool of its subtree) or one tool. */
+export type ReportSubscriptionScope =
+  | 'folder'
+  | 'woku'
+  | 'nps'
+  | 'csat'
+  | 'ces';
+
+/** monthly (1st), biweekly (1st and 16th), weekly (Mondays) at 12:00 UTC, or once. */
+export type ReportSubscriptionFrequency =
+  | 'monthly'
+  | 'biweekly'
+  | 'weekly'
+  | 'once';
+
+/** One send of a scheduled report. */
+export interface ReportSubscriptionDelivery {
+  /** `YYYY-MM-DD/YYYY-MM-DD`, the period it covered (`to` exclusive). */
+  periodKey: string;
+  sentAt: string;
+  /** Recipients that got it. */
+  recipients: number;
+  delivered: boolean;
+  error?: string;
+}
+
+/** A report emailed on a schedule to people inside or outside woku. */
+export interface ReportSubscription {
+  id: string;
+  scopeType: ReportSubscriptionScope;
+  scopeId: string;
+  /** Name of the folder or tool; empty when it no longer exists. */
+  scopeName?: string;
+  frequency: ReportSubscriptionFrequency;
+  /** `once` only: the period of the single report. */
+  periodFrom: string | null;
+  periodTo: string | null;
+  recipients: string[];
+  /** Folder only: the CSV of the period is attached too. */
+  includeCsv: boolean;
+  locale: string;
+  /** `false` when paused, or when a one-off already went out. */
+  active: boolean;
+  nextRunAt: string | null;
+  lastDelivery: ReportSubscriptionDelivery | null;
+  createdAt: string | null;
+}
+
+/** Outcome of `reportSubscriptions.send`. */
+export interface ReportSubscriptionSendResult {
+  status: 'sent' | 'skipped' | 'failed';
+  sent: number;
+  periodKey?: string;
+}
+
+/** A person of a folder's participant list. */
+export interface FolderParticipant {
+  /** Stable id, for `folderParticipants.remove`. */
+  id: string;
+  name?: string;
+  email?: string;
+  /** Digits with the country code, no `+`. */
+  phone?: string;
+}
+
+/** Who of the list answered one tool of the folder subtree. */
+export interface ToolParticipation {
+  type: ToolType;
+  id: string;
+  name: string;
+  folderPath: string;
+  /** The tool takes anonymous responses, which cannot be matched to the list. */
+  anonymousAllowed: boolean;
+  /** Indexes into `participants`: answered once. */
+  responded: number[];
+  missing: number[];
+  /** Answered more than once. */
+  repeated: number[];
+  /** Responses not from the list (anonymous or from someone else). */
+  outsideList: number;
+}
+
+/** A folder's participant list and who of it answered each tool. */
+export interface FolderParticipation {
+  folder: { id: string; name: string };
+  participants: FolderParticipant[];
+  updatedAt: string | null;
+  tools: ToolParticipation[];
+}
+
+/** Outcome of `folderParticipants.replace`. */
+export interface ParticipantsSaveResult {
+  count: number;
+  /** 1-based lines without an email or phone. */
+  invalidLines: number[];
+  duplicates: number;
+}
+
+/** Outcome of `folderParticipants.add`. */
+export interface ParticipantsAddResult extends ParticipantsSaveResult {
+  /** People on the list after adding. */
+  total: number;
+}
+
+/** Outcome of `folderParticipants.resendToMissing`. */
+export interface ResendToMissingResult {
+  /** People of the list who have not answered the tool. */
+  missing: number;
+  sent: number;
+  /** Missing people without a contact for the channel. */
+  withoutContact: number;
+  failed: number;
+}

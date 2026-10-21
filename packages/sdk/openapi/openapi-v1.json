@@ -6733,7 +6733,7 @@
     },
     "/v1/folders/{id}/csv": {
       "get": {
-        "description": "One row per response of every woku, NPS, CSAT and CES tool of the folder and its subfolders, with the native scale next to each score.",
+        "description": "One row per response of every woku, NPS, CSAT and CES tool of the folder and its subfolders, with the native scale next to each score. With `from` and `to`, only the responses of that period.",
         "operationId": "V1FoldersController_getFolderCsv",
         "parameters": [
           {
@@ -6742,6 +6742,26 @@
             "in": "path",
             "schema": {
               "format": "ObjectId",
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "description": "Start of the period (ISO 8601, inclusive). Needs `to`.",
+            "schema": {
+              "example": "2026-09-01T03:00:00.000Z",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "description": "End of the period (ISO 8601, exclusive). Needs `from`.",
+            "schema": {
+              "example": "2026-10-01T03:00:00.000Z",
               "type": "string"
             }
           }
@@ -6825,6 +6845,474 @@
         ]
       }
     },
+    "/v1/report-subscriptions": {
+      "get": {
+        "description": "The reports the company sends by email on a schedule. Filter by one folder or tool with scopeType and scopeId.",
+        "operationId": "V1ReportSubscriptionsController_list",
+        "parameters": [
+          {
+            "name": "scopeType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "folder",
+                "woku",
+                "nps",
+                "csat",
+                "ces"
+              ]
+            }
+          },
+          {
+            "name": "scopeId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Scheduled reports"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List scheduled report emails",
+        "tags": [
+          "v1 - report subscriptions"
+        ]
+      },
+      "post": {
+        "description": "Emails the PDF report of a folder (every tool of its subtree, optionally with the CSV) or of one tool to up to 10 recipients outside woku. monthly (1st), biweekly (1st and 16th) and weekly (Mondays) go out at 12:00 UTC with the previous complete period; once goes out at sendAt (or now) with periodFrom/periodTo. Each email is sent as the company and carries a one-click unsubscribe.",
+        "operationId": "V1ReportSubscriptionsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateReportSubscriptionDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Scheduled report created"
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Folder or tool not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Schedule a report by email",
+        "tags": [
+          "v1 - report subscriptions"
+        ]
+      }
+    },
+    "/v1/report-subscriptions/{id}": {
+      "patch": {
+        "description": "A one-off report is not edited: delete it and create it again.",
+        "operationId": "V1ReportSubscriptionsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateReportSubscriptionDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Scheduled report updated"
+          },
+          "404": {
+            "description": "Scheduled report not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Edit, pause or resume a scheduled report",
+        "tags": [
+          "v1 - report subscriptions"
+        ]
+      },
+      "delete": {
+        "operationId": "V1ReportSubscriptionsController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Scheduled report not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete a scheduled report",
+        "tags": [
+          "v1 - report subscriptions"
+        ]
+      }
+    },
+    "/v1/report-subscriptions/{id}/send": {
+      "post": {
+        "description": "Sends the last complete period (or the one-off period) to its recipients and returns how many got it.",
+        "operationId": "V1ReportSubscriptionsController_sendNow",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Send result"
+          },
+          "404": {
+            "description": "Scheduled report not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Send a scheduled report now",
+        "tags": [
+          "v1 - report subscriptions"
+        ]
+      }
+    },
+    "/v1/folders/{id}/participants": {
+      "get": {
+        "description": "The people expected to answer the tools of the folder and its subfolders and, per tool, the indexes of who answered once (responded), who did not (missing), who answered more than once (repeated), and how many responses are outside the list (anonymous or from someone else). Anonymous responses cannot be matched; anonymousAllowed says which tools take them.",
+        "operationId": "V1FolderParticipantsController_participation",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Folder id",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List and participation"
+          },
+          "404": {
+            "description": "Folder not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Participant list of a folder and who of it answered",
+        "tags": [
+          "v1 - folder participants"
+        ]
+      },
+      "put": {
+        "description": "One person per line: a name, an email and/or a phone with its country code, separated by commas, semicolons or tabs (a CSV as is; a header row is skipped). Up to 500 people. The contacts are stored encrypted.",
+        "operationId": "V1FolderParticipantsController_replace",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Folder id",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetFolderParticipantsDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "People saved, invalid lines and duplicates"
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Folder not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Replace the participant list of a folder",
+        "tags": [
+          "v1 - folder participants"
+        ]
+      },
+      "post": {
+        "description": "Same format as the replace. People already on the list (same email or phone) are skipped.",
+        "operationId": "V1FolderParticipantsController_add",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Folder id",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetFolderParticipantsDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "People added and the new total"
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Folder not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Add people to the participant list of a folder",
+        "tags": [
+          "v1 - folder participants"
+        ]
+      },
+      "delete": {
+        "operationId": "V1FolderParticipantsController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Folder id",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List deleted"
+          },
+          "404": {
+            "description": "Folder not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete the participant list of a folder",
+        "tags": [
+          "v1 - folder participants"
+        ]
+      }
+    },
+    "/v1/folders/{id}/participants/resend": {
+      "post": {
+        "description": "By email or WhatsApp, with the regular sends (they count as API invitations). People without a contact for the channel are reported in withoutContact.",
+        "operationId": "V1FolderParticipantsController_resend",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Folder id",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResendToMissingParticipantsDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "missing, sent, withoutContact, failed"
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Folder not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Send a tool again to the people of the list who have not answered",
+        "tags": [
+          "v1 - folder participants"
+        ]
+      }
+    },
+    "/v1/folders/{id}/participants/{participantId}": {
+      "delete": {
+        "operationId": "V1FolderParticipantsController_removeOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Folder id",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          },
+          {
+            "name": "participantId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Person removed"
+          },
+          "404": {
+            "description": "Folder not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Remove one person from the participant list",
+        "tags": [
+          "v1 - folder participants"
+        ]
+      }
+    },
     "/v1/tools": {
       "get": {
         "description": "Lists one folder level (`folderId`, root by default) or the whole company (`scope=company`). A search (`q`) is company-wide and also returns matching folders. Items of every type (woku, nps, csat, ces) come in one cursor-paginated list, with facet counts per type.",
@@ -6876,7 +7364,9 @@
                 "name",
                 "-name",
                 "created",
-                "-created"
+                "-created",
+                "lastResponse",
+                "-lastResponse"
               ]
             }
           },
@@ -11462,6 +11952,156 @@
         },
         "required": [
           "parentFolderId"
+        ]
+      },
+      "CreateReportSubscriptionDTO": {
+        "type": "object",
+        "properties": {
+          "scopeType": {
+            "type": "string",
+            "enum": [
+              "folder",
+              "woku",
+              "nps",
+              "csat",
+              "ces"
+            ]
+          },
+          "scopeId": {
+            "type": "string",
+            "description": "Folder or tool id",
+            "format": "ObjectId"
+          },
+          "frequency": {
+            "type": "string",
+            "enum": [
+              "monthly",
+              "biweekly",
+              "weekly",
+              "once"
+            ],
+            "description": "monthly (1st), biweekly (1st and 16th), weekly (Mondays) at 12:00 UTC with the previous complete period, or once"
+          },
+          "recipients": {
+            "description": "Recipient emails, 1 to 10; they need no woku account",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "includeCsv": {
+            "type": "boolean",
+            "description": "Folder only: also attach the CSV"
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "es",
+              "en"
+            ],
+            "default": "es"
+          },
+          "sendAt": {
+            "type": "string",
+            "description": "once only: when to send it (ISO); absent = now"
+          },
+          "periodFrom": {
+            "type": "string",
+            "description": "once only: period start (ISO)"
+          },
+          "periodTo": {
+            "type": "string",
+            "description": "once only: period end (ISO, exclusive)"
+          }
+        },
+        "required": [
+          "scopeType",
+          "scopeId",
+          "frequency",
+          "recipients"
+        ]
+      },
+      "UpdateReportSubscriptionDTO": {
+        "type": "object",
+        "properties": {
+          "frequency": {
+            "type": "string",
+            "enum": [
+              "monthly",
+              "biweekly",
+              "weekly"
+            ]
+          },
+          "recipients": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "includeCsv": {
+            "type": "boolean"
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "es",
+              "en"
+            ]
+          },
+          "active": {
+            "type": "boolean",
+            "description": "false pauses, true resumes"
+          }
+        }
+      },
+      "SetFolderParticipantsDTO": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "One person per line: a name, an email and/or a phone (with country code), separated by commas, semicolons or tabs. A CSV pastes as is; a header row is skipped. Replaces the list; up to 500 people.",
+            "example": "Ana Pérez, ana@acme.cl, +56 9 1234 5678\nbo@acme.cl"
+          }
+        },
+        "required": [
+          "text"
+        ]
+      },
+      "ResendToMissingParticipantsDTO": {
+        "type": "object",
+        "properties": {
+          "toolType": {
+            "type": "string",
+            "enum": [
+              "woku",
+              "nps",
+              "csat",
+              "ces"
+            ]
+          },
+          "toolId": {
+            "type": "string",
+            "format": "ObjectId"
+          },
+          "channel": {
+            "type": "string",
+            "enum": [
+              "email",
+              "whatsapp"
+            ]
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "es",
+              "en"
+            ]
+          }
+        },
+        "required": [
+          "toolType",
+          "toolId",
+          "channel"
         ]
       },
       "MoveItemDTO": {

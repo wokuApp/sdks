@@ -363,6 +363,8 @@ for await (const tool of page) {
   console.log(tool.type, tool.name, tool.reviewCount, tool.headline.value);
 }
 const found = await woku.tools.list({ q: 'delivery', scope: 'company' });
+// Tools with the most recent responses first (tools without any go last).
+const recent = await woku.tools.list({ sort: '-lastResponse' });
 // Tracker chips (`name:value`): a tool matches when it has every one. Company-wide.
 const tagged = await woku.tools.list({ trackers: ['TRR:00482'] });
 
@@ -390,6 +392,11 @@ await woku.npsTools.move('nps_tool_id', { folderId: null });
 // AI report and CSV over every tool of the folder and its subfolders.
 const report = await woku.folders.report(folder.id, { lang: 'en' });
 const csv: string = await woku.folders.csv(folder.id);
+// Only the responses of a period (`from` inclusive, `to` exclusive).
+const septemberCsv = await woku.folders.csv(folder.id, {
+  from: '2026-09-01T00:00:00.000Z',
+  to: '2026-10-01T00:00:00.000Z',
+});
 // PDF of that report with a breakdown per type (bytes, e.g. write them to a file).
 const pdf: Uint8Array = await woku.folders.pdf(folder.id, { lang: 'en' });
 
@@ -449,6 +456,75 @@ copy stays frozen:
 
 ```ts
 await woku.npsTools.update('nps_tool_id', { onlyOneResponsePerClient: true });
+```
+
+### Scheduled reports
+
+Email the PDF report of a folder (every tool of its subtree, optionally with
+the CSV) or of one tool to up to 10 people, also outside woku. `monthly` goes
+out on the 1st, `biweekly` on the 1st and 16th and `weekly` on Mondays, at
+12:00 UTC with the previous complete period; `once` goes out at `sendAt` with
+its own period. Each email goes as the company with a one-click unsubscribe.
+
+```ts
+const monthly = await woku.reportSubscriptions.create({
+  scopeType: 'folder',
+  scopeId: folder.id,
+  frequency: 'monthly',
+  recipients: ['board@acme.com'],
+  includeCsv: true,
+});
+console.log(monthly.nextRunAt);
+
+// One report of a chosen period, sent right away.
+const once = await woku.reportSubscriptions.create({
+  scopeType: 'nps',
+  scopeId: 'nps_tool_id',
+  frequency: 'once',
+  recipients: ['ana@acme.com'],
+  periodFrom: '2026-09-01T00:00:00.000Z',
+  periodTo: '2026-10-01T00:00:00.000Z',
+});
+await woku.reportSubscriptions.send(once.id); // { status: 'sent', sent: 1 }
+
+await woku.reportSubscriptions.update(monthly.id, { active: false }); // pause
+const all = await woku.reportSubscriptions.list({
+  scopeType: 'folder',
+  scopeId: folder.id,
+});
+await woku.reportSubscriptions.delete(monthly.id);
+```
+
+### Folder participants
+
+Keep the list of people expected to answer the tools of a folder (a program's
+enrolled, for example) and see, per tool, who answered, who is missing and who
+answered more than once. One person per line: a name, an email and/or a phone
+with its country code; a CSV goes as is. Only identified responses can be
+matched, so each tool says whether it takes anonymous ones.
+
+```ts
+await woku.folderParticipants.replace(
+  folder.id,
+  'Ana, ana@acme.com\nLuis, +56 9 8765 4321',
+);
+await woku.folderParticipants.add(folder.id, 'carla@acme.com'); // skips people already listed
+
+const { participants, tools } = await woku.folderParticipants.get(folder.id);
+for (const tool of tools) {
+  const missing = tool.missing.map((i) => participants[i].name);
+  console.log(tool.name, tool.responded.length, missing, tool.anonymousAllowed);
+}
+
+// Send a tool again to the people who have not answered it.
+await woku.folderParticipants.resendToMissing(folder.id, {
+  toolType: 'nps',
+  toolId: 'nps_tool_id',
+  channel: 'email',
+}); // { missing, sent, withoutContact, failed }
+
+await woku.folderParticipants.remove(folder.id, participants[0].id);
+await woku.folderParticipants.clear(folder.id);
 ```
 
 ## Pagination
@@ -514,7 +590,8 @@ await woku.npsTools.create(body, { idempotencyKey: 'my-key' });
 `trackers`, `npsTools` / `csatTools` / `cesTools`, `nps` / `csat` / `ces`,
 `wokus`, `forms`, `flows`, `actionPlans`, `actionPlanGroups`, `tickets`,
 `ticketDestinations`, `dispatches`, `reports`, `company`, `journeys`,
-`folders`, `tools`, `journeyFolders`.
+`folders`, `folderParticipants`, `tools`, `journeyFolders`,
+`reportSubscriptions`.
 
 ## License
 
