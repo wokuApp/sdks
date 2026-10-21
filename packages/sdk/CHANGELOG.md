@@ -1,5 +1,12 @@
 # @wokuapp/sdk
 
+## 0.8.0
+
+### Minor Changes
+
+- 8c40edd: `reportSubscriptions` schedules report emails (monthly, every two weeks, weekly or once) for a folder or a tool. `folderParticipants` keeps a folder's participant list, says who of it answered each tool and resends to the missing. `folders.csv` takes a period and `tools.list` sorts by the latest response (`lastResponse`).
+- c1afb7c: NPS, CSAT and CES tools take `anonymousDisabled` and `onlyOneResponsePerClient` on create and update, and return both on every tool. A repeat answer to a one-response-per-client survey is rejected with HTTP 409 `ALREADY_RESPONDED`.
+
 ## 0.7.0
 
 ### Minor Changes
