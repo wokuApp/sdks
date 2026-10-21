@@ -1926,7 +1926,7 @@ export interface paths {
         };
         /**
          * Download the folder responses as CSV
-         * @description One row per response of every woku, NPS, CSAT and CES tool of the folder and its subfolders, with the native scale next to each score.
+         * @description One row per response of every woku, NPS, CSAT and CES tool of the folder and its subfolders, with the native scale next to each score. With `from` and `to`, only the responses of that period.
          */
         get: operations["V1FoldersController_getFolderCsv"];
         put?: never;
@@ -1952,6 +1952,137 @@ export interface paths {
         head?: never;
         /** Move a folder under another folder, or to the root */
         patch: operations["V1FoldersController_moveFolder"];
+        trace?: never;
+    };
+    "/v1/report-subscriptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List scheduled report emails
+         * @description The reports the company sends by email on a schedule. Filter by one folder or tool with scopeType and scopeId.
+         */
+        get: operations["V1ReportSubscriptionsController_list"];
+        put?: never;
+        /**
+         * Schedule a report by email
+         * @description Emails the PDF report of a folder (every tool of its subtree, optionally with the CSV) or of one tool to up to 10 recipients outside woku. monthly (1st), biweekly (1st and 16th) and weekly (Mondays) go out at 12:00 UTC with the previous complete period; once goes out at sendAt (or now) with periodFrom/periodTo. Each email is sent as the company and carries a one-click unsubscribe.
+         */
+        post: operations["V1ReportSubscriptionsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/report-subscriptions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete a scheduled report */
+        delete: operations["V1ReportSubscriptionsController_remove"];
+        options?: never;
+        head?: never;
+        /**
+         * Edit, pause or resume a scheduled report
+         * @description A one-off report is not edited: delete it and create it again.
+         */
+        patch: operations["V1ReportSubscriptionsController_update"];
+        trace?: never;
+    };
+    "/v1/report-subscriptions/{id}/send": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send a scheduled report now
+         * @description Sends the last complete period (or the one-off period) to its recipients and returns how many got it.
+         */
+        post: operations["V1ReportSubscriptionsController_sendNow"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/folders/{id}/participants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Participant list of a folder and who of it answered
+         * @description The people expected to answer the tools of the folder and its subfolders and, per tool, the indexes of who answered once (responded), who did not (missing), who answered more than once (repeated), and how many responses are outside the list (anonymous or from someone else). Anonymous responses cannot be matched; anonymousAllowed says which tools take them.
+         */
+        get: operations["V1FolderParticipantsController_participation"];
+        /**
+         * Replace the participant list of a folder
+         * @description One person per line: a name, an email and/or a phone with its country code, separated by commas, semicolons or tabs (a CSV as is; a header row is skipped). Up to 500 people. The contacts are stored encrypted.
+         */
+        put: operations["V1FolderParticipantsController_replace"];
+        /**
+         * Add people to the participant list of a folder
+         * @description Same format as the replace. People already on the list (same email or phone) are skipped.
+         */
+        post: operations["V1FolderParticipantsController_add"];
+        /** Delete the participant list of a folder */
+        delete: operations["V1FolderParticipantsController_remove"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/folders/{id}/participants/resend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send a tool again to the people of the list who have not answered
+         * @description By email or WhatsApp, with the regular sends (they count as API invitations). People without a contact for the channel are reported in withoutContact.
+         */
+        post: operations["V1FolderParticipantsController_resend"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/folders/{id}/participants/{participantId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove one person from the participant list */
+        delete: operations["V1FolderParticipantsController_removeOne"];
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/v1/tools": {
@@ -2992,6 +3123,10 @@ export interface components {
             audienceType?: string;
         };
         CreateNpsToolBodyDTO: {
+            /** @description Require an identified response (email or phone) */
+            anonymousDisabled?: boolean;
+            /** @description Accept one response per identified client; anonymous answers never count */
+            onlyOneResponsePerClient?: boolean;
             /**
              * Format: ObjectId
              * @description Folder to create the tool in. Must belong to your company. Omit for the root.
@@ -3029,6 +3164,10 @@ export interface components {
             localizedContent?: components["schemas"]["NpsToolLocalizedContentBodyDTO"][];
         };
         UpdateNpsToolBodyDTO: {
+            /** @description Require an identified response (email or phone) */
+            anonymousDisabled?: boolean;
+            /** @description Accept one response per identified client; anonymous answers never count */
+            onlyOneResponsePerClient?: boolean;
             name?: string;
             /**
              * @description Recommended company/product/service fragment (e.g. "our company"), NOT the full question.
@@ -3076,6 +3215,10 @@ export interface components {
             subject?: string;
         };
         CreateCsatToolBodyDTO: {
+            /** @description Require an identified response (email or phone) */
+            anonymousDisabled?: boolean;
+            /** @description Accept one response per identified client; anonymous answers never count */
+            onlyOneResponsePerClient?: boolean;
             /**
              * Format: ObjectId
              * @description Folder to create the tool in. Must belong to your company. Omit for the root.
@@ -3113,6 +3256,10 @@ export interface components {
             localizedContent?: components["schemas"]["CsatToolLocalizedContentBodyDTO"][];
         };
         UpdateCsatToolBodyDTO: {
+            /** @description Require an identified response (email or phone) */
+            anonymousDisabled?: boolean;
+            /** @description Accept one response per identified client; anonymous answers never count */
+            onlyOneResponsePerClient?: boolean;
             name?: string;
             question?: string;
             subject?: string;
@@ -3145,6 +3292,10 @@ export interface components {
             action?: string;
         };
         CreateCesToolBodyDTO: {
+            /** @description Require an identified response (email or phone) */
+            anonymousDisabled?: boolean;
+            /** @description Accept one response per identified client; anonymous answers never count */
+            onlyOneResponsePerClient?: boolean;
             /**
              * Format: ObjectId
              * @description Folder to create the tool in. Must belong to your company. Omit for the root.
@@ -3182,6 +3333,10 @@ export interface components {
             localizedContent?: components["schemas"]["CesToolLocalizedContentBodyDTO"][];
         };
         UpdateCesToolBodyDTO: {
+            /** @description Require an identified response (email or phone) */
+            anonymousDisabled?: boolean;
+            /** @description Accept one response per identified client; anonymous answers never count */
+            onlyOneResponsePerClient?: boolean;
             name?: string;
             question?: string;
             action?: string;
@@ -3809,6 +3964,63 @@ export interface components {
              * @description New parent folder, or null to move the folder to the root. A folder cannot move into itself or one of its subfolders.
              */
             parentFolderId: string | null;
+        };
+        CreateReportSubscriptionDTO: {
+            /** @enum {string} */
+            scopeType: "folder" | "woku" | "nps" | "csat" | "ces";
+            /**
+             * Format: ObjectId
+             * @description Folder or tool id
+             */
+            scopeId: string;
+            /**
+             * @description monthly (1st), biweekly (1st and 16th), weekly (Mondays) at 12:00 UTC with the previous complete period, or once
+             * @enum {string}
+             */
+            frequency: "monthly" | "biweekly" | "weekly" | "once";
+            /** @description Recipient emails, 1 to 10; they need no woku account */
+            recipients: string[];
+            /** @description Folder only: also attach the CSV */
+            includeCsv?: boolean;
+            /**
+             * @default es
+             * @enum {string}
+             */
+            locale: "es" | "en";
+            /** @description once only: when to send it (ISO); absent = now */
+            sendAt?: string;
+            /** @description once only: period start (ISO) */
+            periodFrom?: string;
+            /** @description once only: period end (ISO, exclusive) */
+            periodTo?: string;
+        };
+        UpdateReportSubscriptionDTO: {
+            /** @enum {string} */
+            frequency?: "monthly" | "biweekly" | "weekly";
+            recipients?: string[];
+            includeCsv?: boolean;
+            /** @enum {string} */
+            locale?: "es" | "en";
+            /** @description false pauses, true resumes */
+            active?: boolean;
+        };
+        SetFolderParticipantsDTO: {
+            /**
+             * @description One person per line: a name, an email and/or a phone (with country code), separated by commas, semicolons or tabs. A CSV pastes as is; a header row is skipped. Replaces the list; up to 500 people.
+             * @example Ana Pérez, ana@acme.cl, +56 9 1234 5678
+             *     bo@acme.cl
+             */
+            text: string;
+        };
+        ResendToMissingParticipantsDTO: {
+            /** @enum {string} */
+            toolType: "woku" | "nps" | "csat" | "ces";
+            /** Format: ObjectId */
+            toolId: string;
+            /** @enum {string} */
+            channel: "email" | "whatsapp";
+            /** @enum {string} */
+            language?: "es" | "en";
         };
         MoveItemDTO: {
             /** @enum {string} */
@@ -8606,7 +8818,12 @@ export interface operations {
     };
     V1FoldersController_getFolderCsv: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Start of the period (ISO 8601, inclusive). Needs `to`. */
+                from?: string;
+                /** @description End of the period (ISO 8601, exclusive). Needs `from`. */
+                to?: string;
+            };
             header?: never;
             path: {
                 id: string;
@@ -8673,6 +8890,355 @@ export interface operations {
             };
         };
     };
+    V1ReportSubscriptionsController_list: {
+        parameters: {
+            query?: {
+                scopeType?: "folder" | "woku" | "nps" | "csat" | "ces";
+                scopeId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Scheduled reports */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1ReportSubscriptionsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateReportSubscriptionDTO"];
+            };
+        };
+        responses: {
+            /** @description Scheduled report created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Folder or tool not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1ReportSubscriptionsController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scheduled report not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1ReportSubscriptionsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateReportSubscriptionDTO"];
+            };
+        };
+        responses: {
+            /** @description Scheduled report updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scheduled report not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1ReportSubscriptionsController_sendNow: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Send result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Scheduled report not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1FolderParticipantsController_participation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Folder id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List and participation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Folder not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1FolderParticipantsController_replace: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Folder id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetFolderParticipantsDTO"];
+            };
+        };
+        responses: {
+            /** @description People saved, invalid lines and duplicates */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Folder not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1FolderParticipantsController_add: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Folder id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetFolderParticipantsDTO"];
+            };
+        };
+        responses: {
+            /** @description People added and the new total */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Folder not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1FolderParticipantsController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Folder id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List deleted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Folder not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1FolderParticipantsController_resend: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Folder id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResendToMissingParticipantsDTO"];
+            };
+        };
+        responses: {
+            /** @description missing, sent, withoutContact, failed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationErrorResponseDto"];
+                };
+            };
+            /** @description Folder not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1FolderParticipantsController_removeOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Folder id */
+                id: string;
+                participantId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Person removed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Folder not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     V1ToolsController_listTools: {
         parameters: {
             query?: {
@@ -8682,7 +9248,7 @@ export interface operations {
                 types?: string[];
                 /** @description Case and accent insensitive search over names and questions. A search is company-wide and also matches folder names. */
                 q?: string;
-                sort?: "name" | "-name" | "created" | "-created";
+                sort?: "name" | "-name" | "created" | "-created" | "lastResponse" | "-lastResponse";
                 /** @description Opaque `nextCursor` of the previous page. */
                 cursor?: string;
                 limit?: number;

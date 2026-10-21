@@ -39,6 +39,13 @@ export * from './resources/media';
 
 export { Folders } from './resources/folders';
 export { JourneyFolders } from './resources/journey-folders';
+export { FolderParticipants } from './resources/folder-participants';
+export type { ResendToMissingParams } from './resources/folder-participants';
+export { ReportSubscriptions } from './resources/report-subscriptions';
+export type {
+  CreateReportSubscriptionParams,
+  UpdateReportSubscriptionParams,
+} from './resources/report-subscriptions';
 export { Tools, ToolsPage } from './resources/tools';
 export type { ListToolsParams } from './resources/tools';
 

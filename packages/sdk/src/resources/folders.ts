@@ -124,12 +124,19 @@ export class Folders {
     );
   }
 
-  /** CSV text with one row per response of every tool of the folder subtree. */
-  csv(id: string, opts?: RequestOptions): Promise<FolderCsv> {
+  /**
+   * CSV text with one row per response of every tool of the folder subtree,
+   * or only those of a period (`from` inclusive, `to` exclusive, ISO 8601).
+   */
+  csv(
+    id: string,
+    params?: { from?: string; to?: string },
+    opts?: RequestOptions,
+  ): Promise<FolderCsv> {
     return this.client.request<FolderCsv>(
       'get',
       `/v1/folders/${encodeURIComponent(id)}/csv`,
-      opts,
+      { ...opts, query: { ...params, ...opts?.query } },
     );
   }
 
