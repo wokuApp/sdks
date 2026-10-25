@@ -126,7 +126,7 @@ npm install @wokuapp/sdk
 # or: pnpm add @wokuapp/sdk / yarn add @wokuapp/sdk
 ```
 
-Requires Node.js 18+ (uses the global `fetch`).
+Requires Node.js 22 (22.23.4 or later) or Node.js 24.22.1 or later (uses the global `fetch`). Older Node versions miss the October 2026 security fixes and are not supported.
 
 ## Quickstart
 

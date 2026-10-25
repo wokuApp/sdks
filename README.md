@@ -91,7 +91,7 @@ sdks/
 
 ## Development
 
-Requires [pnpm](https://pnpm.io) and Node >= 18.
+Requires [pnpm](https://pnpm.io) and Node 24.22.1 (pinned in `.nvmrc`; run `nvm use`).
 
 ```bash
 pnpm install        # install all workspace deps
