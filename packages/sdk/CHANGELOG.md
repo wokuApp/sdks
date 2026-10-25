@@ -1,5 +1,11 @@
 # @wokuapp/sdk
 
+## 0.8.1
+
+### Patch Changes
+
+- 51698c5: The bundled OpenAPI spec and the generated type comments no longer name private routes in the summaries of seven `/v1` endpoints (for example "v1 alias of POST /wokus/create-woku"). No API change.
+
 ## 0.8.0
 
 ### Minor Changes
