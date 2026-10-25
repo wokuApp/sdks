@@ -131,7 +131,7 @@ export interface paths {
         put?: never;
         /**
          * Search VoC entities by tracker filters (AND, partial match)
-         * @description Returns the VoC entities (nps/csat/ces/form/flow) whose tracker assignments match ALL the given filters. Response carries entity ids and the matched (name, value) pairs; map the ids to fetch the entities. Woku is not searchable here; use GET /search for Woku.
+         * @description Returns the VoC entities (nps/csat/ces/form/flow) whose tracker assignments match ALL the given filters. Response carries entity ids and the matched (name, value) pairs; map the ids to fetch the entities. Woku is not searchable here; use GET /v1/external-trackers/search for Woku.
          */
         post: operations["ExternalTrackersController_searchEntities"];
         delete?: never;
@@ -586,7 +586,7 @@ export interface paths {
         /** List the wokus of the caller company (paginated) */
         get: operations["V1WokusController_listWokus"];
         put?: never;
-        /** Create a woku (v1 alias of POST /wokus/create-woku) */
+        /** Create a woku */
         post: operations["V1WokusController_createWoku"];
         delete?: never;
         options?: never;
@@ -679,7 +679,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Create a woku with a file upload (v1 alias of POST /wokus/create-woku-form-data) */
+        /** Create a woku with a file upload */
         post: operations["V1WokusController_createWokuFormData"];
         delete?: never;
         options?: never;
@@ -694,7 +694,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get review data for a woku (v1 alias of GET /wokus/review/:wokuId) */
+        /** Get review data for a woku */
         get: operations["V1WokusController_getWokuReview"];
         put?: never;
         post?: never;
@@ -713,7 +713,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Create a text review for a woku (v1 alias of POST /wokus/create-textnote) */
+        /** Create a text review for a woku */
         post: operations["V1WokusController_createTextnote"];
         delete?: never;
         options?: never;
@@ -730,7 +730,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Create a voice review for a woku (v1 alias of POST /wokus/create-voicemail) */
+        /** Create a voice review for a woku */
         post: operations["V1WokusController_createVoicemail"];
         delete?: never;
         options?: never;
@@ -747,7 +747,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Share a woku review link via email (v1 alias of POST /wokus/share-woku-to-email) */
+        /** Share a woku review link via email */
         post: operations["V1WokusController_shareWokuToEmail"];
         delete?: never;
         options?: never;
@@ -783,7 +783,7 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get the caller company (v1 alias of GET /companies)
+         * Get the caller company
          * @description Returns the company resolved from the Bearer key along with its folders and wokus.
          */
         get: operations["V1CompaniesController_getCompanyData"];
