@@ -351,7 +351,7 @@
     },
     "/v1/external-trackers/search-entities": {
       "post": {
-        "description": "Returns the VoC entities (nps/csat/ces/form/flow) whose tracker assignments match ALL the given filters. Response carries entity ids and the matched (name, value) pairs; map the ids to fetch the entities. Woku is not searchable here; use GET /search for Woku.",
+        "description": "Returns the VoC entities (nps/csat/ces/form/flow) whose tracker assignments match ALL the given filters. Response carries entity ids and the matched (name, value) pairs; map the ids to fetch the entities. Woku is not searchable here; use GET /v1/external-trackers/search for Woku.",
         "operationId": "ExternalTrackersController_searchEntities",
         "parameters": [],
         "requestBody": {
@@ -1854,7 +1854,7 @@
             "bearer": []
           }
         ],
-        "summary": "Create a woku (v1 alias of POST /wokus/create-woku)",
+        "summary": "Create a woku",
         "tags": [
           "v1 - wokus"
         ]
@@ -2183,7 +2183,7 @@
             "bearer": []
           }
         ],
-        "summary": "Create a woku with a file upload (v1 alias of POST /wokus/create-woku-form-data)",
+        "summary": "Create a woku with a file upload",
         "tags": [
           "v1 - wokus"
         ]
@@ -2221,7 +2221,7 @@
             "bearer": []
           }
         ],
-        "summary": "Get review data for a woku (v1 alias of GET /wokus/review/:wokuId)",
+        "summary": "Get review data for a woku",
         "tags": [
           "v1 - wokus"
         ]
@@ -2269,7 +2269,7 @@
             "bearer": []
           }
         ],
-        "summary": "Create a text review for a woku (v1 alias of POST /wokus/create-textnote)",
+        "summary": "Create a text review for a woku",
         "tags": [
           "v1 - wokus"
         ]
@@ -2317,7 +2317,7 @@
             "bearer": []
           }
         ],
-        "summary": "Create a voice review for a woku (v1 alias of POST /wokus/create-voicemail)",
+        "summary": "Create a voice review for a woku",
         "tags": [
           "v1 - wokus"
         ]
@@ -2365,7 +2365,7 @@
             "bearer": []
           }
         ],
-        "summary": "Share a woku review link via email (v1 alias of POST /wokus/share-woku-to-email)",
+        "summary": "Share a woku review link via email",
         "tags": [
           "v1 - wokus"
         ]
@@ -2461,7 +2461,7 @@
             "bearer": []
           }
         ],
-        "summary": "Get the caller company (v1 alias of GET /companies)",
+        "summary": "Get the caller company",
         "tags": [
           "v1 - companies"
         ]
