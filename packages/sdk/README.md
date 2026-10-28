@@ -527,6 +527,39 @@ await woku.folderParticipants.remove(folder.id, participants[0].id);
 await woku.folderParticipants.clear(folder.id);
 ```
 
+### Data Studio apps
+
+Read the Data Studio apps of the company with their live data, change them
+with operations and manage their versions and data tables. Every change makes
+a new version (nothing is lost) and personal data never comes back.
+
+```ts
+const { data: apps } = await woku.dataApps.list();
+const studio = apps.filter((app) => app.kind === 'studio');
+
+const app = await woku.dataApps.get(studio[0].id); // current version
+const results = await woku.dataApps.runQueries(app.id, {
+  queries: [{ id: 'monthly' }],
+  params: { period: { from: '-30d', to: 'today' } },
+}); // { monthly: { ok, columns, rows, ... } }
+
+// Edit on the current version: all operations or none.
+const change = await woku.dataApps.edit(app.id, {
+  baseVersion: app.currentVersion, // a stale version answers 409
+  operations: [{ op: 'setTitle', title: 'Ventas por sucursal' }],
+});
+await woku.dataApps.restore(app.id, 1); // an earlier version as a new one
+await woku.dataApps.publish(app.id, change.version, { accessKey: 'clave' });
+
+// Data tables: the same file name makes a new version of the table.
+const table = await woku.dataApps.uploadTable(app.id, {
+  file: csvBytes,
+  filename: 'metas.csv',
+  contentType: 'text/csv',
+}); // queries read it as table.source ("table:<id>")
+const tables = await woku.dataApps.listTables(app.id);
+```
+
 ## Pagination
 
 Paginated resource methods return a `Page` (journey enrollments and `tools.list` use a cursor envelope). Iterate every item across pages, or walk pages:
@@ -591,7 +624,7 @@ await woku.npsTools.create(body, { idempotencyKey: 'my-key' });
 `wokus`, `forms`, `flows`, `actionPlans`, `actionPlanGroups`, `tickets`,
 `ticketDestinations`, `dispatches`, `reports`, `company`, `journeys`,
 `folders`, `folderParticipants`, `tools`, `journeyFolders`,
-`reportSubscriptions`.
+`reportSubscriptions`, `dataApps`.
 
 ## License
 

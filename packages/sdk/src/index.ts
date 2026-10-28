@@ -50,3 +50,8 @@ export { Tools, ToolsPage } from './resources/tools';
 export type { ListToolsParams } from './resources/tools';
 
 export { FollowUps } from './resources/follow-ups';
+export { DataApps } from './resources/data-apps';
+export type {
+  ListDataAppsParams,
+  UploadDataAppTableParams,
+} from './resources/data-apps';

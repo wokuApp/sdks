@@ -625,3 +625,79 @@ export interface ResendToMissingResult {
   withoutContact: number;
   failed: number;
 }
+
+/** A data app of the company (`kind: "studio"` for Data Studio apps). */
+export interface DataApp {
+  id: string;
+  title: string;
+  description: string | null;
+  kind: string;
+  slug: string | null;
+  isPublished: boolean;
+  publishedVersion: number | null;
+  currentVersion: number | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+
+/** One version of a Data Studio app with its spec (AppSpec). */
+export interface DataAppView {
+  id: string;
+  title: string;
+  currentVersion: number;
+  publishedVersion: number | null;
+  isPublished: boolean;
+  slug: string | null;
+  hasAccessKey: boolean;
+  version: {
+    version: number;
+    stage: 'wireframe' | 'built';
+    parentVersion: number | null;
+    author: 'agent' | 'user';
+    diffSummary: { es: string[]; en: string[] } | null;
+    createdAt: string;
+    spec: WokuRecord;
+    validation: WokuRecord[];
+  };
+  /** Output columns per query id. */
+  columns: Record<string, WokuRecord[]>;
+  versions: WokuRecord[];
+}
+
+/** Result or error per query id. */
+export type DataAppQueryResults = Record<
+  string,
+  | {
+      ok: true;
+      mode: 'rows' | 'aggregate';
+      columns: WokuRecord[];
+      rows: WokuRecord[];
+      total?: number;
+      page: number;
+      pageSize: number;
+      generatedAt: string;
+    }
+  | { ok: false; error: string }
+>;
+
+/** A new version made by an edit, a restore or a build. */
+export interface DataAppChange extends WokuRecord {
+  version: number;
+}
+
+export interface DataAppPublication {
+  slug: string | null;
+  isPublished: boolean;
+  publishedVersion: number | null;
+}
+
+/** A data table uploaded to an app; queries read it as `source`. */
+export interface DataAppTable {
+  id: string;
+  source: string;
+  name: string;
+  fileName: string;
+  version: number;
+  rowCount: number;
+  columns: Array<{ name: string; label: string; type: string }>;
+}
