@@ -4,12 +4,14 @@ import type { RequestOptions } from '../core/options';
 import type {
   DataApp,
   DataAppChange,
+  DataAppCopy,
   DataAppPublication,
   DataAppQueryResults,
   DataAppTable,
   DataAppView,
 } from '../models';
 import type {
+  CopyDataAppComponentParams,
   EditDataAppParams,
   PublishDataAppVersionParams,
   RunDataAppQueriesParams,
@@ -114,6 +116,37 @@ export class DataApps {
       'post',
       `/v1/data-apps/${encodeURIComponent(id)}/versions/${version}/publish`,
       { ...opts, body: body ?? {} },
+    );
+  }
+
+  /** Brings a component of an earlier version into the current one. */
+  copyFromVersion(
+    id: string,
+    body: CopyDataAppComponentParams,
+    opts?: RequestOptions,
+  ): Promise<DataAppChange> {
+    return this.client.request<DataAppChange>(
+      'post',
+      `/v1/data-apps/${encodeURIComponent(id)}/copy`,
+      { ...opts, body },
+    );
+  }
+
+  /** A new app from the current version; the original does not change. */
+  duplicate(id: string, opts?: RequestOptions): Promise<DataAppCopy> {
+    return this.client.request<DataAppCopy>(
+      'post',
+      `/v1/data-apps/${encodeURIComponent(id)}/duplicate`,
+      opts,
+    );
+  }
+
+  /** The shared link stops answering; versions are kept. */
+  unpublish(id: string, opts?: RequestOptions): Promise<DataAppPublication> {
+    return this.client.request<DataAppPublication>(
+      'post',
+      `/v1/data-apps/${encodeURIComponent(id)}/unpublish`,
+      opts,
     );
   }
 

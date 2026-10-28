@@ -2045,6 +2045,121 @@
         ]
       }
     },
+    "/v1/data-apps/{id}/copy": {
+      "post": {
+        "description": "Brings one component of an earlier version, with the queries and filters it needs, into the current version as a new version.",
+        "operationId": "V1DataAppsController_copyFromVersion",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CopyDataAppComponentBodyDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "New version, summary and issues"
+          },
+          "400": {
+            "description": "Unknown component or container"
+          },
+          "404": {
+            "description": "App or version not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Copy a component from an earlier version",
+        "tags": [
+          "v1 - data-apps"
+        ]
+      }
+    },
+    "/v1/data-apps/{id}/duplicate": {
+      "post": {
+        "description": "Creates a new app from the current version to explore a variant. The original does not change.",
+        "operationId": "V1DataAppsController_duplicate",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The new app"
+          },
+          "404": {
+            "description": "App not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Duplicate a Data Studio app",
+        "tags": [
+          "v1 - data-apps"
+        ]
+      }
+    },
+    "/v1/data-apps/{id}/unpublish": {
+      "post": {
+        "description": "The shared link stops answering. Versions are kept.",
+        "operationId": "V1DataAppsController_unpublish",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Publication state"
+          },
+          "404": {
+            "description": "App not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Stop sharing a Data Studio app",
+        "tags": [
+          "v1 - data-apps"
+        ]
+      }
+    },
     "/v1/data-apps/{id}/versions/{version}/restore": {
       "post": {
         "description": "Nothing is deleted. The shared link does not change.",
@@ -9202,6 +9317,36 @@
         "required": [
           "baseVersion",
           "operations"
+        ]
+      },
+      "CopyDataAppComponentBodyDTO": {
+        "type": "object",
+        "properties": {
+          "fromVersion": {
+            "type": "number",
+            "minimum": 1,
+            "description": "Version to copy the component from."
+          },
+          "nodeId": {
+            "type": "string",
+            "maxLength": 64,
+            "description": "Id of the component in that version."
+          },
+          "parent": {
+            "type": "string",
+            "maxLength": 64,
+            "description": "Container of the current version that receives it (for example \"page\")."
+          },
+          "index": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Position inside the container; omit to add it last."
+          }
+        },
+        "required": [
+          "fromVersion",
+          "nodeId",
+          "parent"
         ]
       },
       "PublishDataAppVersionBodyDTO": {

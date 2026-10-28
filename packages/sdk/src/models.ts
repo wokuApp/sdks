@@ -685,6 +685,13 @@ export interface DataAppChange extends WokuRecord {
   version: number;
 }
 
+/** The app created by a duplicate. */
+export interface DataAppCopy {
+  id: string;
+  title: string;
+  currentVersion: number | null;
+}
+
 export interface DataAppPublication {
   slug: string | null;
   isPublished: boolean;

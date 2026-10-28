@@ -677,6 +677,66 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/data-apps/{id}/copy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Copy a component from an earlier version
+         * @description Brings one component of an earlier version, with the queries and filters it needs, into the current version as a new version.
+         */
+        post: operations["V1DataAppsController_copyFromVersion"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/data-apps/{id}/duplicate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Duplicate a Data Studio app
+         * @description Creates a new app from the current version to explore a variant. The original does not change.
+         */
+        post: operations["V1DataAppsController_duplicate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/data-apps/{id}/unpublish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Stop sharing a Data Studio app
+         * @description The shared link stops answering. Versions are kept.
+         */
+        post: operations["V1DataAppsController_unpublish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/data-apps/{id}/versions/{version}/restore": {
         parameters: {
             query?: never;
@@ -2779,6 +2839,16 @@ export interface components {
             operations: {
                 [key: string]: unknown;
             }[];
+        };
+        CopyDataAppComponentBodyDTO: {
+            /** @description Version to copy the component from. */
+            fromVersion: number;
+            /** @description Id of the component in that version. */
+            nodeId: string;
+            /** @description Container of the current version that receives it (for example "page"). */
+            parent: string;
+            /** @description Position inside the container; omit to add it last. */
+            index?: number;
         };
         PublishDataAppVersionBodyDTO: {
             /** @description Access key of the shared link. Required the first time; omit to keep the current key. */
@@ -5669,6 +5739,98 @@ export interface operations {
             };
             /** @description The resulting spec is invalid */
             422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1DataAppsController_copyFromVersion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CopyDataAppComponentBodyDTO"];
+            };
+        };
+        responses: {
+            /** @description New version, summary and issues */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unknown component or container */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description App or version not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1DataAppsController_duplicate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The new app */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description App not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1DataAppsController_unpublish: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Publication state */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description App not found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

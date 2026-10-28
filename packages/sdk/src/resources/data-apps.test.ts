@@ -126,3 +126,43 @@ it('lists the tables of an app and uploads a data file', async () => {
   expect(table.version).toBe(2);
   expect(uploaded).toEqual({ name: 'metas.csv', size: 8 });
 });
+
+it('copies a component, duplicates and stops sharing', async () => {
+  const calls: string[] = [];
+  server.use(
+    http.post(`${BASE}/v1/data-apps/a1/copy`, async ({ request }) => {
+      calls.push(`copy ${JSON.stringify(await request.json())}`);
+      return HttpResponse.json({ version: 7, issues: [] }, { status: 201 });
+    }),
+    http.post(`${BASE}/v1/data-apps/a1/duplicate`, () => {
+      calls.push('duplicate');
+      return HttpResponse.json(
+        { id: 'a2', title: 'Ranking (copia)', currentVersion: 1 },
+        { status: 201 },
+      );
+    }),
+    http.post(`${BASE}/v1/data-apps/a2/unpublish`, () => {
+      calls.push('unpublish');
+      return HttpResponse.json({
+        slug: 'a2',
+        isPublished: false,
+        publishedVersion: null,
+      });
+    }),
+  );
+  const copied = await sdk().dataApps.copyFromVersion('a1', {
+    fromVersion: 2,
+    nodeId: 'chart',
+    parent: 'page',
+  });
+  expect(copied.version).toBe(7);
+  const copy = await sdk().dataApps.duplicate('a1');
+  expect(copy.id).toBe('a2');
+  const stopped = await sdk().dataApps.unpublish('a2');
+  expect(stopped.isPublished).toBe(false);
+  expect(calls).toEqual([
+    'copy {"fromVersion":2,"nodeId":"chart","parent":"page"}',
+    'duplicate',
+    'unpublish',
+  ]);
+});

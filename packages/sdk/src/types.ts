@@ -73,3 +73,4 @@ export type RunDataAppQueriesParams = Schemas['RunDataAppQueriesBodyDTO'];
 export type EditDataAppParams = Schemas['EditDataAppBodyDTO'];
 export type PublishDataAppVersionParams =
   Schemas['PublishDataAppVersionBodyDTO'];
+export type CopyDataAppComponentParams = Schemas['CopyDataAppComponentBodyDTO'];

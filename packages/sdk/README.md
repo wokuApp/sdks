@@ -549,7 +549,14 @@ const change = await woku.dataApps.edit(app.id, {
   operations: [{ op: 'setTitle', title: 'Ventas por sucursal' }],
 });
 await woku.dataApps.restore(app.id, 1); // an earlier version as a new one
+await woku.dataApps.copyFromVersion(app.id, {
+  fromVersion: 1,
+  nodeId: 'ranking',
+  parent: 'page',
+}); // one component back from an earlier version
 await woku.dataApps.publish(app.id, change.version, { accessKey: 'clave' });
+await woku.dataApps.unpublish(app.id); // the link stops answering
+const variant = await woku.dataApps.duplicate(app.id); // a new app to explore
 
 // Data tables: the same file name makes a new version of the table.
 const table = await woku.dataApps.uploadTable(app.id, {
