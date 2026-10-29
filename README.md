@@ -75,6 +75,15 @@ keeps the previous case, and delivery confirmation remains separate. A newer
 applied. Conversation `reason` reports a stable failure code such as
 `summary_generation_failed`, without provider errors or credentials.
 
+## Support and plans by folder (unreleased)
+
+Ticket destinations and action plan groups can listen to one tool folder
+(`scopeKind: 'folder'` + `folderId`) instead of tracker rows. Destination,
+group and ticket lists filter by `folderId`, and `folders.delete(id, {
+confirmDependents: true })` confirms deleting the destinations and groups
+configured on that folder (otherwise the API answers 409
+`FOLDER_HAS_DEPENDENTS`). See the `@wokuapp/sdk` README for examples.
+
 ## Repository layout
 
 ```

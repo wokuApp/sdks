@@ -221,12 +221,22 @@ export interface TicketOriginTracker {
   value: string;
 }
 
+export interface TicketOriginFolder {
+  id: string;
+  name: string;
+  /** "Stores > Santiago", root first. */
+  path: string;
+  ancestorIds?: string[];
+}
+
 export interface TicketOrigin {
   tool: FollowUpOrigin['tool'] | 'form';
   refId: string;
   instrumentId?: string;
   instrumentName?: string;
   trackers?: TicketOriginTracker[];
+  /** Tool folder when the ticket was created; absent for forms and the root. */
+  folder?: TicketOriginFolder;
   [key: string]: unknown;
 }
 

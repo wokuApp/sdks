@@ -9,6 +9,11 @@ import type {
   WokuRecord,
 } from '../models';
 
+export interface DeleteFolderParams {
+  /** Also delete the destinations and groups configured on the folder. */
+  confirmDependents?: boolean;
+}
+
 /**
  * Folders that organize wokus and NPS, CSAT and CES tools (`/v1/folders`).
  * To list what a folder contains use `woku.tools.list({ folderId })`.
@@ -76,14 +81,38 @@ export class Folders {
   }
 
   /**
-   * Delete a folder. Nothing inside is deleted: subfolders, wokus and tools
-   * move up to the parent folder (or the root).
+   * Delete a folder. Its subfolders, wokus and tools move up to the parent
+   * folder (or the root). The support destinations and action plan groups
+   * configured ON the folder are deleted with it, with their tickets and
+   * plans: when there are any, the API answers 409 (`ConflictError`, code
+   * `FOLDER_HAS_DEPENDENTS`, listing them) unless `confirmDependents: true`.
    */
-  delete(id: string, opts?: RequestOptions): Promise<DeletedResult> {
+  delete(id: string, opts?: RequestOptions): Promise<DeletedResult>;
+  delete(
+    id: string,
+    params: DeleteFolderParams,
+    opts?: RequestOptions,
+  ): Promise<DeletedResult>;
+  delete(
+    id: string,
+    paramsOrOpts?: DeleteFolderParams | RequestOptions,
+    maybeOpts?: RequestOptions,
+  ): Promise<DeletedResult> {
+    const params =
+      paramsOrOpts && 'confirmDependents' in paramsOrOpts
+        ? (paramsOrOpts as DeleteFolderParams)
+        : undefined;
+    const opts = params ? maybeOpts : (paramsOrOpts as RequestOptions);
     return this.client.request<DeletedResult>(
       'delete',
       `/v1/folders/${encodeURIComponent(id)}`,
-      opts,
+      {
+        ...opts,
+        query: {
+          ...(params?.confirmDependents && { confirmDependents: true }),
+          ...opts?.query,
+        },
+      },
     );
   }
 

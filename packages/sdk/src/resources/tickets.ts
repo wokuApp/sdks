@@ -19,6 +19,8 @@ export interface ListTicketsParams {
   severity?: Severity;
   search?: string;
   destinationId?: string;
+  /** Tickets from tools in this folder or its subfolders. */
+  folderId?: string;
   createdFrom?: string;
   createdTo?: string;
   page?: number;
@@ -27,6 +29,8 @@ export interface ListTicketsParams {
 
 export interface TicketStatsParams {
   destinationId?: string;
+  /** Tickets from tools in this folder or its subfolders. */
+  folderId?: string;
   createdFrom?: string;
   createdTo?: string;
 }
@@ -77,16 +81,37 @@ export class Tickets {
   }
 }
 
+export interface ListTicketDestinationsParams {
+  /** Only destinations by folder that listen to this folder. */
+  folderId?: string;
+}
+
 /** Manage SAC ticket destinations (`/v1/ticket-destinations`). */
 export class TicketDestinations {
   constructor(private readonly client: WokuClient) {}
 
-  list(opts?: RequestOptions): Promise<WokuRecord[]> {
-    return this.client.request<WokuRecord[]>(
-      'get',
-      '/v1/ticket-destinations',
-      opts,
-    );
+  /**
+   * List the destinations. With `{ folderId }`, only the destinations by
+   * folder that listen to that folder (configured on it or on an ancestor).
+   */
+  list(opts?: RequestOptions): Promise<WokuRecord[]>;
+  list(
+    params: ListTicketDestinationsParams,
+    opts?: RequestOptions,
+  ): Promise<WokuRecord[]>;
+  list(
+    paramsOrOpts?: ListTicketDestinationsParams | RequestOptions,
+    maybeOpts?: RequestOptions,
+  ): Promise<WokuRecord[]> {
+    const params =
+      paramsOrOpts && 'folderId' in paramsOrOpts
+        ? (paramsOrOpts as ListTicketDestinationsParams)
+        : undefined;
+    const opts = params ? maybeOpts : (paramsOrOpts as RequestOptions);
+    return this.client.request<WokuRecord[]>('get', '/v1/ticket-destinations', {
+      ...opts,
+      query: { ...params, ...opts?.query },
+    });
   }
 
   get(id: string, opts?: RequestOptions): Promise<WokuRecord> {

@@ -38,6 +38,7 @@ export * from './resources/journeys';
 export * from './resources/media';
 
 export { Folders } from './resources/folders';
+export type { DeleteFolderParams } from './resources/folders';
 export { JourneyFolders } from './resources/journey-folders';
 export { FolderParticipants } from './resources/folder-participants';
 export type { ResendToMissingParams } from './resources/folder-participants';
