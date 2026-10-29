@@ -246,7 +246,10 @@ export interface Ticket {
   code?: string;
   title: string;
   severity: Severity;
+  /** Primary destination (highest priority). */
   destinationId?: string;
+  /** Every destination the ticket was routed to, primary first. */
+  destinationIds?: string[];
   origin?: TicketOrigin;
   followUp?: FollowUp;
   contentVersion?: number;

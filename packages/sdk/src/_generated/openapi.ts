@@ -3687,6 +3687,8 @@ export interface components {
             /** @enum {string} */
             severity: "high" | "medium" | "low";
             destinationId?: string;
+            /** @description Every destination the ticket was routed to; destinationId is the primary one. */
+            destinationIds?: string[];
             origin: components["schemas"]["PublicTicketOriginDto"];
             /**
              * @description Monotonic version of generated ticket content.

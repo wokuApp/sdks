@@ -11004,6 +11004,13 @@
           "destinationId": {
             "type": "string"
           },
+          "destinationIds": {
+            "description": "Every destination the ticket was routed to; destinationId is the primary one.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "origin": {
             "$ref": "#/components/schemas/PublicTicketOriginDto"
           },

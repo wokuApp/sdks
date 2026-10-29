@@ -82,7 +82,9 @@ Ticket destinations and action plan groups can listen to one tool folder
 group and ticket lists filter by `folderId`, and `folders.delete(id, {
 confirmDependents: true })` confirms deleting the destinations and groups
 configured on that folder (otherwise the API answers 409
-`FOLDER_HAS_DEPENDENTS`). See the `@wokuapp/sdk` README for examples.
+`FOLDER_HAS_DEPENDENTS`). A ticket reaches every matching destination
+(`destinationIds`, with `destinationId` as the primary one). See the
+`@wokuapp/sdk` README for examples.
 
 ## Repository layout
 
