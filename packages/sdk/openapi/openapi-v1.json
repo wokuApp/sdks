@@ -1776,6 +1776,518 @@
         ]
       }
     },
+    "/v1/data-apps": {
+      "get": {
+        "operationId": "V1DataAppsController_list",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List the data apps of the caller company",
+        "tags": [
+          "v1 - data-apps"
+        ]
+      }
+    },
+    "/v1/data-apps/{id}": {
+      "get": {
+        "description": "Returns the app spec (params, queries, components, requirements), its validation, the output columns of each query and the list of versions.",
+        "operationId": "V1DataAppsController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "required": false,
+            "in": "query",
+            "description": "Version to read. Omit for the current version.",
+            "schema": {
+              "minimum": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "404": {
+            "description": "App not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a Data Studio app with its spec and versions",
+        "tags": [
+          "v1 - data-apps"
+        ]
+      }
+    },
+    "/v1/data-apps/{id}/queries": {
+      "post": {
+        "description": "Live results with parameter values, as the app viewers see them. Personal data fields come back empty.",
+        "operationId": "V1DataAppsController_runQueries",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunDataAppQueriesBodyDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Result or error per query id"
+          },
+          "404": {
+            "description": "App not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Run queries of a Data Studio app",
+        "tags": [
+          "v1 - data-apps"
+        ]
+      }
+    },
+    "/v1/data-apps/{id}/tables": {
+      "get": {
+        "description": "Tables of the app project, with the source id its queries use (\"table:<id>\"), version, row count and columns. Rows are read through the app queries.",
+        "operationId": "V1DataAppsController_listTables",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "404": {
+            "description": "App not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List the tables uploaded to a Data Studio app",
+        "tags": [
+          "v1 - data-apps"
+        ]
+      },
+      "post": {
+        "description": "CSV, XLSX, JSON or XML up to 25 MB and 100000 rows. A file with the same name as an existing table makes a new version of it, and the app queries that use it show the new rows.",
+        "operationId": "V1DataAppsController_uploadTable",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Data file (CSV, XLSX, JSON or XML)."
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The table and its columns"
+          },
+          "400": {
+            "description": "Unsupported or unreadable file"
+          },
+          "404": {
+            "description": "App not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a data file to a Data Studio app",
+        "tags": [
+          "v1 - data-apps"
+        ]
+      }
+    },
+    "/v1/data-apps/{id}/operations": {
+      "post": {
+        "description": "Applies the operations on the current version (all or nothing) and stores a new version. Untouched components stay identical.",
+        "operationId": "V1DataAppsController_edit",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditDataAppBodyDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "New version, summary and issues"
+          },
+          "400": {
+            "description": "Invalid operations"
+          },
+          "409": {
+            "description": "baseVersion is not current"
+          },
+          "422": {
+            "description": "The resulting spec is invalid"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Edit a Data Studio app with operations",
+        "tags": [
+          "v1 - data-apps"
+        ]
+      }
+    },
+    "/v1/data-apps/{id}/copy": {
+      "post": {
+        "description": "Brings one component of an earlier version, with the queries and filters it needs, into the current version as a new version.",
+        "operationId": "V1DataAppsController_copyFromVersion",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CopyDataAppComponentBodyDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "New version, summary and issues"
+          },
+          "400": {
+            "description": "Unknown component or container"
+          },
+          "404": {
+            "description": "App or version not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Copy a component from an earlier version",
+        "tags": [
+          "v1 - data-apps"
+        ]
+      }
+    },
+    "/v1/data-apps/{id}/duplicate": {
+      "post": {
+        "description": "Creates a new app from the current version to explore a variant. The original does not change.",
+        "operationId": "V1DataAppsController_duplicate",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The new app"
+          },
+          "404": {
+            "description": "App not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Duplicate a Data Studio app",
+        "tags": [
+          "v1 - data-apps"
+        ]
+      }
+    },
+    "/v1/data-apps/{id}/unpublish": {
+      "post": {
+        "description": "The shared link stops answering. Versions are kept.",
+        "operationId": "V1DataAppsController_unpublish",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Publication state"
+          },
+          "404": {
+            "description": "App not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Stop sharing a Data Studio app",
+        "tags": [
+          "v1 - data-apps"
+        ]
+      }
+    },
+    "/v1/data-apps/{id}/versions/{version}/restore": {
+      "post": {
+        "description": "Nothing is deleted. The shared link does not change.",
+        "operationId": "V1DataAppsController_restore",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "New version and issues"
+          },
+          "404": {
+            "description": "App or version not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Restore an earlier version as a new one",
+        "tags": [
+          "v1 - data-apps"
+        ]
+      }
+    },
+    "/v1/data-apps/{id}/build": {
+      "post": {
+        "description": "Fails with 400 when the current version is already built.",
+        "operationId": "V1DataAppsController_build",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "New version and issues"
+          },
+          "400": {
+            "description": "Already built"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Build the current sketch with live data",
+        "tags": [
+          "v1 - data-apps"
+        ]
+      }
+    },
+    "/v1/data-apps/{id}/versions/{version}/publish": {
+      "post": {
+        "description": "The first publication needs accessKey; later ones keep the key unless a new one is sent. The key is never returned.",
+        "operationId": "V1DataAppsController_publish",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublishDataAppVersionBodyDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Slug and published version"
+          },
+          "400": {
+            "description": "A sketch cannot be published"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Show a version in the shared link",
+        "tags": [
+          "v1 - data-apps"
+        ]
+      }
+    },
     "/v1/wokus": {
       "get": {
         "operationId": "V1WokusController_listWokus",
@@ -8410,6 +8922,13 @@
           "template": {
             "$ref": "#/components/schemas/TicketDestinationTemplateDto"
           },
+          "priority": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "default": 0,
+            "description": "Routing order: a higher priority is tried first; ties keep the creation order."
+          },
           "kind": {
             "type": "string",
             "enum": [
@@ -8470,6 +8989,13 @@
           },
           "enabled": {
             "type": "boolean"
+          },
+          "priority": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "default": 0,
+            "description": "Routing order: a higher priority is tried first; ties keep the creation order."
           },
           "kind": {
             "type": "string",
@@ -8724,6 +9250,113 @@
           "assigneeId": {
             "type": "string",
             "description": "Group member responsible; null/\"\" clears the assignee."
+          }
+        }
+      },
+      "DataAppQueryRequestDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "maxLength": 64,
+            "description": "Query id of the app spec."
+          },
+          "page": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Page of a rows query (0-based)."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "RunDataAppQueriesBodyDTO": {
+        "type": "object",
+        "properties": {
+          "queries": {
+            "maxItems": 30,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DataAppQueryRequestDTO"
+            }
+          },
+          "params": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Values by param id, e.g. {\"period\":{\"from\":\"-30d\",\"to\":\"today\"}}; text search goes through the app search param. Missing params use their default."
+          },
+          "version": {
+            "type": "number",
+            "minimum": 1,
+            "description": "Version to query. Omit for the current version."
+          }
+        },
+        "required": [
+          "queries"
+        ]
+      },
+      "EditDataAppBodyDTO": {
+        "type": "object",
+        "properties": {
+          "baseVersion": {
+            "type": "number",
+            "minimum": 1,
+            "description": "Current version of the app. A stale version answers 409, read the app again."
+          },
+          "operations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "maxItems": 40,
+            "description": "Operations applied all or nothing, each an object with \"op\" (addNode, removeNode, moveNode, updateProps, changeType, rebindData, setInteractions, addParam, updateParam, removeParam, addQuery, updateQuery, removeQuery, setTitle, upsertRequirement, removeRequirement, setAssumptions, insertSubtree)."
+          }
+        },
+        "required": [
+          "baseVersion",
+          "operations"
+        ]
+      },
+      "CopyDataAppComponentBodyDTO": {
+        "type": "object",
+        "properties": {
+          "fromVersion": {
+            "type": "number",
+            "minimum": 1,
+            "description": "Version to copy the component from."
+          },
+          "nodeId": {
+            "type": "string",
+            "maxLength": 64,
+            "description": "Id of the component in that version."
+          },
+          "parent": {
+            "type": "string",
+            "maxLength": 64,
+            "description": "Container of the current version that receives it (for example \"page\")."
+          },
+          "index": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Position inside the container; omit to add it last."
+          }
+        },
+        "required": [
+          "fromVersion",
+          "nodeId",
+          "parent"
+        ]
+      },
+      "PublishDataAppVersionBodyDTO": {
+        "type": "object",
+        "properties": {
+          "accessKey": {
+            "type": "string",
+            "minLength": 4,
+            "maxLength": 72,
+            "description": "Access key of the shared link. Required the first time; omit to keep the current key."
           }
         }
       },

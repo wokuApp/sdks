@@ -576,6 +576,227 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/data-apps": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List the data apps of the caller company */
+        get: operations["V1DataAppsController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/data-apps/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a Data Studio app with its spec and versions
+         * @description Returns the app spec (params, queries, components, requirements), its validation, the output columns of each query and the list of versions.
+         */
+        get: operations["V1DataAppsController_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/data-apps/{id}/queries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Run queries of a Data Studio app
+         * @description Live results with parameter values, as the app viewers see them. Personal data fields come back empty.
+         */
+        post: operations["V1DataAppsController_runQueries"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/data-apps/{id}/tables": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the tables uploaded to a Data Studio app
+         * @description Tables of the app project, with the source id its queries use ("table:<id>"), version, row count and columns. Rows are read through the app queries.
+         */
+        get: operations["V1DataAppsController_listTables"];
+        put?: never;
+        /**
+         * Upload a data file to a Data Studio app
+         * @description CSV, XLSX, JSON or XML up to 25 MB and 100000 rows. A file with the same name as an existing table makes a new version of it, and the app queries that use it show the new rows.
+         */
+        post: operations["V1DataAppsController_uploadTable"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/data-apps/{id}/operations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Edit a Data Studio app with operations
+         * @description Applies the operations on the current version (all or nothing) and stores a new version. Untouched components stay identical.
+         */
+        post: operations["V1DataAppsController_edit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/data-apps/{id}/copy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Copy a component from an earlier version
+         * @description Brings one component of an earlier version, with the queries and filters it needs, into the current version as a new version.
+         */
+        post: operations["V1DataAppsController_copyFromVersion"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/data-apps/{id}/duplicate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Duplicate a Data Studio app
+         * @description Creates a new app from the current version to explore a variant. The original does not change.
+         */
+        post: operations["V1DataAppsController_duplicate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/data-apps/{id}/unpublish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Stop sharing a Data Studio app
+         * @description The shared link stops answering. Versions are kept.
+         */
+        post: operations["V1DataAppsController_unpublish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/data-apps/{id}/versions/{version}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Restore an earlier version as a new one
+         * @description Nothing is deleted. The shared link does not change.
+         */
+        post: operations["V1DataAppsController_restore"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/data-apps/{id}/build": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Build the current sketch with live data
+         * @description Fails with 400 when the current version is already built.
+         */
+        post: operations["V1DataAppsController_build"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/data-apps/{id}/versions/{version}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Show a version in the shared link
+         * @description The first publication needs accessKey; later ones keep the key unless a new one is sent. The key is never returned.
+         */
+        post: operations["V1DataAppsController_publish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/wokus": {
         parameters: {
             query?: never;
@@ -2480,6 +2701,11 @@ export interface components {
             aiContext?: string;
             routingConditions?: components["schemas"]["TicketRoutingConditionDto"][];
             template?: components["schemas"]["TicketDestinationTemplateDto"];
+            /**
+             * @description Routing order: a higher priority is tried first; ties keep the creation order.
+             * @default 0
+             */
+            priority: number;
             /** @enum {string} */
             kind: "zendesk" | "custom" | "email";
         };
@@ -2500,6 +2726,11 @@ export interface components {
             routingConditions?: components["schemas"]["TicketRoutingConditionDto"][];
             template?: components["schemas"]["TicketDestinationTemplateDto"];
             enabled?: boolean;
+            /**
+             * @description Routing order: a higher priority is tried first; ties keep the creation order.
+             * @default 0
+             */
+            priority: number;
             /** @enum {string} */
             kind?: "zendesk" | "custom" | "email";
         };
@@ -2585,6 +2816,43 @@ export interface components {
             status?: "todo" | "in_progress" | "done";
             /** @description Group member responsible; null/"" clears the assignee. */
             assigneeId?: string;
+        };
+        DataAppQueryRequestDTO: {
+            /** @description Query id of the app spec. */
+            id: string;
+            /** @description Page of a rows query (0-based). */
+            page?: number;
+        };
+        RunDataAppQueriesBodyDTO: {
+            queries: components["schemas"]["DataAppQueryRequestDTO"][];
+            /** @description Values by param id, e.g. {"period":{"from":"-30d","to":"today"}}; text search goes through the app search param. Missing params use their default. */
+            params?: {
+                [key: string]: unknown;
+            };
+            /** @description Version to query. Omit for the current version. */
+            version?: number;
+        };
+        EditDataAppBodyDTO: {
+            /** @description Current version of the app. A stale version answers 409, read the app again. */
+            baseVersion: number;
+            /** @description Operations applied all or nothing, each an object with "op" (addNode, removeNode, moveNode, updateProps, changeType, rebindData, setInteractions, addParam, updateParam, removeParam, addQuery, updateQuery, removeQuery, setTitle, upsertRequirement, removeRequirement, setAssumptions, insertSubtree). */
+            operations: {
+                [key: string]: unknown;
+            }[];
+        };
+        CopyDataAppComponentBodyDTO: {
+            /** @description Version to copy the component from. */
+            fromVersion: number;
+            /** @description Id of the component in that version. */
+            nodeId: string;
+            /** @description Container of the current version that receives it (for example "page"). */
+            parent: string;
+            /** @description Position inside the container; omit to add it last. */
+            index?: number;
+        };
+        PublishDataAppVersionBodyDTO: {
+            /** @description Access key of the shared link. Required the first time; omit to keep the current key. */
+            accessKey?: string;
         };
         V1WokuLocalizedContentDTO: {
             /**
@@ -5276,6 +5544,380 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1DataAppsController_list: {
+        parameters: {
+            query?: {
+                page?: number;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1DataAppsController_get: {
+        parameters: {
+            query?: {
+                /** @description Version to read. Omit for the current version. */
+                version?: number;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description App not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1DataAppsController_runQueries: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RunDataAppQueriesBodyDTO"];
+            };
+        };
+        responses: {
+            /** @description Result or error per query id */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description App not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1DataAppsController_listTables: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description App not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1DataAppsController_uploadTable: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /**
+                     * Format: binary
+                     * @description Data file (CSV, XLSX, JSON or XML).
+                     */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description The table and its columns */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unsupported or unreadable file */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description App not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1DataAppsController_edit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EditDataAppBodyDTO"];
+            };
+        };
+        responses: {
+            /** @description New version, summary and issues */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid operations */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description baseVersion is not current */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The resulting spec is invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1DataAppsController_copyFromVersion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CopyDataAppComponentBodyDTO"];
+            };
+        };
+        responses: {
+            /** @description New version, summary and issues */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unknown component or container */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description App or version not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1DataAppsController_duplicate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The new app */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description App not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1DataAppsController_unpublish: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Publication state */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description App not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1DataAppsController_restore: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                version: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description New version and issues */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description App or version not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1DataAppsController_build: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description New version and issues */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Already built */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1DataAppsController_publish: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                version: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PublishDataAppVersionBodyDTO"];
+            };
+        };
+        responses: {
+            /** @description Slug and published version */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description A sketch cannot be published */
+            400: {
                 headers: {
                     [name: string]: unknown;
                 };

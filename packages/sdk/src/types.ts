@@ -68,3 +68,9 @@ export type CreateActionPlanTaskParams = Schemas['CreateActionPlanTaskDto'];
 export type UpdateActionPlanTaskParams = Schemas['UpdateActionPlanTaskDto'];
 export type ReorderActionPlanTasksParams = Schemas['ReorderActionPlanTasksDto'];
 export type PostPlanReplyParams = Schemas['PostPlanReplyBodyDTO'];
+
+export type RunDataAppQueriesParams = Schemas['RunDataAppQueriesBodyDTO'];
+export type EditDataAppParams = Schemas['EditDataAppBodyDTO'];
+export type PublishDataAppVersionParams =
+  Schemas['PublishDataAppVersionBodyDTO'];
+export type CopyDataAppComponentParams = Schemas['CopyDataAppComponentBodyDTO'];
