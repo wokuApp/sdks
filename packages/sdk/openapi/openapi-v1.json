@@ -10919,6 +10919,10 @@
                 },
                 "value": {
                   "type": "string"
+                },
+                "label": {
+                  "type": "string",
+                  "description": "Name of the entity the value identifies (a journey name), if any."
                 }
               }
             }

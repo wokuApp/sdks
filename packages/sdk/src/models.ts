@@ -219,6 +219,8 @@ export interface TicketOriginTracker {
   trackerId?: string;
   name?: string;
   value: string;
+  /** Name of the entity the value identifies (a journey name), if any. */
+  label?: string;
 }
 
 export interface TicketOriginFolder {

@@ -3660,6 +3660,8 @@ export interface components {
                 trackerId?: string;
                 name?: string;
                 value?: string;
+                /** @description Name of the entity the value identifies (a journey name), if any. */
+                label?: string;
             }[];
         };
         TicketFollowUpDto: {
