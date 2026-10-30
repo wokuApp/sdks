@@ -98,11 +98,12 @@ export class Folders {
     paramsOrOpts?: DeleteFolderParams | RequestOptions,
     maybeOpts?: RequestOptions,
   ): Promise<DeletedResult> {
-    const params =
-      paramsOrOpts && 'confirmDependents' in paramsOrOpts
-        ? (paramsOrOpts as DeleteFolderParams)
-        : undefined;
-    const opts = params ? maybeOpts : (paramsOrOpts as RequestOptions);
+    // A third argument makes the second one params, even when empty.
+    const hasParams =
+      maybeOpts !== undefined ||
+      (!!paramsOrOpts && 'confirmDependents' in paramsOrOpts);
+    const params = hasParams ? (paramsOrOpts as DeleteFolderParams) : undefined;
+    const opts = hasParams ? maybeOpts : (paramsOrOpts as RequestOptions);
     return this.client.request<DeletedResult>(
       'delete',
       `/v1/folders/${encodeURIComponent(id)}`,

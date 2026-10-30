@@ -103,11 +103,13 @@ export class TicketDestinations {
     paramsOrOpts?: ListTicketDestinationsParams | RequestOptions,
     maybeOpts?: RequestOptions,
   ): Promise<WokuRecord[]> {
-    const params =
-      paramsOrOpts && 'folderId' in paramsOrOpts
-        ? (paramsOrOpts as ListTicketDestinationsParams)
-        : undefined;
-    const opts = params ? maybeOpts : (paramsOrOpts as RequestOptions);
+    // A third argument makes the second one params, even when empty.
+    const hasParams =
+      maybeOpts !== undefined || (!!paramsOrOpts && 'folderId' in paramsOrOpts);
+    const params = hasParams
+      ? (paramsOrOpts as ListTicketDestinationsParams)
+      : undefined;
+    const opts = hasParams ? maybeOpts : (paramsOrOpts as RequestOptions);
     return this.client.request<WokuRecord[]>('get', '/v1/ticket-destinations', {
       ...opts,
       query: { ...params, ...opts?.query },

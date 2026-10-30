@@ -2651,7 +2651,7 @@ export interface components {
              * @default PATCH
              * @enum {string}
              */
-            method: "PUT" | "PATCH";
+            method?: "PUT" | "PATCH";
             /** @description Dot-separated path to the ID in the creation response, required for remote-id. Prototype keys are forbidden. */
             responseIdPath?: string;
         };
@@ -2674,7 +2674,7 @@ export interface components {
              * @default equals
              * @enum {string}
              */
-            operator: "equals" | "any";
+            operator?: "equals" | "any";
             /** @description The value the tracker must equal. Required unless operator is "any". */
             value?: string;
         };
@@ -2704,7 +2704,7 @@ export interface components {
              * @default trackers
              * @enum {string}
              */
-            scopeKind: "trackers" | "folder";
+            scopeKind?: "trackers" | "folder";
             /** @description The tool folder of a `folder` scope (required there). */
             folderId?: string;
             routingConditions?: components["schemas"]["TicketRoutingConditionDto"][];
@@ -2713,7 +2713,7 @@ export interface components {
              * @description Routing order: a higher priority is tried first; ties keep the creation order.
              * @default 0
              */
-            priority: number;
+            priority?: number;
             /** @enum {string} */
             kind: "zendesk" | "custom" | "email";
         };
@@ -2736,7 +2736,7 @@ export interface components {
              * @default trackers
              * @enum {string}
              */
-            scopeKind: "trackers" | "folder";
+            scopeKind?: "trackers" | "folder";
             /** @description The tool folder of a `folder` scope (required there). */
             folderId?: string;
             routingConditions?: components["schemas"]["TicketRoutingConditionDto"][];
@@ -2746,7 +2746,7 @@ export interface components {
              * @description Routing order: a higher priority is tried first; ties keep the creation order.
              * @default 0
              */
-            priority: number;
+            priority?: number;
             /** @enum {string} */
             kind?: "zendesk" | "custom" | "email";
         };
@@ -2763,7 +2763,7 @@ export interface components {
              * @default equals
              * @enum {string}
              */
-            operator: "equals" | "any";
+            operator?: "equals" | "any";
             /** @description The value the tracker must equal. Required unless operator is "any". */
             value?: string;
         };
@@ -2784,7 +2784,7 @@ export interface components {
              * @default trackers
              * @enum {string}
              */
-            scopeKind: "trackers" | "folder";
+            scopeKind?: "trackers" | "folder";
             /** @description The tool folder of a `folder` scope (required there). */
             folderId?: string;
             /** @description Tracker conditions; at least one row is required with scopeKind `trackers`, none with `folder`. */
@@ -2795,7 +2795,7 @@ export interface components {
              * @description New improvement comments that trigger a plan draft (default 300).
              * @default 300
              */
-            threshold: number;
+            threshold?: number;
         };
         UpdateActionPlanGroupDto: {
             /** @description Additional email recipients; grants no membership. */
@@ -4132,7 +4132,7 @@ export interface components {
              * @description A journey is born switched off. Turn it on when it is ready.
              * @default false
              */
-            enabled: boolean;
+            enabled?: boolean;
             /** @description The moments of the journey. Each creates a woku, CSAT, CES, or NPS from toolSpec. New v2 moments default to shared within that moment; per_enrollment creates one tool per participation. Existing toolRef assignments are rejected. A zero-day afterStage delay means one hour. In v2 only the first moment can be manual. Later moments use webhook or afterStage; independent webhook settings also let a webhook advance a timed moment. fallbackAfterMs is the optional secondary wait for a webhook-primary moment, anchored to fallbackFromStage. Legacy definitions retain their triggers. */
             moments?: components["schemas"]["V1JourneyMomentDto"][];
         };
@@ -4249,7 +4249,7 @@ export interface components {
              * @description true alerts every review of those kinds (recognitions too); false or absent alerts improvements only.
              * @default false
              */
-            allReviews: boolean;
+            allReviews?: boolean;
         };
         UpdateFolderBodyDTO: {
             name?: string;
@@ -4289,7 +4289,7 @@ export interface components {
              * @default es
              * @enum {string}
              */
-            locale: "es" | "en";
+            locale?: "es" | "en";
             /** @description once only: when to send it (ISO); absent = now */
             sendAt?: string;
             /** @description once only: period start (ISO) */

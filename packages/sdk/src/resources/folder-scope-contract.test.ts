@@ -68,6 +68,20 @@ describe('folder scope (folder-voc-routing)', () => {
     expect(calls.at(-1)!.url.searchParams.get('folderId')).toBeNull();
   });
 
+  it('keeps the request options after an empty params object', async () => {
+    const { calls, woku } = client(() => ({
+      body: { data: [], total: 0, page: 1, limit: 20 },
+    }));
+    const aborted = AbortSignal.abort();
+    await expect(
+      woku.ticketDestinations.list({}, { signal: aborted }),
+    ).rejects.toThrow();
+    await expect(
+      woku.folders.delete('f1', {}, { signal: aborted }),
+    ).rejects.toThrow();
+    expect(calls).toHaveLength(0);
+  });
+
   it('deleting a folder with dependents needs confirmDependents', async () => {
     const { calls, woku } = client((call) =>
       call.url.searchParams.get('confirmDependents') === 'true'

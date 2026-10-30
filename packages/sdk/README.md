@@ -449,6 +449,7 @@ await woku.ticketDestinations.create({
   name: 'Store support',
   kind: 'email',
   config: { emails: ['support@acme.com'] },
+  credentials: {}, // email destinations need none
   scopeKind: 'folder',
   folderId: folder.id,
 });
