@@ -159,7 +159,11 @@ export class ActionPlanGroups {
   constructor(private readonly client: WokuClient) {}
 
   list(
-    params?: { search?: string },
+    params?: {
+      search?: string;
+      /** Only groups by folder that listen to this folder (or an ancestor). */
+      folderId?: string;
+    },
     opts?: RequestOptions,
   ): Promise<WokuRecord[]> {
     return this.client.request<WokuRecord[]>('get', '/v1/action-plan-groups', {

@@ -14,7 +14,7 @@ under the [`@wokuapp`](https://www.npmjs.com/org/wokuapp) npm scope.
 
 | Package                                            | Description                                                                                                                                                                                                                                                                              | Version                                                    |
 | -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| [`@wokuapp/sdk`](./packages/sdk)                   | **Server-side** SDK for the Woku management API (`/v1`): customer journeys, trackers, VoC tools (NPS/CSAT/CES, with one-response-per-client), folders (with reports, per-tool metrics and participant lists), scheduled report emails and a unified tools view, wokus, forms, flows, action plans, tickets, dispatches, sends and Data Studio apps. Typed, retrying, auto-paginated. | ![npm](https://img.shields.io/npm/v/@wokuapp/sdk)          |
+| [`@wokuapp/sdk`](./packages/sdk)                   | **Server-side** SDK for the Woku management API (`/v1`): customer journeys, trackers, VoC tools (NPS/CSAT/CES, with one-response-per-client), folders (with reports, per-tool metrics and participant lists), scheduled report emails and a unified tools view, wokus, forms, flows, action plans and tickets (routed by trackers or by tool folder), dispatches, sends and Data Studio apps. Typed, retrying, auto-paginated. | ![npm](https://img.shields.io/npm/v/@wokuapp/sdk)          |
 | [`@wokuapp/react-native`](./packages/react-native) | React Native SDK to capture Woku/NPS (text + audio) and CSAT/CES scores inside iOS and Android apps, with offline buffering and configurable intercepts.                                                                                                                                 | ![npm](https://img.shields.io/npm/v/@wokuapp/react-native) |
 | [`@wokuapp/woku-widget`](./packages/woku-widget)   | Embeddable web widget to capture Woku and NPS feedback on a website.                                                                                                                                                                                                                     | ![npm](https://img.shields.io/npm/v/@wokuapp/woku-widget)  |
 
@@ -74,6 +74,17 @@ keeps the previous case, and delivery confirmation remains separate. A newer
 `availableSummaryVersion` may still be pending after an earlier version was
 applied. Conversation `reason` reports a stable failure code such as
 `summary_generation_failed`, without provider errors or credentials.
+
+## Support and plans by folder (unreleased)
+
+Ticket destinations and action plan groups can listen to one tool folder
+(`scopeKind: 'folder'` + `folderId`) instead of tracker rows. Destination,
+group and ticket lists filter by `folderId`, and `folders.delete(id, {
+confirmDependents: true })` confirms deleting the destinations and groups
+configured on that folder (otherwise the API answers 409
+`FOLDER_HAS_DEPENDENTS`). A ticket reaches every matching destination
+(`destinationIds`, with `destinationId` as the primary one). See the
+`@wokuapp/sdk` README for examples.
 
 ## Repository layout
 

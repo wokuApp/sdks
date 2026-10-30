@@ -428,7 +428,48 @@ await woku.folders.update(folder.id, {
 });
 
 // Deleting a folder never deletes its content: it moves up to the parent.
-await woku.folders.delete(folder.id);
+// Support destinations and plan groups configured ON the folder are deleted
+// with it (with their tickets and plans): without confirmation the API answers
+// 409 (ConflictError, code FOLDER_HAS_DEPENDENTS) listing them.
+await woku.folders.delete(folder.id, { confirmDependents: true });
+```
+
+### Support and plans by folder
+
+A ticket destination or an action plan group listens either to tracker rows or
+to ONE tool folder: every woku, NPS, CSAT and CES tool inside it, at any depth,
+resolved when each review arrives (moving a tool out stops it counting).
+A ticket reaches every enabled destination that matches it (trackers, a folder
+and its subfolders): `ticket.destinationIds` lists them all and
+`ticket.destinationId` is the highest-priority one. Email destinations share
+one email per ticket, sent once to each address.
+
+```ts
+await woku.ticketDestinations.create({
+  name: 'Store support',
+  kind: 'email',
+  config: { emails: ['support@acme.com'] },
+  credentials: {}, // email destinations need none
+  scopeKind: 'folder',
+  folderId: folder.id,
+});
+
+await woku.actionPlanGroups.create({
+  name: 'Store experience',
+  scopeKind: 'folder',
+  folderId: folder.id,
+  members: [{ userId: 'user_id', role: 'admin' }],
+});
+
+// What listens to a folder (configured on it or on an ancestor folder).
+const destinations = await woku.ticketDestinations.list({
+  folderId: folder.id,
+});
+const groups = await woku.actionPlanGroups.list({ folderId: folder.id });
+
+// Tickets from the tools of a folder and its subfolders.
+for await (const ticket of await woku.tickets.list({ folderId: folder.id }))
+  console.log(ticket.code, ticket.origin?.folder?.path);
 ```
 
 ```ts

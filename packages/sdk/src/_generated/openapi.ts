@@ -2069,7 +2069,7 @@ export interface paths {
         post?: never;
         /**
          * Delete a folder
-         * @description The folder is removed; its subfolders, wokus and NPS, CSAT and CES tools move up to the parent folder (or the root). Nothing inside is deleted.
+         * @description The folder is removed; its subfolders, wokus and NPS, CSAT and CES tools move up to the parent folder (or the root). The support destinations and action plan groups configured on this folder are deleted with it, together with their tickets and plans: without confirmDependents=true such a delete answers 409 FOLDER_HAS_DEPENDENTS listing them.
          */
         delete: operations["V1FoldersController_deleteFolder"];
         options?: never;
@@ -2651,7 +2651,7 @@ export interface components {
              * @default PATCH
              * @enum {string}
              */
-            method: "PUT" | "PATCH";
+            method?: "PUT" | "PATCH";
             /** @description Dot-separated path to the ID in the creation response, required for remote-id. Prototype keys are forbidden. */
             responseIdPath?: string;
         };
@@ -2674,7 +2674,7 @@ export interface components {
              * @default equals
              * @enum {string}
              */
-            operator: "equals" | "any";
+            operator?: "equals" | "any";
             /** @description The value the tracker must equal. Required unless operator is "any". */
             value?: string;
         };
@@ -2699,13 +2699,21 @@ export interface components {
             };
             /** @description Per-destination AI triage context. */
             aiContext?: string;
+            /**
+             * @description What routes tickets here: tracker conditions or one tool folder (every tool inside it, at any depth). Never both; `folder` clears the conditions.
+             * @default trackers
+             * @enum {string}
+             */
+            scopeKind?: "trackers" | "folder";
+            /** @description The tool folder of a `folder` scope (required there). */
+            folderId?: string;
             routingConditions?: components["schemas"]["TicketRoutingConditionDto"][];
             template?: components["schemas"]["TicketDestinationTemplateDto"];
             /**
              * @description Routing order: a higher priority is tried first; ties keep the creation order.
              * @default 0
              */
-            priority: number;
+            priority?: number;
             /** @enum {string} */
             kind: "zendesk" | "custom" | "email";
         };
@@ -2723,6 +2731,14 @@ export interface components {
             };
             /** @description Per-destination AI triage context. */
             aiContext?: string;
+            /**
+             * @description What routes tickets here: tracker conditions or one tool folder (every tool inside it, at any depth). Never both; `folder` clears the conditions.
+             * @default trackers
+             * @enum {string}
+             */
+            scopeKind?: "trackers" | "folder";
+            /** @description The tool folder of a `folder` scope (required there). */
+            folderId?: string;
             routingConditions?: components["schemas"]["TicketRoutingConditionDto"][];
             template?: components["schemas"]["TicketDestinationTemplateDto"];
             enabled?: boolean;
@@ -2730,7 +2746,7 @@ export interface components {
              * @description Routing order: a higher priority is tried first; ties keep the creation order.
              * @default 0
              */
-            priority: number;
+            priority?: number;
             /** @enum {string} */
             kind?: "zendesk" | "custom" | "email";
         };
@@ -2747,7 +2763,7 @@ export interface components {
              * @default equals
              * @enum {string}
              */
-            operator: "equals" | "any";
+            operator?: "equals" | "any";
             /** @description The value the tracker must equal. Required unless operator is "any". */
             value?: string;
         };
@@ -2763,15 +2779,23 @@ export interface components {
             /** @example Atención en tienda */
             name: string;
             description?: string;
-            /** @description Tracker conditions; at least one row is required. */
-            conditions: components["schemas"]["ActionPlanGroupConditionDto"][];
+            /**
+             * @description What feeds the group: tracker conditions or one tool folder (every tool inside it, at any depth). Never both.
+             * @default trackers
+             * @enum {string}
+             */
+            scopeKind?: "trackers" | "folder";
+            /** @description The tool folder of a `folder` scope (required there). */
+            folderId?: string;
+            /** @description Tracker conditions; at least one row is required with scopeKind `trackers`, none with `folder`. */
+            conditions?: components["schemas"]["ActionPlanGroupConditionDto"][];
             /** @description Group team; at least one admin (assignees optional). */
             members: components["schemas"]["ActionPlanGroupMemberDto"][];
             /**
              * @description New improvement comments that trigger a plan draft (default 300).
              * @default 300
              */
-            threshold: number;
+            threshold?: number;
         };
         UpdateActionPlanGroupDto: {
             /** @description Additional email recipients; grants no membership. */
@@ -2779,6 +2803,13 @@ export interface components {
             name?: string;
             /** @description Empty string clears. */
             description?: string;
+            /**
+             * @description Switch the scope; `folder` clears the tracker conditions, `trackers` clears the folder.
+             * @enum {string}
+             */
+            scopeKind?: "trackers" | "folder";
+            /** @description The tool folder of a `folder` scope. */
+            folderId?: string;
             conditions?: components["schemas"]["ActionPlanGroupConditionDto"][];
             members?: components["schemas"]["ActionPlanGroupMemberDto"][];
             threshold?: number;
@@ -3629,6 +3660,8 @@ export interface components {
                 trackerId?: string;
                 name?: string;
                 value?: string;
+                /** @description Name of the entity the value identifies (a journey name), if any. */
+                label?: string;
             }[];
         };
         TicketFollowUpDto: {
@@ -3656,6 +3689,8 @@ export interface components {
             /** @enum {string} */
             severity: "high" | "medium" | "low";
             destinationId?: string;
+            /** @description Every destination the ticket was routed to; destinationId is the primary one. */
+            destinationIds?: string[];
             origin: components["schemas"]["PublicTicketOriginDto"];
             /**
              * @description Monotonic version of generated ticket content.
@@ -4097,7 +4132,7 @@ export interface components {
              * @description A journey is born switched off. Turn it on when it is ready.
              * @default false
              */
-            enabled: boolean;
+            enabled?: boolean;
             /** @description The moments of the journey. Each creates a woku, CSAT, CES, or NPS from toolSpec. New v2 moments default to shared within that moment; per_enrollment creates one tool per participation. Existing toolRef assignments are rejected. A zero-day afterStage delay means one hour. In v2 only the first moment can be manual. Later moments use webhook or afterStage; independent webhook settings also let a webhook advance a timed moment. fallbackAfterMs is the optional secondary wait for a webhook-primary moment, anchored to fallbackFromStage. Legacy definitions retain their triggers. */
             moments?: components["schemas"]["V1JourneyMomentDto"][];
         };
@@ -4214,7 +4249,7 @@ export interface components {
              * @description true alerts every review of those kinds (recognitions too); false or absent alerts improvements only.
              * @default false
              */
-            allReviews: boolean;
+            allReviews?: boolean;
         };
         UpdateFolderBodyDTO: {
             name?: string;
@@ -4254,7 +4289,7 @@ export interface components {
              * @default es
              * @enum {string}
              */
-            locale: "es" | "en";
+            locale?: "es" | "en";
             /** @description once only: when to send it (ISO); absent = now */
             sendAt?: string;
             /** @description once only: period start (ISO) */
@@ -4825,7 +4860,10 @@ export interface operations {
     };
     V1TicketDestinationsController_list: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Only destinations by folder that listen to this folder (the folder itself or one of its ancestors). */
+                folderId?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -5001,6 +5039,8 @@ export interface operations {
             query?: {
                 /** @description Free-text search over name, description and condition values. */
                 search?: string;
+                /** @description Only groups by folder that listen to this folder (the folder itself or one of its ancestors). */
+                folderId?: string;
             };
             header?: never;
             path?: never;
@@ -8239,6 +8279,8 @@ export interface operations {
                 search?: string;
                 /** @description Only tickets routed to this SAC destination. */
                 destinationId?: string;
+                /** @description Only tickets from tools in this folder or its subfolders (the folder snapshotted on the ticket). */
+                folderId?: string;
                 /** @description Lower bound for createdAt (ISO 8601). */
                 createdFrom?: string;
                 /** @description Upper bound for createdAt (ISO 8601). */
@@ -8277,6 +8319,8 @@ export interface operations {
             query?: {
                 /** @description Scope the aggregate to a single SAC destination. */
                 destinationId?: string;
+                /** @description Only tickets from tools in this folder or its subfolders (the folder snapshotted on the ticket). */
+                folderId?: string;
                 /** @description Lower bound for createdAt (ISO 8601). */
                 createdFrom?: string;
                 /** @description Upper bound for createdAt (ISO 8601). */
@@ -9304,7 +9348,10 @@ export interface operations {
     };
     V1FoldersController_deleteFolder: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Required (true) when support destinations or action plan groups are configured on the folder: they are deleted with it, together with their tickets and plans. Without it such a delete answers 409 FOLDER_HAS_DEPENDENTS listing them. */
+                confirmDependents?: boolean;
+            };
             header?: never;
             path: {
                 id: string;
@@ -9322,6 +9369,13 @@ export interface operations {
             };
             /** @description Folder not found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description FOLDER_HAS_DEPENDENTS: destinations or groups are configured on the folder; repeat with confirmDependents=true */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };

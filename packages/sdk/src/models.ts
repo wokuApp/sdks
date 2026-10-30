@@ -219,6 +219,16 @@ export interface TicketOriginTracker {
   trackerId?: string;
   name?: string;
   value: string;
+  /** Name of the entity the value identifies (a journey name), if any. */
+  label?: string;
+}
+
+export interface TicketOriginFolder {
+  id: string;
+  name: string;
+  /** "Stores > Santiago", root first. */
+  path: string;
+  ancestorIds?: string[];
 }
 
 export interface TicketOrigin {
@@ -227,6 +237,8 @@ export interface TicketOrigin {
   instrumentId?: string;
   instrumentName?: string;
   trackers?: TicketOriginTracker[];
+  /** Tool folder when the ticket was created; absent for forms and the root. */
+  folder?: TicketOriginFolder;
   [key: string]: unknown;
 }
 
@@ -236,7 +248,10 @@ export interface Ticket {
   code?: string;
   title: string;
   severity: Severity;
+  /** Primary destination (highest priority). */
   destinationId?: string;
+  /** Every destination the ticket was routed to, primary first. */
+  destinationIds?: string[];
   origin?: TicketOrigin;
   followUp?: FollowUp;
   contentVersion?: number;

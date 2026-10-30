@@ -696,7 +696,17 @@
     "/v1/ticket-destinations": {
       "get": {
         "operationId": "V1TicketDestinationsController_list",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "folderId",
+            "required": false,
+            "in": "query",
+            "description": "Only destinations by folder that listen to this folder (the folder itself or one of its ancestors).",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Destinations (no credentials)"
@@ -909,6 +919,15 @@
             "required": false,
             "in": "query",
             "description": "Free-text search over name, description and condition values.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "folderId",
+            "required": false,
+            "in": "query",
+            "description": "Only groups by folder that listen to this folder (the folder itself or one of its ancestors).",
             "schema": {
               "type": "string"
             }
@@ -5485,6 +5504,16 @@
             }
           },
           {
+            "name": "folderId",
+            "required": false,
+            "in": "query",
+            "description": "Only tickets from tools in this folder or its subfolders (the folder snapshotted on the ticket).",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          },
+          {
             "name": "createdFrom",
             "required": false,
             "in": "query",
@@ -5568,6 +5597,16 @@
             "required": false,
             "in": "query",
             "description": "Scope the aggregate to a single SAC destination.",
+            "schema": {
+              "format": "ObjectId",
+              "type": "string"
+            }
+          },
+          {
+            "name": "folderId",
+            "required": false,
+            "in": "query",
+            "description": "Only tickets from tools in this folder or its subfolders (the folder snapshotted on the ticket).",
             "schema": {
               "format": "ObjectId",
               "type": "string"
@@ -7031,7 +7070,7 @@
         ]
       },
       "delete": {
-        "description": "The folder is removed; its subfolders, wokus and NPS, CSAT and CES tools move up to the parent folder (or the root). Nothing inside is deleted.",
+        "description": "The folder is removed; its subfolders, wokus and NPS, CSAT and CES tools move up to the parent folder (or the root). The support destinations and action plan groups configured on this folder are deleted with it, together with their tickets and plans: without confirmDependents=true such a delete answers 409 FOLDER_HAS_DEPENDENTS listing them.",
         "operationId": "V1FoldersController_deleteFolder",
         "parameters": [
           {
@@ -7042,6 +7081,15 @@
               "format": "ObjectId",
               "type": "string"
             }
+          },
+          {
+            "name": "confirmDependents",
+            "required": false,
+            "in": "query",
+            "description": "Required (true) when support destinations or action plan groups are configured on the folder: they are deleted with it, together with their tickets and plans. Without it such a delete answers 409 FOLDER_HAS_DEPENDENTS listing them.",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
@@ -7050,6 +7098,9 @@
           },
           "404": {
             "description": "Folder not found"
+          },
+          "409": {
+            "description": "FOLDER_HAS_DEPENDENTS: destinations or groups are configured on the folder; repeat with confirmDependents=true"
           }
         },
         "security": [
@@ -8913,6 +8964,19 @@
             "maxLength": 2000,
             "description": "Per-destination AI triage context."
           },
+          "scopeKind": {
+            "type": "string",
+            "enum": [
+              "trackers",
+              "folder"
+            ],
+            "default": "trackers",
+            "description": "What routes tickets here: tracker conditions or one tool folder (every tool inside it, at any depth). Never both; `folder` clears the conditions."
+          },
+          "folderId": {
+            "type": "string",
+            "description": "The tool folder of a `folder` scope (required there)."
+          },
           "routingConditions": {
             "type": "array",
             "items": {
@@ -8977,6 +9041,19 @@
             "type": "string",
             "maxLength": 2000,
             "description": "Per-destination AI triage context."
+          },
+          "scopeKind": {
+            "type": "string",
+            "enum": [
+              "trackers",
+              "folder"
+            ],
+            "default": "trackers",
+            "description": "What routes tickets here: tracker conditions or one tool folder (every tool inside it, at any depth). Never both; `folder` clears the conditions."
+          },
+          "folderId": {
+            "type": "string",
+            "description": "The tool folder of a `folder` scope (required there)."
           },
           "routingConditions": {
             "type": "array",
@@ -9089,8 +9166,21 @@
             "type": "string",
             "maxLength": 500
           },
+          "scopeKind": {
+            "type": "string",
+            "enum": [
+              "trackers",
+              "folder"
+            ],
+            "default": "trackers",
+            "description": "What feeds the group: tracker conditions or one tool folder (every tool inside it, at any depth). Never both."
+          },
+          "folderId": {
+            "type": "string",
+            "description": "The tool folder of a `folder` scope (required there)."
+          },
           "conditions": {
-            "description": "Tracker conditions; at least one row is required.",
+            "description": "Tracker conditions; at least one row is required with scopeKind `trackers`, none with `folder`.",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ActionPlanGroupConditionDto"
@@ -9112,7 +9202,6 @@
         },
         "required": [
           "name",
-          "conditions",
           "members"
         ]
       },
@@ -9134,6 +9223,18 @@
             "type": "string",
             "maxLength": 500,
             "description": "Empty string clears."
+          },
+          "scopeKind": {
+            "type": "string",
+            "enum": [
+              "trackers",
+              "folder"
+            ],
+            "description": "Switch the scope; `folder` clears the tracker conditions, `trackers` clears the folder."
+          },
+          "folderId": {
+            "type": "string",
+            "description": "The tool folder of a `folder` scope."
           },
           "conditions": {
             "type": "array",
@@ -10818,6 +10919,10 @@
                 },
                 "value": {
                   "type": "string"
+                },
+                "label": {
+                  "type": "string",
+                  "description": "Name of the entity the value identifies (a journey name), if any."
                 }
               }
             }
@@ -10902,6 +11007,13 @@
           },
           "destinationId": {
             "type": "string"
+          },
+          "destinationIds": {
+            "description": "Every destination the ticket was routed to; destinationId is the primary one.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "origin": {
             "$ref": "#/components/schemas/PublicTicketOriginDto"

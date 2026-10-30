@@ -10,7 +10,15 @@ const output = join(temporary, 'openapi.ts');
 try {
   execFileSync(
     'pnpm',
-    ['exec', 'openapi-typescript', 'openapi/openapi-v1.json', '-o', output],
+    [
+      'exec',
+      'openapi-typescript',
+      'openapi/openapi-v1.json',
+      '-o',
+      output,
+      // A field with a server default stays optional: callers may omit it.
+      '--default-non-nullable=false',
+    ],
     { cwd, stdio: 'inherit' },
   );
   const generated = readFileSync(output, 'utf8');
