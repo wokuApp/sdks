@@ -1076,6 +1076,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/reports/company-woku": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the company report of wokus
+         * @description Returns the report over every woku of the company (the root and every folder), with the same text sections as a folder report.
+         */
+        get: operations["V1ReportsController_getCompanyWoku"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/reports/nps-tool/{npsToolId}": {
         parameters: {
             query?: never;
@@ -2338,6 +2358,26 @@ export interface paths {
          * @description Reviews and the native-scale headline of each type (woku stars, NPS score, CSAT satisfied %, CES mean) for the whole company or one folder and its subfolders. Scales are never mixed. A type that fails to compute reports `{ error: true }` and the others stay valid.
          */
         get: operations["V1ToolsController_getToolsStats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/tools/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Metrics of every tool of one type in the company
+         * @description The metrics of the company report of one type (`type` woku, nps, csat or ces): the same per-tool figures as the folder metrics for every tool of that type in the company, at the root and in every folder, for a period (`days` 7, 30 or 90, or 0 for the whole history, default 30; or a custom `from`/`to` range of whole UTC days) against the period before it. Scales are never mixed: one type per call.
+         */
+        get: operations["V1ToolsController_getToolsMetrics"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3650,6 +3690,14 @@ export interface components {
             defaultLocale?: "es" | "en";
             localizedContent?: components["schemas"]["CesToolLocalizedContentBodyDTO"][];
         };
+        PublicTicketOriginFolderDto: {
+            id: string;
+            name: string;
+            /** @description Breadcrumb, root first ("Tiendas > Santiago"). */
+            path: string;
+            /** @description The folder first, then its parents up to the root. */
+            ancestorIds: string[];
+        };
         PublicTicketOriginDto: {
             /** @enum {string} */
             tool: "woku" | "nps" | "form" | "csat" | "ces";
@@ -3663,6 +3711,8 @@ export interface components {
                 /** @description Name of the entity the value identifies (a journey name), if any. */
                 label?: string;
             }[];
+            /** @description Folder of the source tool, when it lives in one (SV-0021). */
+            folder?: components["schemas"]["PublicTicketOriginFolderDto"];
         };
         TicketFollowUpDto: {
             conversationId?: string;
@@ -4396,6 +4446,13 @@ export interface operations {
                     "application/json": components["schemas"]["FollowUpEnvelopeDto"];
                 };
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Follow-up not found in this company */
             404: {
                 headers: {
@@ -4448,6 +4505,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     ExternalTrackersController_createTracker: {
@@ -4474,7 +4538,7 @@ export interface operations {
                 content?: never;
             };
             /** @description Invalid or missing API key */
-            403: {
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -4506,6 +4570,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     ExternalTrackersController_assignByName: {
@@ -4532,6 +4603,13 @@ export interface operations {
             };
             /** @description Tracker is inactive or validation error */
             400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -4572,6 +4650,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Tracker name or assignment not found */
             404: {
                 headers: {
@@ -4605,6 +4690,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     ExternalTrackersController_searchEntities: {
@@ -4622,6 +4714,13 @@ export interface operations {
         responses: {
             /** @description Matching entities */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -4654,6 +4753,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Tracker not found */
             404: {
                 headers: {
@@ -4680,6 +4786,13 @@ export interface operations {
         responses: {
             /** @description Tracker definition updated */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -4719,6 +4832,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Tracker not found */
             404: {
                 headers: {
@@ -4741,6 +4861,13 @@ export interface operations {
         responses: {
             /** @description Tracker deactivated */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -4781,6 +4908,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     ExternalTrackersController_assignEntityTrackerByName: {
@@ -4808,6 +4942,13 @@ export interface operations {
             };
             /** @description Unsupported entity type, inactive tracker or validation error */
             400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -4849,6 +4990,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Tracker name or assignment not found */
             404: {
                 headers: {
@@ -4872,6 +5020,13 @@ export interface operations {
         responses: {
             /** @description Destinations (no credentials) */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -4905,6 +5060,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     V1TicketDestinationsController_get: {
@@ -4919,6 +5081,13 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -4945,6 +5114,13 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -4982,6 +5158,13 @@ export interface operations {
             };
             /** @description Validation error */
             400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -5025,6 +5208,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Destination not found */
             404: {
                 headers: {
@@ -5049,6 +5239,13 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -5082,6 +5279,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     V1ActionPlanGroupsController_get: {
@@ -5096,6 +5300,13 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -5122,6 +5333,13 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -5164,6 +5382,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Group not found */
             404: {
                 headers: {
@@ -5189,6 +5414,13 @@ export interface operations {
         };
         responses: {
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -5237,6 +5469,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     V1ActionPlansController_get: {
@@ -5251,6 +5490,13 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -5282,6 +5528,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Plan not found */
             404: {
                 headers: {
@@ -5303,6 +5556,13 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -5346,6 +5606,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Plan not found */
             404: {
                 headers: {
@@ -5383,6 +5650,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Invalid status transition */
             409: {
                 headers: {
@@ -5408,6 +5682,13 @@ export interface operations {
         };
         responses: {
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -5443,6 +5724,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     V1ActionPlansController_deleteTask: {
@@ -5458,6 +5746,13 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -5482,6 +5777,13 @@ export interface operations {
         };
         responses: {
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -5513,6 +5815,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     V1ActionPlansController_reopen: {
@@ -5527,6 +5836,13 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -5551,6 +5867,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     V1ActionPlansController_complete: {
@@ -5570,6 +5893,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     V1ActionPlansController_resume: {
@@ -5584,6 +5914,13 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -5609,6 +5946,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     V1DataAppsController_get: {
@@ -5626,6 +5970,13 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -5662,6 +6013,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description App not found */
             404: {
                 headers: {
@@ -5683,6 +6041,13 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -5732,6 +6097,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description App not found */
             404: {
                 headers: {
@@ -5765,6 +6137,13 @@ export interface operations {
             };
             /** @description Invalid operations */
             400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -5815,6 +6194,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description App or version not found */
             404: {
                 headers: {
@@ -5837,6 +6223,13 @@ export interface operations {
         responses: {
             /** @description The new app */
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -5869,6 +6262,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description App not found */
             404: {
                 headers: {
@@ -5892,6 +6292,13 @@ export interface operations {
         responses: {
             /** @description New version and issues */
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -5931,6 +6338,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     V1DataAppsController_publish: {
@@ -5963,6 +6377,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     V1WokusController_listWokus: {
@@ -5979,6 +6400,13 @@ export interface operations {
         responses: {
             /** @description Paginated wokus */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6017,6 +6445,13 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     V1WokusController_getWoku: {
@@ -6032,6 +6467,13 @@ export interface operations {
         responses: {
             /** @description Woku with stats */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6066,6 +6508,13 @@ export interface operations {
         responses: {
             /** @description Woku deleted */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6118,6 +6567,13 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Woku does not belong to the caller company */
             403: {
                 headers: {
@@ -6150,6 +6606,13 @@ export interface operations {
         responses: {
             /** @description Paginated reviews */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6202,6 +6665,13 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Woku does not belong to the caller company */
             403: {
                 headers: {
@@ -6249,6 +6719,13 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Woku does not belong to the caller company */
             403: {
                 headers: {
@@ -6286,6 +6763,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     V1WokusController_getWokuReview: {
@@ -6302,6 +6786,13 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6332,6 +6823,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     V1WokusController_createVoicemail: {
@@ -6357,6 +6855,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     V1WokusController_shareWokuToEmail: {
@@ -6377,6 +6882,13 @@ export interface operations {
         };
         responses: {
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6418,8 +6930,8 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
-            /** @description Invalid company key */
-            403: {
+            /** @description Invalid or missing API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6453,7 +6965,7 @@ export interface operations {
                 content?: never;
             };
             /** @description Invalid or missing API key */
-            403: {
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6480,7 +6992,7 @@ export interface operations {
                 };
             };
             /** @description Invalid or missing API key */
-            403: {
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6507,7 +7019,7 @@ export interface operations {
                 };
             };
             /** @description Invalid or missing API key */
-            403: {
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6526,6 +7038,38 @@ export interface operations {
         responses: {
             /** @description Company NPS report */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1ReportsController_getCompanyWoku: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Company woku report */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6558,6 +7102,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     V1NpsController_getNpsTool: {
@@ -6573,6 +7124,13 @@ export interface operations {
         responses: {
             /** @description NPS tool definition */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6608,6 +7166,13 @@ export interface operations {
         responses: {
             /** @description Paginated NPS responses */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6651,6 +7216,13 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Tool does not belong to caller */
             403: {
                 headers: {
@@ -6690,6 +7262,13 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
+            };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description NPS does not belong to caller */
             403: {
@@ -6740,6 +7319,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description NPS does not belong to caller */
             403: {
                 headers: {
@@ -6769,6 +7355,13 @@ export interface operations {
         responses: {
             /** @description CSAT tool definition */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6808,6 +7401,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     V1CsatController_createCsat: {
@@ -6838,6 +7438,13 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
+            };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Tool does not belong to caller */
             403: {
@@ -6878,6 +7485,13 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
+            };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Response does not belong to caller */
             403: {
@@ -6928,6 +7542,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Response does not belong to caller */
             403: {
                 headers: {
@@ -6957,6 +7578,13 @@ export interface operations {
         responses: {
             /** @description CES tool definition */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6996,6 +7624,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     V1CesController_createCes: {
@@ -7026,6 +7661,13 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
+            };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Tool does not belong to caller */
             403: {
@@ -7066,6 +7708,13 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
+            };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Response does not belong to caller */
             403: {
@@ -7111,6 +7760,13 @@ export interface operations {
         responses: {
             /** @description Voice comment accepted */
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -7167,6 +7823,13 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     V1InvitationsController_sendNpsInvitations: {
@@ -7202,6 +7865,13 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
+            };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description NPS tool does not belong to the caller company */
             403: {
@@ -7246,6 +7916,13 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Tool does not belong to caller */
             403: {
                 headers: {
@@ -7288,6 +7965,13 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
+            };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Tool does not belong to caller */
             403: {
@@ -7334,6 +8018,13 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
+            };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Form does not belong to the caller company */
             403: {
@@ -7388,6 +8079,13 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Woku does not belong to the caller company */
             403: {
                 headers: {
@@ -7423,6 +8121,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     V1FormsController_listFormResponses: {
@@ -7442,6 +8147,13 @@ export interface operations {
         responses: {
             /** @description Paginated form responses */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -7495,6 +8207,13 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Form does not belong to the caller company */
             403: {
                 headers: {
@@ -7537,6 +8256,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Form does not belong to the caller company */
             403: {
                 headers: {
@@ -7567,6 +8293,13 @@ export interface operations {
         responses: {
             /** @description Paginated flows */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -7606,6 +8339,13 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     V1FlowsController_getFlow: {
@@ -7622,6 +8362,13 @@ export interface operations {
         responses: {
             /** @description Flow data */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -7661,6 +8408,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Flow not found */
             404: {
                 headers: {
@@ -7692,6 +8446,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Flow not found */
             404: {
                 headers: {
@@ -7715,6 +8476,13 @@ export interface operations {
         responses: {
             /** @description Paginated NPS tools */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -7755,7 +8523,7 @@ export interface operations {
                 };
             };
             /** @description Invalid or missing API key */
-            403: {
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -7776,6 +8544,13 @@ export interface operations {
         responses: {
             /** @description NPS response */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -7816,6 +8591,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     V1CsatToolsController_createCsatTool: {
@@ -7851,7 +8633,7 @@ export interface operations {
                 };
             };
             /** @description Invalid or missing API key */
-            403: {
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -7872,6 +8654,13 @@ export interface operations {
         responses: {
             /** @description CSAT response */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -7900,6 +8689,13 @@ export interface operations {
         responses: {
             /** @description Paginated CES tools */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -7940,7 +8736,7 @@ export interface operations {
                 };
             };
             /** @description Invalid or missing API key */
-            403: {
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -7961,6 +8757,13 @@ export interface operations {
         responses: {
             /** @description CES response */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -7988,6 +8791,13 @@ export interface operations {
         responses: {
             /** @description NPS tool deleted */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -8033,6 +8843,13 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description NPS tool not found */
             404: {
                 headers: {
@@ -8064,6 +8881,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Tool or folder not found */
             404: {
                 headers: {
@@ -8086,6 +8910,13 @@ export interface operations {
         responses: {
             /** @description CSAT tool deleted */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -8131,6 +8962,13 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description CSAT tool not found */
             404: {
                 headers: {
@@ -8162,6 +9000,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Tool or folder not found */
             404: {
                 headers: {
@@ -8184,6 +9029,13 @@ export interface operations {
         responses: {
             /** @description CES tool deleted */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -8229,6 +9081,13 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description CES tool not found */
             404: {
                 headers: {
@@ -8255,6 +9114,13 @@ export interface operations {
         responses: {
             /** @description Ces tool moved */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -8312,6 +9178,13 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     V1TicketsController_getStats: {
@@ -8339,6 +9212,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     V1TicketsController_getTicket: {
@@ -8360,6 +9240,13 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["PublicTicketDto"];
                 };
+            };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Ticket not found */
             404: {
@@ -8402,6 +9289,13 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
+            };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Ticket not found */
             404: {
@@ -8452,6 +9346,13 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     V1DispatchesController_stats: {
@@ -8476,6 +9377,13 @@ export interface operations {
         responses: {
             /** @description Aggregate response-rate metrics */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -8514,7 +9422,14 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
-            /** @description Invalid API key, company access or entitlement */
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No company access or entitlement */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8566,7 +9481,14 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
-            /** @description Invalid API key, company access or entitlement */
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No company access or entitlement */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8625,7 +9547,14 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
-            /** @description Invalid API key, company access or entitlement */
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No company access or entitlement */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8677,7 +9606,14 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
-            /** @description Invalid API key, company access or entitlement */
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No company access or entitlement */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8728,7 +9664,14 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
-            /** @description Invalid API key, company access or entitlement */
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No company access or entitlement */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8776,7 +9719,14 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
-            /** @description Invalid API key, company access or entitlement */
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No company access or entitlement */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8838,7 +9788,14 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
-            /** @description Invalid API key, company access or entitlement */
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No company access or entitlement */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8887,7 +9844,14 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
-            /** @description Invalid API key, company access or entitlement */
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No company access or entitlement */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8931,6 +9895,13 @@ export interface operations {
                 };
             };
             /** @description Invalid or missing API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No company access or entitlement */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -8980,7 +9951,14 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
-            /** @description Invalid API key, company access or entitlement */
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No company access or entitlement */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -9038,7 +10016,14 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
-            /** @description Invalid API key, company access or entitlement */
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No company access or entitlement */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -9081,7 +10066,14 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
-            /** @description Invalid API key, company access or entitlement */
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No company access or entitlement */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -9130,7 +10122,14 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
-            /** @description Invalid API key, company access or entitlement */
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No company access or entitlement */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -9182,7 +10181,14 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
-            /** @description Invalid API key, company access or entitlement */
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No company access or entitlement */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -9232,7 +10238,14 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
-            /** @description Invalid API key, company access or entitlement */
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No company access or entitlement */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -9276,6 +10289,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     V1FoldersController_createFolder: {
@@ -9310,6 +10330,13 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Parent folder not found */
             404: {
                 headers: {
@@ -9332,6 +10359,13 @@ export interface operations {
         responses: {
             /** @description Folder */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -9362,6 +10396,13 @@ export interface operations {
         responses: {
             /** @description Folder deleted */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -9405,6 +10446,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Folder not found */
             404: {
                 headers: {
@@ -9432,6 +10480,13 @@ export interface operations {
         responses: {
             /** @description Folder report */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -9469,6 +10524,13 @@ export interface operations {
                     "application/pdf": string;
                 };
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Folder not found */
             404: {
                 headers: {
@@ -9498,6 +10560,13 @@ export interface operations {
         responses: {
             /** @description Folder tool metrics */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -9536,6 +10605,13 @@ export interface operations {
                 content: {
                     "text/csv": string;
                 };
+            };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Folder not found */
             404: {
@@ -9577,6 +10653,13 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Folder not found */
             404: {
                 headers: {
@@ -9600,6 +10683,13 @@ export interface operations {
         responses: {
             /** @description Scheduled reports */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -9636,6 +10726,13 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Folder or tool not found */
             404: {
                 headers: {
@@ -9658,6 +10755,13 @@ export interface operations {
         responses: {
             /** @description Deleted */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -9694,6 +10798,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Scheduled report not found */
             404: {
                 headers: {
@@ -9716,6 +10827,13 @@ export interface operations {
         responses: {
             /** @description Send result */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -9744,6 +10862,13 @@ export interface operations {
         responses: {
             /** @description List and participation */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -9789,6 +10914,13 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Folder not found */
             404: {
                 headers: {
@@ -9829,6 +10961,13 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Folder not found */
             404: {
                 headers: {
@@ -9852,6 +10991,13 @@ export interface operations {
         responses: {
             /** @description List deleted */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -9897,6 +11043,13 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Folder not found */
             404: {
                 headers: {
@@ -9921,6 +11074,13 @@ export interface operations {
         responses: {
             /** @description Person removed */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -9974,6 +11134,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     V1ToolsController_getToolsStats: {
@@ -9994,6 +11161,47 @@ export interface operations {
         responses: {
             /** @description Figures per type */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1ToolsController_getToolsMetrics: {
+        parameters: {
+            query: {
+                /** @description Period in days: 7, 30 or 90, or 0 for the whole history. Defaults to 30. */
+                days?: 0 | 7 | 30 | 90;
+                /** @description Custom period start (YYYY-MM-DD, UTC day, inclusive). With `to`, replaces `days`. */
+                from?: string;
+                /** @description Custom period end (YYYY-MM-DD, UTC day, inclusive). */
+                to?: string;
+                /** @description Tool type */
+                type: "woku" | "nps" | "csat" | "ces";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Tool metrics of the type */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -10030,6 +11238,13 @@ export interface operations {
                     "application/json": components["schemas"]["ValidationErrorResponseDto"];
                 };
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Folder or item not found */
             404: {
                 headers: {
@@ -10055,6 +11270,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     V1JourneyFoldersController_organizeJourneyFolders: {
@@ -10068,6 +11290,13 @@ export interface operations {
         responses: {
             /** @description Organization started */
             202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };

@@ -409,6 +409,11 @@ const september = await woku.folders.metrics(folder.id, {
   from: '2026-09-01',
   to: '2026-09-30',
 });
+// RP-0060: the same figures for every tool of ONE type in the whole company
+// (the metrics of the company report of that type).
+const companyCsat = await woku.tools.metrics({ type: 'csat', days: 30 });
+// And the AI report over every woku of the company.
+const wokuReport = await woku.reports.companyWoku();
 for (const tool of metrics.tools) {
   console.log(
     tool.name,

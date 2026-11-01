@@ -27,6 +27,9 @@
               }
             }
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "404": {
             "description": "Follow-up not found in this company"
           }
@@ -109,6 +112,9 @@
         "responses": {
           "200": {
             "description": "Paginated list of tracker definitions"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -149,7 +155,7 @@
           "201": {
             "description": "Tracker definition created"
           },
-          "403": {
+          "401": {
             "description": "Invalid or missing API key"
           },
           "409": {
@@ -184,6 +190,9 @@
         "responses": {
           "200": {
             "description": ""
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -226,6 +235,9 @@
           },
           "400": {
             "description": "Tracker is inactive or validation error"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "403": {
             "description": "Woku belongs to another company"
@@ -270,6 +282,9 @@
         "responses": {
           "200": {
             "description": "Value removed"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "404": {
             "description": "Tracker name or assignment not found"
@@ -336,6 +351,9 @@
         "responses": {
           "200": {
             "description": ""
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -367,6 +385,9 @@
         "responses": {
           "200": {
             "description": "Matching entities"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "404": {
             "description": "A filter names an unknown tracker"
@@ -400,6 +421,9 @@
         "responses": {
           "200": {
             "description": "Tracker definition"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "404": {
             "description": "Tracker not found"
@@ -442,6 +466,9 @@
           "200": {
             "description": "Tracker definition updated"
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "404": {
             "description": "Tracker not found"
           },
@@ -478,6 +505,9 @@
           "200": {
             "description": "Tracker activated"
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "404": {
             "description": "Tracker not found"
           }
@@ -510,6 +540,9 @@
         "responses": {
           "200": {
             "description": "Tracker deactivated"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "404": {
             "description": "Tracker not found"
@@ -561,6 +594,9 @@
           },
           "400": {
             "description": "Unsupported entity type"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -618,6 +654,9 @@
           },
           "400": {
             "description": "Unsupported entity type, inactive tracker or validation error"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "403": {
             "description": "Entity belongs to another company"
@@ -678,6 +717,9 @@
           "200": {
             "description": "Value removed"
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "404": {
             "description": "Tracker name or assignment not found"
           }
@@ -710,6 +752,9 @@
         "responses": {
           "200": {
             "description": "Destinations (no credentials)"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -742,6 +787,9 @@
           },
           "400": {
             "description": "Validation error"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -772,6 +820,9 @@
         "responses": {
           "200": {
             "description": ""
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "404": {
             "description": "Destination not found"
@@ -817,6 +868,9 @@
           "400": {
             "description": "Validation error"
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "404": {
             "description": "Destination not found"
           }
@@ -847,6 +901,9 @@
         "responses": {
           "200": {
             "description": ""
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "404": {
             "description": "Destination not found"
@@ -895,6 +952,9 @@
           "400": {
             "description": "Not confirmed"
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "404": {
             "description": "Destination not found"
           }
@@ -936,6 +996,9 @@
         "responses": {
           "200": {
             "description": ""
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -967,6 +1030,9 @@
           },
           "400": {
             "description": "Validation error"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -997,6 +1063,9 @@
         "responses": {
           "200": {
             "description": ""
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "404": {
             "description": "Group not found"
@@ -1042,6 +1111,9 @@
           "400": {
             "description": "Validation error"
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "404": {
             "description": "Group not found"
           }
@@ -1072,6 +1144,9 @@
         "responses": {
           "200": {
             "description": ""
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "404": {
             "description": "Group not found"
@@ -1115,6 +1190,9 @@
         "responses": {
           "200": {
             "description": ""
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "404": {
             "description": "Group not found"
@@ -1268,6 +1346,9 @@
         "responses": {
           "200": {
             "description": ""
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -1298,6 +1379,9 @@
         "responses": {
           "200": {
             "description": ""
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "404": {
             "description": "Plan not found"
@@ -1332,6 +1416,9 @@
           "200": {
             "description": ""
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "404": {
             "description": "Plan not found"
           }
@@ -1365,6 +1452,9 @@
         "responses": {
           "200": {
             "description": ""
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "404": {
             "description": "Plan not found"
@@ -1410,6 +1500,9 @@
           },
           "400": {
             "description": "Not confirmed or invalid body"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "404": {
             "description": "Plan not found"
@@ -1458,6 +1551,9 @@
           "202": {
             "description": ""
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "409": {
             "description": "Invalid status transition"
           }
@@ -1501,6 +1597,9 @@
           "201": {
             "description": ""
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "409": {
             "description": "Plan is not a draft or managed"
           }
@@ -1543,6 +1642,9 @@
         "responses": {
           "200": {
             "description": ""
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -1593,6 +1695,9 @@
           "200": {
             "description": ""
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "409": {
             "description": "Plan is not a draft or managed"
           }
@@ -1632,6 +1737,9 @@
         "responses": {
           "200": {
             "description": ""
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -1662,6 +1770,9 @@
         "responses": {
           "200": {
             "description": ""
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -1692,6 +1803,9 @@
         "responses": {
           "200": {
             "description": ""
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -1722,6 +1836,9 @@
         "responses": {
           "200": {
             "description": ""
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -1752,6 +1869,9 @@
         "responses": {
           "200": {
             "description": ""
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -1782,6 +1902,9 @@
         "responses": {
           "200": {
             "description": ""
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -1824,6 +1947,9 @@
         "responses": {
           "200": {
             "description": ""
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -1865,6 +1991,9 @@
         "responses": {
           "200": {
             "description": ""
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "404": {
             "description": "App not found"
@@ -1910,6 +2039,9 @@
           "200": {
             "description": "Result or error per query id"
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "404": {
             "description": "App not found"
           }
@@ -1943,6 +2075,9 @@
         "responses": {
           "200": {
             "description": ""
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "404": {
             "description": "App not found"
@@ -1999,6 +2134,9 @@
           "400": {
             "description": "Unsupported or unreadable file"
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "404": {
             "description": "App not found"
           }
@@ -2045,6 +2183,9 @@
           },
           "400": {
             "description": "Invalid operations"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "409": {
             "description": "baseVersion is not current"
@@ -2096,6 +2237,9 @@
           "400": {
             "description": "Unknown component or container"
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "404": {
             "description": "App or version not found"
           }
@@ -2130,6 +2274,9 @@
           "201": {
             "description": "The new app"
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "404": {
             "description": "App not found"
           }
@@ -2163,6 +2310,9 @@
         "responses": {
           "200": {
             "description": "Publication state"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "404": {
             "description": "App not found"
@@ -2206,6 +2356,9 @@
           "201": {
             "description": "New version and issues"
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "404": {
             "description": "App or version not found"
           }
@@ -2242,6 +2395,9 @@
           },
           "400": {
             "description": "Already built"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -2294,6 +2450,9 @@
           },
           "400": {
             "description": "A sketch cannot be published"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -2331,6 +2490,9 @@
         "responses": {
           "200": {
             "description": "Paginated wokus"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -2378,6 +2540,9 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -2408,6 +2573,9 @@
         "responses": {
           "200": {
             "description": "Woku with stats"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "403": {
             "description": "Woku does not belong to the caller company"
@@ -2463,6 +2631,9 @@
               }
             }
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "403": {
             "description": "Woku does not belong to the caller company"
           },
@@ -2496,6 +2667,9 @@
         "responses": {
           "200": {
             "description": "Woku deleted"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "403": {
             "description": "Woku does not belong to the caller company"
@@ -2549,6 +2723,9 @@
         "responses": {
           "200": {
             "description": "Paginated reviews"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "403": {
             "description": "Woku does not belong to the caller company"
@@ -2607,6 +2784,9 @@
               }
             }
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "403": {
             "description": "Woku does not belong to the caller company"
           },
@@ -2663,6 +2843,9 @@
               }
             }
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "403": {
             "description": "Woku does not belong to the caller company"
           },
@@ -2707,6 +2890,9 @@
         "responses": {
           "201": {
             "description": ""
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -2745,6 +2931,9 @@
         "responses": {
           "200": {
             "description": ""
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -2793,6 +2982,9 @@
         "responses": {
           "201": {
             "description": ""
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -2841,6 +3033,9 @@
         "responses": {
           "201": {
             "description": ""
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -2889,6 +3084,9 @@
         "responses": {
           "201": {
             "description": ""
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -2947,8 +3145,8 @@
               }
             }
           },
-          "403": {
-            "description": "Invalid company key"
+          "401": {
+            "description": "Invalid or missing API key"
           },
           "413": {
             "description": "The media upload exceeds 25 MB"
@@ -2983,7 +3181,7 @@
           "200": {
             "description": "Company data retrieved"
           },
-          "403": {
+          "401": {
             "description": "Invalid or missing API key"
           }
         },
@@ -3014,7 +3212,7 @@
               }
             }
           },
-          "403": {
+          "401": {
             "description": "Invalid or missing API key"
           }
         },
@@ -3045,7 +3243,7 @@
               }
             }
           },
-          "403": {
+          "401": {
             "description": "Invalid or missing API key"
           }
         },
@@ -3068,6 +3266,9 @@
         "responses": {
           "200": {
             "description": "Company NPS report"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -3076,6 +3277,30 @@
           }
         ],
         "summary": "Get the company-wide NPS report",
+        "tags": [
+          "v1 - reports"
+        ]
+      }
+    },
+    "/v1/reports/company-woku": {
+      "get": {
+        "description": "Returns the report over every woku of the company (the root and every folder), with the same text sections as a folder report.",
+        "operationId": "V1ReportsController_getCompanyWoku",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Company woku report"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get the company report of wokus",
         "tags": [
           "v1 - reports"
         ]
@@ -3102,6 +3327,9 @@
           },
           "400": {
             "description": "NPS tool does not belong to the caller company"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -3132,6 +3360,9 @@
         "responses": {
           "200": {
             "description": "NPS tool definition"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "403": {
             "description": "Tool does not belong to caller"
@@ -3175,6 +3406,9 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "403": {
             "description": "Tool does not belong to caller"
@@ -3250,6 +3484,9 @@
           "200": {
             "description": "Paginated NPS responses"
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "403": {
             "description": "NPS tool filter does not belong to the caller company"
           }
@@ -3302,6 +3539,9 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "403": {
             "description": "NPS does not belong to caller"
@@ -3368,6 +3608,9 @@
           "201": {
             "description": "Voice review added"
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "403": {
             "description": "NPS does not belong to caller"
           },
@@ -3403,6 +3646,9 @@
         "responses": {
           "200": {
             "description": "CSAT tool definition"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "403": {
             "description": "Tool does not belong to caller"
@@ -3446,6 +3692,9 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "403": {
             "description": "Tool does not belong to caller"
@@ -3518,6 +3767,9 @@
         "responses": {
           "200": {
             "description": "Paginated CSAT responses"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -3568,6 +3820,9 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "403": {
             "description": "Response does not belong to caller"
@@ -3634,6 +3889,9 @@
           "201": {
             "description": "Voice comment accepted"
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "403": {
             "description": "Response does not belong to caller"
           },
@@ -3669,6 +3927,9 @@
         "responses": {
           "200": {
             "description": "CES tool definition"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "403": {
             "description": "Tool does not belong to caller"
@@ -3712,6 +3973,9 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "403": {
             "description": "Tool does not belong to caller"
@@ -3784,6 +4048,9 @@
         "responses": {
           "200": {
             "description": "Paginated CES responses"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -3834,6 +4101,9 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "403": {
             "description": "Response does not belong to caller"
@@ -3899,6 +4169,9 @@
         "responses": {
           "201": {
             "description": "Voice comment accepted"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "403": {
             "description": "Response does not belong to caller"
@@ -3974,6 +4247,9 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -4036,6 +4312,9 @@
               }
             }
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "403": {
             "description": "NPS tool does not belong to the caller company"
           }
@@ -4096,6 +4375,9 @@
               }
             }
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "403": {
             "description": "Tool does not belong to caller"
           }
@@ -4155,6 +4437,9 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "403": {
             "description": "Tool does not belong to caller"
@@ -4226,6 +4511,9 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "403": {
             "description": "Form does not belong to the caller company"
@@ -4301,6 +4589,9 @@
               }
             }
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "403": {
             "description": "Woku does not belong to the caller company"
           },
@@ -4343,6 +4634,9 @@
         "responses": {
           "200": {
             "description": "Paginated forms"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -4391,6 +4685,9 @@
         "responses": {
           "200": {
             "description": "Paginated form responses"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "403": {
             "description": "Form does not belong to the caller company"
@@ -4448,6 +4745,9 @@
               }
             }
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "403": {
             "description": "Form does not belong to the caller company"
           },
@@ -4488,6 +4788,9 @@
         "responses": {
           "200": {
             "description": "Form definition"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "403": {
             "description": "Form does not belong to the caller company"
@@ -4531,6 +4834,9 @@
         "responses": {
           "200": {
             "description": "Paginated flows"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -4580,6 +4886,9 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -4611,6 +4920,9 @@
         "responses": {
           "200": {
             "description": "Flow data"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "403": {
             "description": "Flow does not belong to the caller company"
@@ -4656,6 +4968,9 @@
           "200": {
             "description": "Flow updated"
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "404": {
             "description": "Flow not found"
           }
@@ -4686,6 +5001,9 @@
         "responses": {
           "200": {
             "description": "Flow deleted"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "404": {
             "description": "Flow not found"
@@ -4727,6 +5045,9 @@
         "responses": {
           "200": {
             "description": "Paginated NPS tools"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -4776,7 +5097,7 @@
               }
             }
           },
-          "403": {
+          "401": {
             "description": "Invalid or missing API key"
           }
         },
@@ -4808,6 +5129,9 @@
         "responses": {
           "200": {
             "description": "NPS response"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "403": {
             "description": "NPS does not belong to the caller company"
@@ -4851,6 +5175,9 @@
         "responses": {
           "200": {
             "description": "Paginated CSAT tools"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -4900,7 +5227,7 @@
               }
             }
           },
-          "403": {
+          "401": {
             "description": "Invalid or missing API key"
           }
         },
@@ -4932,6 +5259,9 @@
         "responses": {
           "200": {
             "description": "CSAT response"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "404": {
             "description": "CSAT response not found"
@@ -4972,6 +5302,9 @@
         "responses": {
           "200": {
             "description": "Paginated CES tools"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -5021,7 +5354,7 @@
               }
             }
           },
-          "403": {
+          "401": {
             "description": "Invalid or missing API key"
           }
         },
@@ -5053,6 +5386,9 @@
         "responses": {
           "200": {
             "description": "CES response"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "404": {
             "description": "CES response not found"
@@ -5107,6 +5443,9 @@
               }
             }
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "404": {
             "description": "NPS tool not found"
           }
@@ -5137,6 +5476,9 @@
         "responses": {
           "200": {
             "description": "NPS tool deleted"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "404": {
             "description": "NPS tool not found"
@@ -5180,6 +5522,9 @@
         "responses": {
           "200": {
             "description": "NPS tool moved"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "404": {
             "description": "Tool or folder not found"
@@ -5234,6 +5579,9 @@
               }
             }
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "404": {
             "description": "CSAT tool not found"
           }
@@ -5264,6 +5612,9 @@
         "responses": {
           "200": {
             "description": "CSAT tool deleted"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "404": {
             "description": "CSAT tool not found"
@@ -5307,6 +5658,9 @@
         "responses": {
           "200": {
             "description": "Csat tool moved"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "404": {
             "description": "Tool or folder not found"
@@ -5361,6 +5715,9 @@
               }
             }
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "404": {
             "description": "CES tool not found"
           }
@@ -5391,6 +5748,9 @@
         "responses": {
           "200": {
             "description": "CES tool deleted"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "404": {
             "description": "CES tool not found"
@@ -5434,6 +5794,9 @@
         "responses": {
           "200": {
             "description": "Ces tool moved"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "404": {
             "description": "Tool or folder not found"
@@ -5574,6 +5937,9 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -5634,6 +6000,9 @@
         "responses": {
           "200": {
             "description": "Aggregate ticket counts"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -5671,6 +6040,9 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "404": {
             "description": "Ticket not found"
@@ -5729,6 +6101,9 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "404": {
             "description": "Ticket not found"
@@ -5858,6 +6233,9 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -5938,6 +6316,9 @@
         "responses": {
           "200": {
             "description": "Aggregate response-rate metrics"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -6005,8 +6386,11 @@
               }
             }
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "403": {
-            "description": "Invalid API key, company access or entitlement"
+            "description": "No company access or entitlement"
           },
           "404": {
             "description": "Journey, moment or evaluation not found"
@@ -6076,8 +6460,11 @@
               }
             }
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "403": {
-            "description": "Invalid API key, company access or entitlement"
+            "description": "No company access or entitlement"
           },
           "404": {
             "description": "Journey, moment or evaluation not found"
@@ -6142,8 +6529,11 @@
               }
             }
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "403": {
-            "description": "Invalid API key, company access or entitlement"
+            "description": "No company access or entitlement"
           },
           "404": {
             "description": "Journey, moment or evaluation not found"
@@ -6221,8 +6611,11 @@
               }
             }
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "403": {
-            "description": "Invalid API key, company access or entitlement"
+            "description": "No company access or entitlement"
           },
           "404": {
             "description": "Journey, moment or evaluation not found"
@@ -6279,8 +6672,11 @@
               }
             }
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "403": {
-            "description": "Invalid API key, company access or entitlement"
+            "description": "No company access or entitlement"
           },
           "404": {
             "description": "Journey, moment or evaluation not found"
@@ -6348,8 +6744,11 @@
               }
             }
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "403": {
-            "description": "Invalid API key, company access or entitlement"
+            "description": "No company access or entitlement"
           },
           "404": {
             "description": "Journey, moment or evaluation not found"
@@ -6417,8 +6816,11 @@
               }
             }
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "403": {
-            "description": "Invalid API key, company access or entitlement"
+            "description": "No company access or entitlement"
           },
           "404": {
             "description": "Journey, moment or evaluation not found"
@@ -6488,8 +6890,11 @@
               }
             }
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "403": {
-            "description": "Invalid API key, company access or entitlement"
+            "description": "No company access or entitlement"
           },
           "404": {
             "description": "Journey, moment or evaluation not found"
@@ -6534,8 +6939,11 @@
               }
             }
           },
-          "403": {
+          "401": {
             "description": "Invalid or missing API key"
+          },
+          "403": {
+            "description": "No company access or entitlement"
           },
           "404": {
             "description": "Journey, moment or evaluation not found"
@@ -6596,8 +7004,11 @@
               }
             }
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "403": {
-            "description": "Invalid API key, company access or entitlement"
+            "description": "No company access or entitlement"
           },
           "404": {
             "description": "Journey, moment or evaluation not found"
@@ -6655,8 +7066,11 @@
               }
             }
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "403": {
-            "description": "Invalid API key, company access or entitlement"
+            "description": "No company access or entitlement"
           },
           "404": {
             "description": "Journey not found"
@@ -6717,8 +7131,11 @@
               }
             }
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "403": {
-            "description": "Invalid API key, company access or entitlement"
+            "description": "No company access or entitlement"
           },
           "404": {
             "description": "Journey not found"
@@ -6764,8 +7181,11 @@
               }
             }
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "403": {
-            "description": "Invalid API key, company access or entitlement"
+            "description": "No company access or entitlement"
           },
           "404": {
             "description": "Journey not found"
@@ -6818,8 +7238,11 @@
               }
             }
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "403": {
-            "description": "Invalid API key, company access or entitlement"
+            "description": "No company access or entitlement"
           },
           "404": {
             "description": "Journey not found"
@@ -6882,8 +7305,11 @@
               }
             }
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "403": {
-            "description": "Invalid API key, company access or entitlement"
+            "description": "No company access or entitlement"
           },
           "404": {
             "description": "Journey, moment or evaluation not found"
@@ -6932,6 +7358,9 @@
         "responses": {
           "200": {
             "description": "Folders"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -6981,6 +7410,9 @@
               }
             }
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "404": {
             "description": "Parent folder not found"
           }
@@ -7013,6 +7445,9 @@
         "responses": {
           "200": {
             "description": "Folder"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "404": {
             "description": "Folder not found"
@@ -7055,6 +7490,9 @@
           "200": {
             "description": "Folder updated"
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "404": {
             "description": "Folder not found"
           }
@@ -7095,6 +7533,9 @@
         "responses": {
           "200": {
             "description": "Folder deleted"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "404": {
             "description": "Folder not found"
@@ -7155,6 +7596,9 @@
           "200": {
             "description": "Folder report"
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "404": {
             "description": "Folder not found"
           }
@@ -7209,6 +7653,9 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "404": {
             "description": "Folder not found"
@@ -7279,6 +7726,9 @@
           "200": {
             "description": "Folder tool metrics"
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "404": {
             "description": "Folder not found"
           }
@@ -7340,6 +7790,9 @@
               }
             }
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "404": {
             "description": "Folder not found"
           }
@@ -7393,6 +7846,9 @@
               }
             }
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "404": {
             "description": "Folder not found"
           }
@@ -7441,6 +7897,9 @@
         "responses": {
           "200": {
             "description": "Scheduled reports"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -7480,6 +7939,9 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "404": {
             "description": "Folder or tool not found"
@@ -7525,6 +7987,9 @@
           "200": {
             "description": "Scheduled report updated"
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "404": {
             "description": "Scheduled report not found"
           }
@@ -7555,6 +8020,9 @@
         "responses": {
           "200": {
             "description": "Deleted"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "404": {
             "description": "Scheduled report not found"
@@ -7590,6 +8058,9 @@
           "200": {
             "description": "Send result"
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "404": {
             "description": "Scheduled report not found"
           }
@@ -7624,6 +8095,9 @@
         "responses": {
           "200": {
             "description": "List and participation"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "404": {
             "description": "Folder not found"
@@ -7678,6 +8152,9 @@
               }
             }
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "404": {
             "description": "Folder not found"
           }
@@ -7731,6 +8208,9 @@
               }
             }
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "404": {
             "description": "Folder not found"
           }
@@ -7762,6 +8242,9 @@
         "responses": {
           "200": {
             "description": "List deleted"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "404": {
             "description": "Folder not found"
@@ -7818,6 +8301,9 @@
               }
             }
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "404": {
             "description": "Folder not found"
           }
@@ -7860,6 +8346,9 @@
         "responses": {
           "200": {
             "description": "Person removed"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "404": {
             "description": "Folder not found"
@@ -8019,6 +8508,9 @@
         "responses": {
           "200": {
             "description": "Folders, tools and facets"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -8071,6 +8563,9 @@
         "responses": {
           "200": {
             "description": "Figures per type"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -8079,6 +8574,81 @@
           }
         ],
         "summary": "Headline figures per tool type",
+        "tags": [
+          "v1 - tools"
+        ]
+      }
+    },
+    "/v1/tools/metrics": {
+      "get": {
+        "description": "The metrics of the company report of one type (`type` woku, nps, csat or ces): the same per-tool figures as the folder metrics for every tool of that type in the company, at the root and in every folder, for a period (`days` 7, 30 or 90, or 0 for the whole history, default 30; or a custom `from`/`to` range of whole UTC days) against the period before it. Scales are never mixed: one type per call.",
+        "operationId": "V1ToolsController_getToolsMetrics",
+        "parameters": [
+          {
+            "name": "days",
+            "required": false,
+            "in": "query",
+            "description": "Period in days: 7, 30 or 90, or 0 for the whole history. Defaults to 30.",
+            "schema": {
+              "type": "number",
+              "enum": [
+                0,
+                7,
+                30,
+                90
+              ]
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "description": "Custom period start (YYYY-MM-DD, UTC day, inclusive). With `to`, replaces `days`.",
+            "schema": {
+              "example": "2026-09-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "description": "Custom period end (YYYY-MM-DD, UTC day, inclusive).",
+            "schema": {
+              "example": "2026-09-30",
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "required": true,
+            "in": "query",
+            "description": "Tool type",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "woku",
+                "nps",
+                "csat",
+                "ces"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tool metrics of the type"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Metrics of every tool of one type in the company",
         "tags": [
           "v1 - tools"
         ]
@@ -8113,6 +8683,9 @@
               }
             }
           },
+          "401": {
+            "description": "Missing or invalid API key"
+          },
           "404": {
             "description": "Folder or item not found"
           }
@@ -8136,6 +8709,9 @@
         "responses": {
           "200": {
             "description": "Status"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           }
         },
         "security": [
@@ -8157,6 +8733,9 @@
         "responses": {
           "202": {
             "description": "Organization started"
+          },
+          "401": {
+            "description": "Missing or invalid API key"
           },
           "409": {
             "description": "Already organizing"
@@ -10884,6 +11463,34 @@
           }
         }
       },
+      "PublicTicketOriginFolderDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string",
+            "description": "Breadcrumb, root first (\"Tiendas > Santiago\")."
+          },
+          "ancestorIds": {
+            "description": "The folder first, then its parents up to the root.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "path",
+          "ancestorIds"
+        ]
+      },
       "PublicTicketOriginDto": {
         "type": "object",
         "properties": {
@@ -10926,6 +11533,14 @@
                 }
               }
             }
+          },
+          "folder": {
+            "description": "Folder of the source tool, when it lives in one (SV-0021).",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicTicketOriginFolderDto"
+              }
+            ]
           }
         },
         "required": [
