@@ -2,7 +2,7 @@ import type { WokuClient } from '../core/client';
 import type { RequestOptions } from '../core/options';
 import type { WokuRecord } from '../models';
 
-/** Read NPS reports (`/v1/reports`). */
+/** Read company reports (`/v1/reports`). */
 export class Reports {
   constructor(private readonly client: WokuClient) {}
 
@@ -12,6 +12,17 @@ export class Reports {
     opts?: RequestOptions,
   ): Promise<WokuRecord> {
     return this.client.request<WokuRecord>('get', '/v1/reports/company-nps', {
+      ...opts,
+      query: { ...params, ...opts?.query },
+    });
+  }
+
+  /** Report over every woku of the company (the root and every folder). */
+  companyWoku(
+    params?: Record<string, unknown>,
+    opts?: RequestOptions,
+  ): Promise<WokuRecord> {
+    return this.client.request<WokuRecord>('get', '/v1/reports/company-woku', {
       ...opts,
       query: { ...params, ...opts?.query },
     });

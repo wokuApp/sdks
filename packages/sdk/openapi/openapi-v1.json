@@ -3081,6 +3081,27 @@
         ]
       }
     },
+    "/v1/reports/company-woku": {
+      "get": {
+        "description": "Returns the report over every woku of the company (the root and every folder), with the same text sections as a folder report.",
+        "operationId": "V1ReportsController_getCompanyWoku",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Company woku report"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get the company report of wokus",
+        "tags": [
+          "v1 - reports"
+        ]
+      }
+    },
     "/v1/reports/nps-tool/{npsToolId}": {
       "get": {
         "description": "Returns the NPS report for the given tool. Fails with 400 if the tool does not belong to the caller company.",
@@ -8084,6 +8105,78 @@
         ]
       }
     },
+    "/v1/tools/metrics": {
+      "get": {
+        "description": "The metrics of the company report of one type (`type` woku, nps, csat or ces): the same per-tool figures as the folder metrics for every tool of that type in the company, at the root and in every folder, for a period (`days` 7, 30 or 90, or 0 for the whole history, default 30; or a custom `from`/`to` range of whole UTC days) against the period before it. Scales are never mixed: one type per call.",
+        "operationId": "V1ToolsController_getToolsMetrics",
+        "parameters": [
+          {
+            "name": "days",
+            "required": false,
+            "in": "query",
+            "description": "Period in days: 7, 30 or 90, or 0 for the whole history. Defaults to 30.",
+            "schema": {
+              "type": "number",
+              "enum": [
+                0,
+                7,
+                30,
+                90
+              ]
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "description": "Custom period start (YYYY-MM-DD, UTC day, inclusive). With `to`, replaces `days`.",
+            "schema": {
+              "example": "2026-09-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "description": "Custom period end (YYYY-MM-DD, UTC day, inclusive).",
+            "schema": {
+              "example": "2026-09-30",
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "required": true,
+            "in": "query",
+            "description": "Tool type",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "woku",
+                "nps",
+                "csat",
+                "ces"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tool metrics of the type"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Metrics of every tool of one type in the company",
+        "tags": [
+          "v1 - tools"
+        ]
+      }
+    },
     "/v1/tools/move": {
       "post": {
         "description": "Moves items of mixed types (woku, nps, csat, ces, folder) in one call. It is idempotent: moving items to where they already are succeeds. Nothing moves if one item is missing.",
@@ -10884,6 +10977,34 @@
           }
         }
       },
+      "PublicTicketOriginFolderDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string",
+            "description": "Breadcrumb, root first (\"Tiendas > Santiago\")."
+          },
+          "ancestorIds": {
+            "description": "The folder first, then its parents up to the root.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "path",
+          "ancestorIds"
+        ]
+      },
       "PublicTicketOriginDto": {
         "type": "object",
         "properties": {
@@ -10926,6 +11047,14 @@
                 }
               }
             }
+          },
+          "folder": {
+            "description": "Folder of the source tool, when it lives in one (SV-0021).",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicTicketOriginFolderDto"
+              }
+            ]
           }
         },
         "required": [

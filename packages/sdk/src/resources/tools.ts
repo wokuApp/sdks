@@ -3,6 +3,7 @@ import type { RequestOptions } from '../core/options';
 import type { MoveToolItemsParams } from '../types';
 import type {
   Folder,
+  FolderToolMetrics,
   MoveResult,
   ToolItem,
   ToolItemsPageResponse,
@@ -152,6 +153,29 @@ export class Tools {
     opts?: RequestOptions,
   ): Promise<ToolsStats> {
     return this.client.request<ToolsStats>('get', '/v1/tools/stats', {
+      ...opts,
+      query: { ...params, ...opts?.query },
+    });
+  }
+
+  /**
+   * The metrics of the company report of one type: the same per-tool figures
+   * as `folders.metrics` for every tool of that `type` in the company (the
+   * root and every folder), for a period against the one before it. `days` is
+   * 7, 30 (default) or 90, or 0 for the whole history; or a custom range with
+   * `from` and `to` (`YYYY-MM-DD` UTC days, both inclusive). One type per call:
+   * scales are never mixed.
+   */
+  metrics(
+    params: {
+      type: ToolType;
+      days?: 0 | 7 | 30 | 90;
+      from?: string;
+      to?: string;
+    },
+    opts?: RequestOptions,
+  ): Promise<FolderToolMetrics> {
+    return this.client.request<FolderToolMetrics>('get', '/v1/tools/metrics', {
       ...opts,
       query: { ...params, ...opts?.query },
     });

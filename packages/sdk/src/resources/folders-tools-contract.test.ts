@@ -132,6 +132,20 @@ const cases: [string, string, string, string, (w: Woku) => Promise<unknown>][] =
       (w) => w.folders.pdf('f1', { lang: 'en' }),
     ],
     [
+      'tools.metrics',
+      'GET',
+      '/v1/tools/metrics',
+      '/v1/tools/metrics',
+      (w) => w.tools.metrics({ type: 'csat', days: 7 }),
+    ],
+    [
+      'reports.companyWoku',
+      'GET',
+      '/v1/reports/company-woku',
+      '/v1/reports/company-woku',
+      (w) => w.reports.companyWoku(),
+    ],
+    [
       'tools.stats',
       'GET',
       '/v1/tools/stats',

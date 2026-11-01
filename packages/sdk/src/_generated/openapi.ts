@@ -1076,6 +1076,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/reports/company-woku": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the company report of wokus
+         * @description Returns the report over every woku of the company (the root and every folder), with the same text sections as a folder report.
+         */
+        get: operations["V1ReportsController_getCompanyWoku"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/reports/nps-tool/{npsToolId}": {
         parameters: {
             query?: never;
@@ -2338,6 +2358,26 @@ export interface paths {
          * @description Reviews and the native-scale headline of each type (woku stars, NPS score, CSAT satisfied %, CES mean) for the whole company or one folder and its subfolders. Scales are never mixed. A type that fails to compute reports `{ error: true }` and the others stay valid.
          */
         get: operations["V1ToolsController_getToolsStats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/tools/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Metrics of every tool of one type in the company
+         * @description The metrics of the company report of one type (`type` woku, nps, csat or ces): the same per-tool figures as the folder metrics for every tool of that type in the company, at the root and in every folder, for a period (`days` 7, 30 or 90, or 0 for the whole history, default 30; or a custom `from`/`to` range of whole UTC days) against the period before it. Scales are never mixed: one type per call.
+         */
+        get: operations["V1ToolsController_getToolsMetrics"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3650,6 +3690,14 @@ export interface components {
             defaultLocale?: "es" | "en";
             localizedContent?: components["schemas"]["CesToolLocalizedContentBodyDTO"][];
         };
+        PublicTicketOriginFolderDto: {
+            id: string;
+            name: string;
+            /** @description Breadcrumb, root first ("Tiendas > Santiago"). */
+            path: string;
+            /** @description The folder first, then its parents up to the root. */
+            ancestorIds: string[];
+        };
         PublicTicketOriginDto: {
             /** @enum {string} */
             tool: "woku" | "nps" | "form" | "csat" | "ces";
@@ -3663,6 +3711,8 @@ export interface components {
                 /** @description Name of the entity the value identifies (a journey name), if any. */
                 label?: string;
             }[];
+            /** @description Folder of the source tool, when it lives in one (SV-0021). */
+            folder?: components["schemas"]["PublicTicketOriginFolderDto"];
         };
         TicketFollowUpDto: {
             conversationId?: string;
@@ -6525,6 +6575,24 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description Company NPS report */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1ReportsController_getCompanyWoku: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Company woku report */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -9993,6 +10061,33 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description Figures per type */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    V1ToolsController_getToolsMetrics: {
+        parameters: {
+            query: {
+                /** @description Period in days: 7, 30 or 90, or 0 for the whole history. Defaults to 30. */
+                days?: 0 | 7 | 30 | 90;
+                /** @description Custom period start (YYYY-MM-DD, UTC day, inclusive). With `to`, replaces `days`. */
+                from?: string;
+                /** @description Custom period end (YYYY-MM-DD, UTC day, inclusive). */
+                to?: string;
+                /** @description Tool type */
+                type: "woku" | "nps" | "csat" | "ces";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Tool metrics of the type */
             200: {
                 headers: {
                     [name: string]: unknown;
