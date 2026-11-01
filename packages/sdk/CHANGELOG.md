@@ -1,5 +1,15 @@
 # @wokuapp/sdk
 
+## 0.12.0
+
+### Minor Changes
+
+- ce057b4: Company reports (RP-0060): `tools.metrics({ type })` returns the per-tool figures of every tool of one type in the company (the metrics of the company report of that type, same shape as `folders.metrics`), and `reports.companyWoku()` returns the AI report over every woku of the company.
+
+### Patch Changes
+
+- 1d67d4d: Regenerate the v1 types: every keyed operation now documents the `401` the API returns for a missing or invalid key (it used to answer `403`), so a bad key surfaces as `AuthenticationError` instead of `PermissionDeniedError`.
+
 ## 0.11.0
 
 ### Minor Changes
