@@ -6,6 +6,7 @@ import { Heart } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { useWidgetContext } from '../../contexts/WidgetContext';
 import type { Messages } from '../../i18n';
+import { sendToHost } from '../../bridge';
 
 interface ThankProps {
   messages: Messages;
@@ -36,7 +37,14 @@ export const Thank = ({ messages }: ThankProps) => {
       <p className="text-sm text-neutral-600">{t.subtitle}</p>
       {canRateAgain && (
         <div className="flex grow h-full items-end">
-          <Button variant="primary" onClick={reset}>
+          <Button
+            variant="primary"
+            onClick={() => {
+              reset();
+              // The panel opens for a new rating: the host keeps it on screen.
+              sendToHost('woku:open');
+            }}
+          >
             {t.rateAgain}
           </Button>
         </div>

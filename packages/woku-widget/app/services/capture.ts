@@ -433,7 +433,10 @@ export async function createScaleResponse(
     body: JSON.stringify(body),
   });
   const created = await handleResponse<Record<string, string | undefined>>(res);
-  return created[kind === 'ces' ? 'cesId' : 'csatId'] ?? '';
+  const id = created[kind === 'ces' ? 'cesId' : 'csatId'];
+  // Without its id the comment could never attach: a failed capture.
+  if (!id) throw new Error(`The ${kind} response returned no id`);
+  return id;
 }
 
 export interface CreateScaleTextnoteParams {

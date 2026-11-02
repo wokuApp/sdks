@@ -61,6 +61,16 @@ it('keeps the thank-you step on screen for 10 s after a submit, then hides', asy
   expect(overlay().style.display).toBe('none');
 });
 
+it('does not fold away a new rating started during the thank-you step', async () => {
+  // "Rate again" (or a host show()) inside the 10 s must keep the widget.
+  await openWidget();
+  fromIframe('woku:submit', { score: 4 });
+  await vi.advanceTimersByTimeAsync(3000);
+  fromIframe('woku:open');
+  await vi.advanceTimersByTimeAsync(10_000);
+  expect(overlay().style.display).not.toBe('none');
+});
+
 it('hides at once when the person closes the widget', async () => {
   const closed = vi.fn();
   window.WokuWidget.on('close', closed);

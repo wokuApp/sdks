@@ -459,3 +459,64 @@ it('shows the chosen stars above the woku comment', async () => {
   });
   expect(change.querySelectorAll('svg.fill-yellow-500')).toHaveLength(4);
 });
+
+it('tells the host a new rating starts when the person rates again', async () => {
+  configure({ captureType: 'ces', cesToolId: 'c1' });
+  fireEvent.click(await screen.findByRole('radio', { name: /^4/ }));
+  fireEvent.click(
+    await screen.findByRole('button', { name: 'Enviar sin comentario' }),
+  );
+  const opens = () =>
+    posted.filter((m) => (m as { type?: string }).type === 'woku:open').length;
+  const before = opens();
+  fireEvent.click(
+    await screen.findByRole('button', { name: 'Volver a calificar' }),
+  );
+  expect(opens()).toBe(before + 1);
+  expect(await screen.findByRole('radio', { name: /^4/ })).toBeTruthy();
+});
+
+it('checks identity before keeping a score without a comment', async () => {
+  // A token-bound invitation needs who answers, also without a comment.
+  configure({ captureType: 'ces', cesToolId: 'c1', dispatchToken: 'tok' });
+  fireEvent.click(await screen.findByRole('radio', { name: /^4/ }));
+  fireEvent.click(
+    await screen.findByRole('button', { name: 'Enviar sin comentario' }),
+  );
+  await new Promise((resolve) => setTimeout(resolve, 50));
+  expect(
+    calls.find((c) => c.method === 'POST' && c.url.endsWith('/v1/ces')),
+  ).toBeUndefined();
+  expect(screen.getByText('Ingresa un email válido')).toBeTruthy();
+});
+
+it('does not show a CES scale without its question when the tool cannot load', async () => {
+  const base = fetch;
+  vi.stubGlobal('fetch', (input: RequestInfo | URL, init?: RequestInit) =>
+    String(input).includes('/v1/ces-tool/')
+      ? Promise.resolve(new Response('{}', { status: 404 }))
+      : base(input, init),
+  );
+  configure({ captureType: 'ces', cesToolId: 'missing' });
+  expect(
+    await screen.findByText('Esta encuesta no está disponible por ahora.'),
+  ).toBeTruthy();
+  expect(screen.queryByRole('radio')).toBeNull();
+});
+
+it('fails a CES capture whose response has no id instead of keeping an empty one', async () => {
+  const base = fetch;
+  vi.stubGlobal('fetch', (input: RequestInfo | URL, init?: RequestInit) =>
+    (init?.method ?? 'GET') === 'POST' && String(input).endsWith('/v1/ces')
+      ? Promise.resolve(respond({}))
+      : base(input, init),
+  );
+  configure({ captureType: 'ces', cesToolId: 'c1', email: 'ana@acme.com' });
+  fireEvent.click(await screen.findByRole('radio', { name: /^4/ }));
+  fireEvent.click(
+    await screen.findByRole('button', { name: 'Enviar sin comentario' }),
+  );
+  await new Promise((resolve) => setTimeout(resolve, 50));
+  expect(submitted()).toBe(false);
+  expect(screen.queryByText('¡Gracias por tu opinión!')).toBeNull();
+});

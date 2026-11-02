@@ -27,6 +27,7 @@ export const Qualifier = ({ messages }: QualifierProps) => {
     scaleScore,
     setScaleScore,
     setStep,
+    loading,
   } = useWidgetContext();
   const [showTooltip, setShowTooltip] = useState(false);
 
@@ -57,6 +58,18 @@ export const Qualifier = ({ messages }: QualifierProps) => {
   const q = messages.qualifier;
 
   if (config.captureType === 'ces' || config.captureType === 'csat') {
+    // The question comes from the tool: no scale without it.
+    if (!scaleTool) {
+      return loading ? (
+        <div className="flex justify-center py-6" aria-hidden="true">
+          <div className="h-6 w-6 rounded-full border-2 border-indigo-700 border-t-transparent animate-spin" />
+        </div>
+      ) : (
+        <p className="py-6 text-center text-sm text-neutral-600">
+          {q.unavailable}
+        </p>
+      );
+    }
     const isCes = config.captureType === 'ces';
     return (
       <div className="flex flex-col gap-4 py-2 relative">

@@ -39,3 +39,8 @@ link, the old text link included.
 
 The comment step shows the chosen rating (stars or score) and lets the person go back to
 change it until the response is sent.
+
+Review fixes: "Send without comment" checks identity like "Send" (a token-bound invitation
+needs who answers); a CES or CSAT tool that cannot load shows a short notice instead of a scale
+without its question; a response without its id fails instead of retrying forever; and rating
+again during the thank-you step is no longer folded away by its timer (`open` fires again).

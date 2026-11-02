@@ -1,5 +1,6 @@
 {
   "qualifier": {
+    "unavailable": "This survey is not available right now.",
     "rateBad": "Poor",
     "rateGood": "Excellent",
     "tooltip": "Rate from 1 to 5",

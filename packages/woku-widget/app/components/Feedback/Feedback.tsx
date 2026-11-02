@@ -116,19 +116,25 @@ export const Feedback = ({ messages }: FeedbackProps) => {
     setShowAudioRecorder(false);
   };
 
-  const handleSubmit = async () => {
-    if (isSendingRef.current) return;
+  /** Who answers, when the invitation needs it: false shows the email hint. */
+  const identityOk = (): boolean => {
     const requiresIdentity =
       Boolean(config.dispatchToken) || Boolean(wokuData?.anonymousDisabled);
     if (requiresIdentity && !email && !config.phone) {
       setShowEmailTooltip(true);
-      return;
+      return false;
     }
     if (!emailIsValid && !anonymous) {
       setShowEmailTooltip(true);
       setTimeout(() => setShowEmailTooltip(false), 5000);
-      return;
+      return false;
     }
+    return true;
+  };
+
+  const handleSubmit = async () => {
+    if (isSendingRef.current) return;
+    if (!identityOk()) return;
 
     if (!textnote && !feedbackAudio) return;
 
@@ -310,6 +316,7 @@ export const Feedback = ({ messages }: FeedbackProps) => {
     }
     // A score tool's comment is optional: keep the score that was chosen.
     if (isSendingRef.current) return;
+    if (!identityOk()) return;
     isSendingRef.current = true;
     setIsSending(true);
     try {

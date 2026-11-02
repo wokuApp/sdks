@@ -1,5 +1,6 @@
 {
   "qualifier": {
+    "unavailable": "Esta encuesta no está disponible por ahora.",
     "rateBad": "Malo",
     "rateGood": "Muy bueno",
     "tooltip": "Califica del 1 al 5",

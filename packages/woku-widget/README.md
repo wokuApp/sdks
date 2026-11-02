@@ -117,7 +117,7 @@ WokuWidget.on('skip', () => {
 ```
 
 Lifecycle notes: `open` fires whenever the panel opens, by a click or by itself (`modal`,
-`fullscreen` or `startOpen`); after `submit` the thank-you step stays on screen for 10 s
+`fullscreen` or `startOpen`), and again when the person rates again; after `submit` the thank-you step stays on screen for 10 s
 before the widget folds away. A person invited by `email` or `dispatchToken` is not offered
 to rate again. On the comment step the chosen rating stays in sight, and the person can tap it to
 change it until the response is sent.
