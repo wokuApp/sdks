@@ -12,3 +12,8 @@ delegates the microphone (`allow="microphone"`) so voice notes work on hosts tha
 Fixes: the thank-you step stays visible for 2.5 s after a submit (it used to be hidden at
 once); the `open` event also fires when the panel opens by itself (modal, fullscreen or
 `startOpen`); a person invited by email or dispatch token is no longer offered "Rate again".
+
+Also fixes the styling of the widget itself: the build never ran Tailwind, so the CSS shipped
+to the CDN (0.3.1) had no utility classes and the widget rendered unstyled; a side-tab opened
+by click or `startOpen` stayed squeezed into its 60 px collapsed width; and the close button,
+drawn outside the panel, was clipped by the iframe. Escape now closes an open panel.

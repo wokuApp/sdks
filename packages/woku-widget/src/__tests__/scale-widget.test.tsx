@@ -245,3 +245,27 @@ it('does not offer to rate again to a person invited by email', async () => {
     screen.queryByRole('button', { name: 'Volver a Calificar' }),
   ).toBeNull();
 });
+
+it('measures its content, not the iframe, so a side-tab grows to the open panel', async () => {
+  configure({ captureType: 'ces', cesToolId: 'c1' });
+  const question = await screen.findByText(
+    '¿Qué tan fácil fue empezar a medir con woku?',
+  );
+  // The resize observer watches the outermost container: it must shrink-wrap
+  // its content (jsdom has no layout, so the class is the contract here).
+  const container = question.closest('.font-sans') as HTMLElement;
+  expect(container.className).toContain('w-max');
+});
+
+it('closes with Escape, keeping the close button inside the panel', async () => {
+  configure({ captureType: 'ces', cesToolId: 'c1' });
+  await screen.findByText('¿Qué tan fácil fue empezar a medir con woku?');
+  const close = screen.getByRole('button', { name: 'Cerrar widget' });
+  expect(close.className).not.toContain('-top-');
+  fireEvent.keyDown(window, { key: 'Escape' });
+  expect(
+    posted.some(
+      (message) => (message as { type?: string })?.type === 'woku:close',
+    ),
+  ).toBe(true);
+});

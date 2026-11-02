@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/postcss';
 import { resolve } from 'path';
 
 /**
@@ -13,6 +14,13 @@ export default defineConfig({
   // (e.g. cdn.woku.app/sdks/woku-widget/v1/ and /v0.1.0/) without rebuilding.
   base: './',
   plugins: [react()],
+  // Tailwind v4 generates the utility classes the micro-app uses. Without it
+  // the shipped CSS carried none and the widget rendered unstyled.
+  css: {
+    postcss: {
+      plugins: [tailwindcss({ base: resolve(__dirname, 'app') })],
+    },
+  },
   resolve: {
     alias: {
       '@app': resolve(__dirname, 'app'),
