@@ -17,3 +17,7 @@ Also fixes the styling of the widget itself: the build never ran Tailwind, so th
 to the CDN (0.3.1) had no utility classes and the widget rendered unstyled; a side-tab opened
 by click or `startOpen` stayed squeezed into its 60 px collapsed width; and the close button,
 drawn outside the panel, was clipped by the iframe. Escape now closes an open panel.
+
+The woku mode now reads the API's reviewer payload (`{ woku, users, company }`): the woku
+name and image were missing because the widget expected a flat object. The name uses the
+widget language when the woku has that translation.

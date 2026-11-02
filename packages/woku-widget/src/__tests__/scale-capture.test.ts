@@ -135,3 +135,51 @@ describe('createScaleTextnote', () => {
     });
   });
 });
+
+describe('fetchWokuReview with the reviewer payload of the API', () => {
+  const nested = {
+    woku: {
+      _id: 'w1',
+      description: 'Tus primeras opiniones en woku',
+      file: { type: 'image', url: 'https://cdn.test/w1.webp' },
+      localizedContent: [
+        { locale: 'en', description: 'Your first opinions on woku' },
+      ],
+      anonymousDisabled: true,
+    },
+    users: [],
+    company: { name: 'woku' },
+  };
+
+  it('reads the woku nested under `woku`, with its image and description', async () => {
+    vi.stubGlobal('fetch', mockFetch(nested));
+    const { fetchWokuReview } = await import('../../app/services/capture');
+    await expect(fetchWokuReview(BASE, PK, 'w1')).resolves.toEqual({
+      _id: 'w1',
+      description: 'Tus primeras opiniones en woku',
+      imageUrl: 'https://cdn.test/w1.webp',
+      anonymousDisabled: true,
+    });
+  });
+
+  it('uses the localized description for the widget language', async () => {
+    vi.stubGlobal('fetch', mockFetch(nested));
+    const { fetchWokuReview } = await import('../../app/services/capture');
+    await expect(fetchWokuReview(BASE, PK, 'w1', 'en')).resolves.toEqual(
+      expect.objectContaining({ description: 'Your first opinions on woku' }),
+    );
+  });
+
+  it('does not use a video as an image', async () => {
+    vi.stubGlobal(
+      'fetch',
+      mockFetch({
+        woku: { ...nested.woku, file: { type: 'video', url: 'v.mp4' } },
+      }),
+    );
+    const { fetchWokuReview } = await import('../../app/services/capture');
+    await expect(fetchWokuReview(BASE, PK, 'w1')).resolves.toEqual(
+      expect.objectContaining({ imageUrl: '' }),
+    );
+  });
+});

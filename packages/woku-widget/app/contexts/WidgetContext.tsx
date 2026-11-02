@@ -168,6 +168,7 @@ export function WidgetProvider({
                 config.apiBaseUrl,
                 config.publishableKey,
                 config.wokuId,
+                locale,
               ).then((data) => {
                 if (!cancelled) setWokuData(data);
               })

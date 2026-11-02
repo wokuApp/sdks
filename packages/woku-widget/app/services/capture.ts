@@ -138,10 +138,25 @@ export interface CreateNpsVoicemailParams extends CaptureContext {
 // Woku API
 // ---------------------------------------------------------------------------
 
+interface ReviewerWoku {
+  _id?: string;
+  description?: string;
+  imageUrl?: string;
+  anonymousDisabled?: boolean;
+  file?: { type?: string; url?: string } | null;
+  localizedContent?: { locale?: string; description?: string }[] | null;
+}
+
+/**
+ * The API answers with the reviewer payload `{ woku, users, company }` (the
+ * same the review app reads). Older or mocked servers answered with a flat
+ * woku; both normalize to what the widget renders.
+ */
 export async function fetchWokuReview(
   apiBaseUrl: string,
   publishableKey: string,
   wokuId: string,
+  lang?: string,
 ): Promise<WokuReviewData> {
   const res = await fetch(
     `${apiBaseUrl}/v1/wokus/${encodeURIComponent(wokuId)}/review`,
@@ -149,7 +164,24 @@ export async function fetchWokuReview(
       headers: buildHeaders(publishableKey),
     },
   );
-  return handleResponse<WokuReviewData>(res);
+  const body = await handleResponse<{ woku?: ReviewerWoku } & ReviewerWoku>(
+    res,
+  );
+  const woku: ReviewerWoku = body.woku ?? body;
+  const language = (lang ?? '').split('-')[0].toLowerCase();
+  const localized = language
+    ? woku.localizedContent?.find(
+        (entry) => entry.locale?.toLowerCase() === language,
+      )?.description
+    : undefined;
+  const fileImage =
+    woku.file && woku.file.type !== 'video' ? (woku.file.url ?? '') : '';
+  return {
+    _id: woku._id ?? wokuId,
+    description: localized || woku.description || '',
+    imageUrl: woku.imageUrl ?? fileImage,
+    anonymousDisabled: Boolean(woku.anonymousDisabled),
+  };
 }
 
 export async function createWokuTextnote(
