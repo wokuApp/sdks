@@ -1,5 +1,6 @@
 {
   "qualifier": {
+    "unavailable": "This survey is not available right now.",
     "rateBad": "Poor",
     "rateGood": "Excellent",
     "tooltip": "Rate from 1 to 5",
@@ -7,18 +8,29 @@
     "npsQuestion": "How likely are you to recommend our services to a friend or colleague?",
     "npsDetractor": "Not at all likely",
     "npsPromoter": "Extremely likely",
-    "npsTooltip": "Select a score from 0 to 10"
+    "npsTooltip": "Select a score from 0 to 10",
+    "npsToolQuestion": "On a scale of 0 to 10, how likely are you to recommend {target} to {audience}?",
+    "npsDefaultAudience": "a friend or colleague",
+    "cesLow": "Very difficult",
+    "cesHigh": "Very easy",
+    "csatLow": "Very dissatisfied",
+    "csatHigh": "Very satisfied",
+    "scaleTooltip": "Select from 1 to 5"
   },
   "feedback": {
     "title": "Deepen your rating by leaving a text or audio note.",
     "placeholder": "Write your opinion here...",
-    "send": "Send Feedback",
-    "pending": "Write or Record your Opinion",
+    "send": "Send",
+    "pending": "Write or record your opinion",
     "recordAudio": "Press to record audio",
     "stop": "Stop",
     "delete": "Delete",
     "emailRequired": "Please enter a valid email",
-    "skip": "Skip"
+    "skip": "Skip",
+    "scoreTitle": "Want to tell us why? It is optional.",
+    "sendWithoutComment": "Send without comment",
+    "change": "Change",
+    "changeRating": "Change your rating"
   },
   "identity": {
     "emailPlaceholder": "Email...",
@@ -27,7 +39,7 @@
   "thank": {
     "title": "Thank you for your feedback!",
     "subtitle": "We are committed to listening and adapting to your needs to provide you with the most value.",
-    "rateAgain": "Rate Again"
+    "rateAgain": "Rate again"
   },
   "branding": {
     "poweredBy": "Powered by"
@@ -36,6 +48,7 @@
     "closeWidget": "Close widget",
     "openFeedback": "Open feedback",
     "starRating": "Star rating",
-    "npsRating": "NPS score from 0 to 10"
+    "npsRating": "NPS score from 0 to 10",
+    "scaleRating": "Score from 1 to 5"
   }
 }

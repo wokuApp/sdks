@@ -41,6 +41,17 @@ const _listeners: Map<WidgetEventName, EventCallback[]> = new Map();
 
 const DEFAULT_API_BASE = 'https://clientapi.woku.app';
 
+/** How long the thank-you step stays visible after a submit. */
+// Long enough to read it and to follow "Powered by woku".
+const THANK_YOU_VISIBLE_MS = 10_000;
+let _thankYouTimer: ReturnType<typeof setTimeout> | null = null;
+
+/** A new rating (rate again, a host show()) keeps the widget on screen. */
+function cancelThankYouTimer(): void {
+  if (_thankYouTimer) clearTimeout(_thankYouTimer);
+  _thankYouTimer = null;
+}
+
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
@@ -74,6 +85,7 @@ function init(config: WokuWidgetConfig): void {
 }
 
 function show(): void {
+  cancelThankYouTimer();
   if (!_iframeManager) {
     _pendingShow = true;
     return;
@@ -88,6 +100,7 @@ function hide(): void {
 }
 
 function destroy(): void {
+  cancelThankYouTimer();
   _cleanupTriggers?.();
   _cleanupTriggers = null;
   _iframeManager?.destroy();
@@ -145,6 +158,7 @@ function handleAppMessage(msg: PostMessageFromApp): void {
     }
 
     case 'woku:open':
+      cancelThankYouTimer();
       emit('open');
       break;
 
@@ -153,10 +167,17 @@ function handleAppMessage(msg: PostMessageFromApp): void {
       emit('close');
       break;
 
-    case 'woku:submit':
+    case 'woku:submit': {
       emit('submit', msg.payload);
-      _iframeManager.hide();
+      // Leave the thank-you step on screen before folding the widget away.
+      const manager = _iframeManager;
+      cancelThankYouTimer();
+      _thankYouTimer = setTimeout(() => {
+        _thankYouTimer = null;
+        if (_iframeManager === manager) manager.hide();
+      }, THANK_YOU_VISIBLE_MS);
       break;
+    }
 
     case 'woku:skip':
       emit('skip');

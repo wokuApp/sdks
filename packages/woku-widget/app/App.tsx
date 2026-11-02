@@ -8,6 +8,7 @@ import { X, MessageSquare } from 'lucide-react';
 import { Qualifier } from './components/Qualifier/Qualifier';
 import { Feedback } from './components/Feedback/Feedback';
 import { Thank } from './components/Thank/Thank';
+import { PoweredByWoku } from './components/ui/PoweredByWoku';
 import { WidgetProvider, useWidgetContext } from './contexts/WidgetContext';
 import { sendToHost, onHostMessage, notifyResize } from './bridge';
 import { parseUrlConfig, mergeConfig, type WidgetAppConfig } from './config';
@@ -78,6 +79,8 @@ export default function Root() {
         config.captureType,
         config.wokuId,
         config.npsToolId,
+        config.cesToolId,
+        config.csatToolId,
         config.dispatchToken,
         config.collectionKind,
         config.flowId,
@@ -124,6 +127,16 @@ function AppShell({ messages }: { messages: ReturnType<typeof getMessages> }) {
     sendToHost('woku:close');
   };
 
+  // Escape closes an open panel, as any dialog should.
+  useEffect(() => {
+    if (!open) return undefined;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') handleClose();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  });
+
   // The widget starts as a collapsed side-tab; opening shows the panel.
   // In modal/fullscreen mode the overlay is already open from the loader,
   // so we start open automatically.
@@ -131,19 +144,26 @@ function AppShell({ messages }: { messages: ReturnType<typeof getMessages> }) {
     config.behavior === 'modal' || config.behavior === 'fullscreen';
 
   useEffect(() => {
-    if (isModal) setOpen(true);
-  }, [isModal]);
+    if (!isModal && !config.startOpen) return;
+    setOpen(true);
+    // The host hears "open" whether a person or the configuration opened it.
+    sendToHost('woku:open');
+  }, [isModal, config.startOpen]);
 
   return (
-    <div ref={containerRef} className="font-sans text-neutral-900">
+    // w-max: the container measures its content (the open panel), not the
+    // iframe it sits in. A side-tab starts 60px wide, and reporting the
+    // iframe's own width kept the open panel squeezed into those 60px.
+    <div ref={containerRef} className="font-sans text-neutral-900 w-max">
       {open ? (
         // Widget panel
-        <div className="relative bg-white border border-neutral-200 rounded-xl shadow-xl w-72 min-h-64 flex flex-col gap-3 p-4">
+        <div className="relative bg-white border border-neutral-200 rounded-xl shadow-xl w-72 flex flex-col gap-3 px-4 pb-4 pt-9">
           {/* Close button */}
           <button
             type="button"
             onClick={handleClose}
-            className="absolute -top-3 right-2 rounded-full w-7 h-7 bg-neutral-700 text-white flex items-center justify-center cursor-pointer hover:bg-neutral-900 transition-colors"
+            // Inside the panel: the iframe clips anything drawn outside it.
+            className="absolute top-2 right-2 rounded-full w-7 h-7 text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900 flex items-center justify-center cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
             aria-label={messages.aria.closeWidget}
           >
             <X className="h-4 w-4" />
@@ -156,17 +176,11 @@ function AppShell({ messages }: { messages: ReturnType<typeof getMessages> }) {
 
           {/* Branding */}
           {config.branding && (
-            <div className="text-xs text-neutral-400 flex items-center gap-1 justify-center mt-auto">
-              <span>{messages.branding.poweredBy}</span>
-              <a
-                href="https://woku.app"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline font-medium"
-              >
-                woku
-              </a>
-            </div>
+            <PoweredByWoku
+              label={messages.branding.poweredBy}
+              campaign={config.captureType}
+              className="mt-auto"
+            />
           )}
         </div>
       ) : (

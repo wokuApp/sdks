@@ -6,12 +6,19 @@ import {
   type ReactNode,
 } from 'react';
 import type { WidgetAppConfig } from '../config';
-import type { WokuReviewData } from '../services/capture';
+import type {
+  NpsToolData,
+  ScaleToolData,
+  WokuReviewData,
+} from '../services/capture';
 import {
   fetchWokuReview,
   fetchCompanyBranding,
+  fetchNpsTool,
+  fetchScaleTool,
   type CompanyBranding,
 } from '../services/capture';
+import { resolveLocale } from '../i18n';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -34,6 +41,14 @@ export interface WidgetContextType {
   setNpsScore: (s: number | undefined) => void;
   npsId: string | undefined; // returned after POST /v1/nps
   setNpsId: (id: string | undefined) => void;
+  npsTool: NpsToolData | null; // the tool's subject and audience, when known
+
+  // CES / CSAT-mode state (1-5)
+  scaleScore: number | undefined;
+  setScaleScore: (s: number | undefined) => void;
+  scaleTool: ScaleToolData | null;
+  scaleResponseId: string | undefined;
+  setScaleResponseId: (id: string | undefined) => void;
 
   // Shared feedback state
   textnote: string | undefined;
@@ -94,6 +109,14 @@ export function WidgetProvider({
   // NPS
   const [npsScore, setNpsScore] = useState<number | undefined>(undefined);
   const [npsId, setNpsId] = useState<string | undefined>(undefined);
+  const [npsTool, setNpsTool] = useState<NpsToolData | null>(null);
+
+  // CES / CSAT
+  const [scaleScore, setScaleScore] = useState<number | undefined>(undefined);
+  const [scaleTool, setScaleTool] = useState<ScaleToolData | null>(null);
+  const [scaleResponseId, setScaleResponseId] = useState<string | undefined>(
+    undefined,
+  );
 
   // Shared
   const [textnote, setTextnote] = useState<string | undefined>(undefined);
@@ -131,6 +154,13 @@ export function WidgetProvider({
       setError(undefined);
       try {
         // Fetch company branding in parallel
+        const locale = resolveLocale(config.lang);
+        const scaleToolId =
+          config.captureType === 'ces'
+            ? config.cesToolId
+            : config.captureType === 'csat'
+              ? config.csatToolId
+              : undefined;
         const [brandingData] = await Promise.all([
           fetchCompanyBranding(config.apiBaseUrl, config.publishableKey),
           config.captureType === 'woku' && config.wokuId
@@ -138,9 +168,35 @@ export function WidgetProvider({
                 config.apiBaseUrl,
                 config.publishableKey,
                 config.wokuId,
+                locale,
               ).then((data) => {
                 if (!cancelled) setWokuData(data);
               })
+            : Promise.resolve(),
+          (config.captureType === 'ces' || config.captureType === 'csat') &&
+          scaleToolId
+            ? fetchScaleTool(
+                config.captureType,
+                config.apiBaseUrl,
+                config.publishableKey,
+                scaleToolId,
+                locale,
+              ).then((data) => {
+                if (!cancelled) setScaleTool(data);
+              })
+            : Promise.resolve(),
+          config.captureType === 'nps' && config.npsToolId
+            ? fetchNpsTool(
+                config.apiBaseUrl,
+                config.publishableKey,
+                config.npsToolId,
+                locale,
+              )
+                .then((data) => {
+                  if (!cancelled) setNpsTool(data);
+                })
+                // The generic question still works without the tool copy.
+                .catch(() => undefined)
             : Promise.resolve(),
         ]);
         if (!cancelled) setBranding(brandingData);
@@ -158,6 +214,10 @@ export function WidgetProvider({
   }, [
     config.captureType,
     config.wokuId,
+    config.npsToolId,
+    config.cesToolId,
+    config.csatToolId,
+    config.lang,
     config.apiBaseUrl,
     config.publishableKey,
   ]);
@@ -167,6 +227,8 @@ export function WidgetProvider({
     setQualification(undefined);
     setNpsScore(undefined);
     setNpsId(undefined);
+    setScaleScore(undefined);
+    setScaleResponseId(undefined);
     setTextnote(undefined);
     setAnonymous(false);
     if (!isInitialEmail) setEmail(undefined);
@@ -183,6 +245,12 @@ export function WidgetProvider({
     setNpsScore,
     npsId,
     setNpsId,
+    npsTool,
+    scaleScore,
+    setScaleScore,
+    scaleTool,
+    scaleResponseId,
+    setScaleResponseId,
     textnote,
     setTextnote,
     email,

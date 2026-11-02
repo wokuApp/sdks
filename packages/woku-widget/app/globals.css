@@ -1,6 +1,10 @@
 @import 'tailwindcss';
 
-/* Montserrat is loaded from index.html */
+/* Montserrat is loaded from index.html; the app root uses `font-sans`. */
+@theme {
+  --font-sans: 'Montserrat', system-ui, sans-serif;
+}
+
 :root {
   font-family: 'Montserrat', system-ui, sans-serif;
   font-synthesis: none;

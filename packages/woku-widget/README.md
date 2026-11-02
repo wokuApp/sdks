@@ -1,15 +1,15 @@
 # @wokuapp/woku-widget
 
-Ambivalent web widget for capturing **Woku ratings (1-5 stars)** and **NPS scores (0-10)**.
+Ambivalent web widget for capturing **Woku ratings (1-5 stars)**, **NPS scores (0-10)** and
+**CES and CSAT scores (1-5)**.
 
 Distributed as a micro-app hosted on `cdn.woku.app` (S3 + CloudFront) and embedded in any
 website via a lightweight loader `<script>` (~2.5 KB gzipped) that injects an `<iframe>`.
 
-## Proposed capture provenance (unreleased)
+## Capture provenance
 
-The next package and CDN release adds `collectionKind` and `flowId` to loader
-configuration. New Woku and NPS captures default to `standalone`. An external
-Flow host must pass `collectionKind: 'flow'` and the actual `flowId`; the API
+The loader configuration accepts `collectionKind` and `flowId`. New captures
+default to `standalone`. An external Flow host must pass `collectionKind: 'flow'` and the actual `flowId`; the API
 validates company and instrument membership. The loader sends this context by
 postMessage and the app preserves it through config merging, text/audio bodies,
 and initial NPS score plus comment attachments. Changing provenance resets the
@@ -18,8 +18,7 @@ prepared evaluation so a comment cannot attach to an earlier response.
 Flow responses may create normal tickets but do not start follow-up, including
 one-step and incomplete Flows. Individual instruments inside a customer journey
 remain standalone unless the response actually comes from a Flow. This capture
-widget does not expose support conversations. Use the new options after the
-matching API, npm package and CDN assets are released.
+widget does not expose support conversations.
 
 ## Quick start
 
@@ -32,9 +31,11 @@ matching API, npm package and CDN assets are released.
   WokuWidget.init({
     companyId: 'YOUR_COMPANY_ID',
     publishableKey: 'pk_live_...',
-    captureType: 'nps', // 'nps' | 'woku'
+    captureType: 'nps', // 'nps' | 'woku' | 'ces' | 'csat'
     // wokuId: 'WOKU_ID',        // required when captureType === 'woku'
     // npsToolId: 'NPS_TOOL_ID', // optional for NPS (omit for company-level NPS)
+    // cesToolId: 'CES_TOOL_ID', // required when captureType === 'ces'
+    // csatToolId: 'CSAT_TOOL_ID', // required when captureType === 'csat'
     // lang: 'es',               // 'es' | 'en'; auto-detected from browser if omitted
     triggers: [{ type: 'time', value: 5, behavior: 'modal' }],
   });
@@ -46,10 +47,18 @@ page — all styles live inside the iframe (zero risk of clashing with host styl
 
 ## captureType
 
-| Value    | Rating UI           | API endpoint                                                      |
-| -------- | ------------------- | ----------------------------------------------------------------- |
-| `'woku'` | 5-star rating (1-5) | `POST /v1/wokus/:wokuId/textnotes` \| `/voicemails`               |
-| `'nps'`  | NPS scale (0-10)    | `POST /v1/nps` → `POST /v1/nps/:npsId/textnotes` \| `/voicemails` |
+| Value    | Rating UI           | API endpoint                                                         |
+| -------- | ------------------- | -------------------------------------------------------------------- |
+| `'woku'` | 5-star rating (1-5) | `POST /v1/wokus/:wokuId/textnotes` \| `/voicemails`                  |
+| `'nps'`  | NPS scale (0-10)    | `POST /v1/nps` → `POST /v1/nps/:npsId/textnotes` \| `/voicemails`    |
+| `'ces'`  | Effort scale (1-5)  | `POST /v1/ces` → `POST /v1/ces/:cesId/textnotes` \| `/voicemails`    |
+| `'csat'` | Satisfaction (1-5)  | `POST /v1/csat` → `POST /v1/csat/:csatId/textnotes` \| `/voicemails` |
+
+CES and CSAT show the tool's own question (read with `GET /v1/ces-tool/:id?lang=` or
+`/v1/csat-tool/:id?lang=`, in the widget language when the tool has that copy). NPS uses
+the tool's subject and audience when `npsToolId` is set. For `nps`, `ces` and `csat` the
+comment is optional: **Send without comment** records the score; in a woku the comment is
+the review itself, so **Skip** sends nothing.
 
 ## WokuWidgetConfig
 
@@ -57,19 +66,22 @@ page — all styles live inside the iframe (zero risk of clashing with host styl
 interface WokuWidgetConfig {
   companyId: string;
   publishableKey: string; // pk_... safe to embed in the page
-  captureType: 'woku' | 'nps';
+  captureType: 'woku' | 'nps' | 'ces' | 'csat';
 
   wokuId?: string; // required when captureType === 'woku'
+  cesToolId?: string; // required when captureType === 'ces'
+  csatToolId?: string; // required when captureType === 'csat'
   email?: string; // preidentified customer
   phone?: string; // alternative to email
   dispatchToken?: string; // prepared journey response token
-  collectionKind?: 'standalone' | 'flow'; // proposed, unreleased
+  collectionKind?: 'standalone' | 'flow'; // default: 'standalone'
   flowId?: string; // required with collectionKind: 'flow'
   npsToolId?: string; // optional for NPS — omit for company-level
   apiBaseUrl?: string; // default: https://clientapi.woku.app
   widgetBaseUrl?: string; // default: https://cdn.woku.app/sdks/woku-widget/v1
   lang?: string; // 'es' | 'en'; auto-detect if omitted
   branding?: boolean; // show "Powered by Woku"; default: true
+  startOpen?: boolean; // open side-tab/banner as soon as a trigger fires; default: false
 
   triggers: TriggerConfig[];
   theme?: ThemeConfig;
@@ -104,6 +116,12 @@ WokuWidget.on('skip', () => {
 });
 ```
 
+Lifecycle notes: `open` fires whenever the panel opens, by a click or by itself (`modal`,
+`fullscreen` or `startOpen`), and again when the person rates again; after `submit` the thank-you step stays on screen for 10 s
+before the widget folds away. A person invited by `email` or `dispatchToken` is not offered
+to rate again. On the comment step the chosen rating stays in sight, and the person can tap it to
+change it until the response is sent.
+
 ## CSP requirements
 
 The host page must allow:
@@ -115,6 +133,11 @@ Content-Security-Policy:
 ```
 
 The loader does not use `eval` or inline scripts.
+
+Voice notes: the iframe is created with `allow="microphone"`. If the host page sends a
+`Permissions-Policy` header, it must also delegate the microphone to the widget origin, for
+example `microphone=(self "https://cdn.woku.app")`; otherwise text still works and audio is
+unavailable.
 
 ## i18n
 
@@ -148,17 +171,17 @@ Build outputs:
 | `dist/app/index.html`   | Micro-app entry — loaded inside the iframe           |
 | `dist/app/assets/*`     | Hashed JS/CSS bundles for the micro-app              |
 
-## CDN paths for the proposed release (S3 + CloudFront)
+## CDN paths (S3 + CloudFront)
 
 ```
 cdn.woku.app/sdks/woku-widget/v1/loader.js          ← major-alias (cache 5 min)
 cdn.woku.app/sdks/woku-widget/v1/index.html         ← major-alias (cache 5 min)
-cdn.woku.app/sdks/woku-widget/v0.3.0/loader.js      ← semver-pinned (cache immutable)
-cdn.woku.app/sdks/woku-widget/v0.3.0/index.html
-cdn.woku.app/sdks/woku-widget/v0.3.0/assets/*
+cdn.woku.app/sdks/woku-widget/v<version>/loader.js  ← semver-pinned (cache immutable)
+cdn.woku.app/sdks/woku-widget/v<version>/index.html
+cdn.woku.app/sdks/woku-widget/v<version>/assets/*
 ```
 
-Deploy `dist/app/` and `dist/loader/loader.js` to both CDN prefixes after the compatible API release. Upload hashed assets before `index.html`; keep pinned versions immutable and invalidate only the `v1` alias. CDN deployment is separate from npm publication.
+Deploy `dist/app/` and `dist/loader/loader.js` to both CDN prefixes after the compatible API release. Upload hashed assets before `index.html`; keep pinned versions immutable and invalidate only the `v1` alias. CDN deployment is separate from npm publication: from the published commit, run `SEMVER=<version> ALIAS=v1 ./scripts/release-widget.sh` (while the package is 0.x the live alias is still `v1`, the loader's default).
 
 ## Architecture
 
@@ -189,7 +212,7 @@ deadline. Optional branding failures do not block public capture. Once NPS is
 confirmed, its id is reused when retrying an optional attachment. Uncertain REST
 score submissions have no automatic transport retry.
 
-Widget supports Woku/NPS; React Native supports all four instruments. Use only pk\_
+Widget and React Native support all four instruments. Use only pk\_
 keys; management keys are rejected. The API key used to prepare a journey stays
 on your backend and is never passed to the loader.
 

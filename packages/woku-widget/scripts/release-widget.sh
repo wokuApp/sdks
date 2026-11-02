@@ -13,11 +13,13 @@
 # needed to publish under a new prefix.
 #
 # Usage:
-#   SEMVER=0.1.0 ./scripts/release-widget.sh
+#   SEMVER=0.4.0 ALIAS=v1 ./scripts/release-widget.sh
 #
 # Required env vars:
 #   SEMVER        — package version, e.g. 0.1.0
 # Optional env vars (default to the woku infra above):
+#   ALIAS         — alias prefix, default v<major>. While the package is 0.x the
+#                   live alias is still v1 (the loader's default): pass ALIAS=v1.
 #   BUCKET        — S3 bucket name
 #   CF_DIST_ID    — CloudFront distribution ID for cdn.woku.app
 #   DRY_RUN=1     — skip the actual aws s3 sync and CloudFront invalidation
@@ -27,7 +29,7 @@ set -euo pipefail
 SEMVER="${SEMVER:?SEMVER env var is required}"
 BUCKET="${BUCKET:-woku-landing-cdn-assets}"
 CF_DIST_ID="${CF_DIST_ID:-ERGI4WK35YP6V}"
-MAJOR="v$(echo "$SEMVER" | cut -d. -f1)"
+MAJOR="${ALIAS:-v$(echo "$SEMVER" | cut -d. -f1)}"
 VERSIONED_PATH="sdks/woku-widget/v${SEMVER}"
 ALIAS_PATH="sdks/woku-widget/${MAJOR}"
 

@@ -1,10 +1,11 @@
 /**
  * Feedback — Stage 2.
- * Text or audio input. Calls the correct endpoint (woku or nps).
- * Icons via lucide-react.
+ * Text or audio input. Calls the correct endpoint (woku, nps, ces or csat).
+ * For score tools (nps, ces, csat) the comment is optional: sending without
+ * it still records the score. Icons via lucide-react.
  */
 import { ChangeEvent, useState, useEffect, useRef } from 'react';
-import { Mic, Trash2, Square, Mail } from 'lucide-react';
+import { Mic, Trash2, Square, Mail, Star } from 'lucide-react';
 import AudioRecorder from '../common/AudioRecorder';
 import { Button } from '../ui/Button';
 import { useWidgetContext } from '../../contexts/WidgetContext';
@@ -15,6 +16,9 @@ import {
   createNps,
   createNpsTextnote,
   createNpsVoicemail,
+  createScaleResponse,
+  createScaleTextnote,
+  createScaleVoicemail,
 } from '../../services/capture';
 import type { Messages } from '../../i18n';
 
@@ -39,8 +43,21 @@ export const Feedback = ({ messages }: FeedbackProps) => {
     wokuData,
     npsId: existingNpsId,
     setNpsId,
+    scaleScore,
+    scaleTool,
+    scaleResponseId,
+    setScaleResponseId,
     setStep,
   } = useWidgetContext();
+  const isScoreTool = config.captureType !== 'woku';
+  const chosen =
+    config.captureType === 'woku'
+      ? qualification
+      : config.captureType === 'nps'
+        ? npsScore
+        : scaleScore;
+  // A retry after a failed attachment reuses the recorded response.
+  const scoreRecorded = Boolean(existingNpsId || scaleResponseId);
 
   const [showAudioRecorder, setShowAudioRecorder] = useState(false);
   const [showMicTooltip, setShowMicTooltip] = useState(false);
@@ -99,19 +116,25 @@ export const Feedback = ({ messages }: FeedbackProps) => {
     setShowAudioRecorder(false);
   };
 
-  const handleSubmit = async () => {
-    if (isSendingRef.current) return;
+  /** Who answers, when the invitation needs it: false shows the email hint. */
+  const identityOk = (): boolean => {
     const requiresIdentity =
       Boolean(config.dispatchToken) || Boolean(wokuData?.anonymousDisabled);
     if (requiresIdentity && !email && !config.phone) {
       setShowEmailTooltip(true);
-      return;
+      return false;
     }
     if (!emailIsValid && !anonymous) {
       setShowEmailTooltip(true);
       setTimeout(() => setShowEmailTooltip(false), 5000);
-      return;
+      return false;
     }
+    return true;
+  };
+
+  const handleSubmit = async () => {
+    if (isSendingRef.current) return;
+    if (!identityOk()) return;
 
     if (!textnote && !feedbackAudio) return;
 
@@ -121,18 +144,14 @@ export const Feedback = ({ messages }: FeedbackProps) => {
     try {
       if (config.captureType === 'woku') {
         await submitWoku();
+      } else if (config.captureType === 'nps') {
+        await submitNps(true);
       } else {
-        await submitNps();
+        await submitScale(true);
       }
 
       setStep('thank');
-
-      // Notify host of submission
-      sendToHost('woku:submit', {
-        captureType: config.captureType,
-        qualification,
-        npsScore,
-      });
+      notifySubmitted(true);
     } catch (err) {
       console.error('[WokuWidget] Submit error:', err);
     } finally {
@@ -185,7 +204,60 @@ export const Feedback = ({ messages }: FeedbackProps) => {
     }
   };
 
-  const submitNps = async () => {
+  const identity = () =>
+    anonymous || (!email && !config.phone)
+      ? { anonymous: true }
+      : {
+          ...(email ? { clientEmail: email } : {}),
+          ...(config.phone ? { clientPhone: config.phone } : {}),
+        };
+
+  const notifySubmitted = (comment: boolean) =>
+    sendToHost('woku:submit', {
+      captureType: config.captureType,
+      qualification,
+      npsScore,
+      score: scaleScore,
+      comment,
+    });
+
+  const submitScale = async (withComment: boolean) => {
+    const kind = config.captureType === 'ces' ? 'ces' : 'csat';
+    const toolId =
+      (kind === 'ces' ? config.cesToolId : config.csatToolId) ??
+      scaleTool?._id ??
+      '';
+    const responseId =
+      scaleResponseId ??
+      (await createScaleResponse({
+        kind,
+        apiBaseUrl: config.apiBaseUrl,
+        publishableKey: config.publishableKey,
+        collectionKind: config.collectionKind,
+        flowId: config.flowId,
+        toolId,
+        score: scaleScore ?? 1,
+        ...identity(),
+        dispatchToken: config.dispatchToken,
+      }));
+    setScaleResponseId(responseId);
+    if (!withComment) return;
+
+    const common = {
+      kind,
+      apiBaseUrl: config.apiBaseUrl,
+      publishableKey: config.publishableKey,
+      responseId,
+    } as const;
+    if (textnote && textnote.length > 0)
+      await createScaleTextnote({ ...common, description: textnote });
+    if (feedbackAudio) {
+      stopRecording();
+      await createScaleVoicemail({ ...common, file: feedbackAudio });
+    }
+  };
+
+  const submitNps = async (withComment: boolean) => {
     const score = npsScore ?? 0;
 
     // POST /v1/nps first to get the npsId
@@ -210,6 +282,7 @@ export const Feedback = ({ messages }: FeedbackProps) => {
       ).npsId;
 
     setNpsId(npsId);
+    if (!withComment) return;
 
     if (textnote && textnote.length > 0) {
       await createNpsTextnote({
@@ -235,9 +308,28 @@ export const Feedback = ({ messages }: FeedbackProps) => {
     }
   };
 
-  const handleSkip = () => {
-    setStep('thank');
-    sendToHost('woku:skip');
+  const handleSkip = async () => {
+    if (!isScoreTool) {
+      setStep('thank');
+      sendToHost('woku:skip');
+      return;
+    }
+    // A score tool's comment is optional: keep the score that was chosen.
+    if (isSendingRef.current) return;
+    if (!identityOk()) return;
+    isSendingRef.current = true;
+    setIsSending(true);
+    try {
+      if (config.captureType === 'nps') await submitNps(false);
+      else await submitScale(false);
+      setStep('thank');
+      notifySubmitted(false);
+    } catch (err) {
+      console.error('[WokuWidget] Submit error:', err);
+    } finally {
+      isSendingRef.current = false;
+      setIsSending(false);
+    }
   };
 
   const hasContent = Boolean(textnote) || Boolean(feedbackAudio);
@@ -248,7 +340,48 @@ export const Feedback = ({ messages }: FeedbackProps) => {
         visible ? 'opacity-100' : 'opacity-0'
       }`}
     >
-      <p className="text-center text-sm text-neutral-700">{f.title}</p>
+      {/* The chosen rating stays in sight, as on review.woku.app, and can be
+          changed until it is sent (once recorded, it is final). */}
+      {chosen !== undefined && (
+        <button
+          type="button"
+          onClick={() => setStep('qualifier')}
+          disabled={isSending || recording || scoreRecorded}
+          aria-label={`${f.changeRating}: ${chosen}`}
+          className="self-center flex items-center gap-2 rounded-md px-2 py-1 text-xs cursor-pointer hover:bg-neutral-100 disabled:cursor-default disabled:hover:bg-transparent"
+        >
+          {config.captureType === 'woku' ? (
+            <span className="flex gap-0.5" aria-hidden="true">
+              {[1, 2, 3, 4, 5].map((v) => (
+                <Star
+                  key={v}
+                  className={
+                    v <= chosen
+                      ? 'h-4 w-4 fill-yellow-500 stroke-yellow-500'
+                      : 'h-4 w-4 fill-transparent stroke-neutral-300'
+                  }
+                />
+              ))}
+            </span>
+          ) : (
+            <span
+              aria-hidden="true"
+              className="rounded-md border border-indigo-600 bg-indigo-50 px-2 py-0.5 text-sm font-bold text-indigo-700"
+            >
+              {chosen}
+            </span>
+          )}
+          {!scoreRecorded && (
+            <span className="font-medium text-indigo-700 underline">
+              {f.change}
+            </span>
+          )}
+        </button>
+      )}
+
+      <p className="text-center text-sm text-neutral-700">
+        {isScoreTool ? f.scoreTitle : f.title}
+      </p>
 
       <div className="h-full w-full flex flex-col gap-1">
         {/* Email / identity row */}
@@ -302,8 +435,8 @@ export const Feedback = ({ messages }: FeedbackProps) => {
             </div>
             {showEmailTooltip && (
               <div className="absolute left-1 -top-10 z-50">
-                <div className="relative bg-indigo-600 rounded-lg text-white py-2 px-3 text-xs shadow-md">
-                  <div className="absolute left-4 -bottom-1.5 w-3 h-3 bg-indigo-600 rotate-45 rounded-[2px]" />
+                <div className="relative bg-neutral-900 rounded-md text-white py-2 px-3 text-xs shadow-md">
+                  <div className="absolute left-4 -bottom-1.5 w-3 h-3 bg-neutral-900 rotate-45 rounded-[2px]" />
                   {f.emailRequired}
                 </div>
               </div>
@@ -356,15 +489,25 @@ export const Feedback = ({ messages }: FeedbackProps) => {
         )}
       </div>
 
-      {/* Actions row */}
-      <div className="flex items-end gap-2 justify-end">
+      {/* Actions: send on top; skip (or keep the score) with the voice note
+          button below, as on the review.woku.app feedback step. */}
+      <Button
+        fullWidth
+        disabled={isSending || !hasContent}
+        loading={isSending}
+        onClick={() => void handleSubmit()}
+      >
+        {hasContent ? f.send : f.pending}
+      </Button>
+
+      <div className="flex items-center gap-2">
         <Button
+          variant="secondary"
           fullWidth
-          disabled={isSending || !hasContent}
-          loading={isSending}
-          onClick={() => void handleSubmit()}
+          disabled={isSending}
+          onClick={() => void handleSkip()}
         >
-          {hasContent ? f.send : f.pending}
+          {isScoreTool ? f.sendWithoutComment : f.skip}
         </Button>
 
         {!textnote && (
@@ -373,17 +516,15 @@ export const Feedback = ({ messages }: FeedbackProps) => {
               type="button"
               disabled={recording}
               onClick={handleAudioButtonClick}
-              className="text-neutral-600 disabled:opacity-50 hover:text-indigo-700 transition-colors"
+              className="h-10 w-10 rounded-full bg-indigo-700 text-white hover:bg-indigo-500 flex items-center justify-center transition-colors cursor-pointer disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
               aria-label={f.recordAudio}
             >
-              <Mic
-                className={`h-7 w-7 ${recording ? 'text-indigo-700' : ''}`}
-              />
+              <Mic className="h-4 w-4" />
             </button>
             {showMicTooltip && (
-              <div className="absolute -right-1 bottom-10 w-28 text-center text-xs">
-                <div className="relative bg-indigo-600 rounded-lg text-white py-2 px-3 shadow-md">
-                  <div className="absolute right-5 -bottom-1.5 w-3 h-3 bg-indigo-600 rotate-45 rounded-[2px]" />
+              <div className="absolute -right-1 bottom-12 w-28 text-center text-xs">
+                <div className="relative bg-neutral-900 rounded-md text-white py-2 px-3 shadow-md">
+                  <div className="absolute right-5 -bottom-1.5 w-3 h-3 bg-neutral-900 rotate-45 rounded-[2px]" />
                   <span className="font-semibold">{f.recordAudio}</span>
                 </div>
               </div>
@@ -391,15 +532,6 @@ export const Feedback = ({ messages }: FeedbackProps) => {
           </div>
         )}
       </div>
-
-      {/* Skip */}
-      <button
-        type="button"
-        onClick={handleSkip}
-        className="text-xs text-neutral-400 hover:text-neutral-600 text-center mt-1 cursor-pointer"
-      >
-        {f.skip}
-      </button>
     </div>
   );
 };

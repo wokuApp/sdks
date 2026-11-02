@@ -1,33 +1,45 @@
 {
   "qualifier": {
+    "unavailable": "Esta encuesta no está disponible por ahora.",
     "rateBad": "Malo",
-    "rateGood": "Muy Bueno",
+    "rateGood": "Muy bueno",
     "tooltip": "Califica del 1 al 5",
     "rateUs": "Califica y deja un comentario sobre:",
     "npsQuestion": "¿Con qué probabilidad recomendarías nuestros servicios a un amigo o colega?",
     "npsDetractor": "Nada probable",
     "npsPromoter": "Muy probable",
-    "npsTooltip": "Selecciona un puntaje del 0 al 10"
+    "npsTooltip": "Selecciona un puntaje del 0 al 10",
+    "npsToolQuestion": "En una escala de 0 a 10, ¿qué tan probable es que recomiendes {target} a {audience}?",
+    "npsDefaultAudience": "un amigo o colega",
+    "cesLow": "Muy difícil",
+    "cesHigh": "Muy fácil",
+    "csatLow": "Muy insatisfecho/a",
+    "csatHigh": "Muy satisfecho/a",
+    "scaleTooltip": "Selecciona del 1 al 5"
   },
   "feedback": {
     "title": "Profundiza tu calificación dejando un texto o audio.",
     "placeholder": "Escribe aquí tu opinión...",
-    "send": "Enviar Feedback",
-    "pending": "Escribe o Graba tu Opinión",
+    "send": "Enviar",
+    "pending": "Escribe o graba tu opinión",
     "recordAudio": "Presiona para grabar audio",
     "stop": "Parar",
     "delete": "Borrar",
     "emailRequired": "Ingresa un email válido",
-    "skip": "Saltar"
+    "skip": "Omitir",
+    "scoreTitle": "¿Quieres contarnos por qué? Es opcional.",
+    "sendWithoutComment": "Enviar sin comentario",
+    "change": "Cambiar",
+    "changeRating": "Cambiar tu calificación"
   },
   "identity": {
     "emailPlaceholder": "Email...",
     "anonymous": "Anónimo"
   },
   "thank": {
-    "title": "¡Gracias por tu Opinión!",
+    "title": "¡Gracias por tu opinión!",
     "subtitle": "Estamos comprometidos a escuchar y adaptarnos a tus necesidades para brindarte el máximo valor.",
-    "rateAgain": "Volver a Calificar"
+    "rateAgain": "Volver a calificar"
   },
   "branding": {
     "poweredBy": "Powered by"
@@ -36,6 +48,7 @@
     "closeWidget": "Cerrar widget",
     "openFeedback": "Abrir feedback",
     "starRating": "Calificación en estrellas",
-    "npsRating": "Puntuación NPS del 0 al 10"
+    "npsRating": "Puntuación NPS del 0 al 10",
+    "scaleRating": "Puntuación del 1 al 5"
   }
 }

@@ -6,13 +6,17 @@ import { Heart } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { useWidgetContext } from '../../contexts/WidgetContext';
 import type { Messages } from '../../i18n';
+import { sendToHost } from '../../bridge';
 
 interface ThankProps {
   messages: Messages;
 }
 
 export const Thank = ({ messages }: ThankProps) => {
-  const { reset } = useWidgetContext();
+  const { reset, isInitialEmail, config } = useWidgetContext();
+  // An invited or pre-identified person answers once: rating again would
+  // create a second response for the same invitation.
+  const canRateAgain = !isInitialEmail && !config.dispatchToken;
   const [visible, setVisible] = useState(false);
   const t = messages.thank;
 
@@ -31,11 +35,20 @@ export const Thank = ({ messages }: ThankProps) => {
       </div>
       <h2 className="font-semibold text-neutral-900">{t.title}</h2>
       <p className="text-sm text-neutral-600">{t.subtitle}</p>
-      <div className="flex grow h-full items-end">
-        <Button variant="primary" onClick={reset}>
-          {t.rateAgain}
-        </Button>
-      </div>
+      {canRateAgain && (
+        <div className="flex grow h-full items-end">
+          <Button
+            variant="primary"
+            onClick={() => {
+              reset();
+              // The panel opens for a new rating: the host keeps it on screen.
+              sendToHost('woku:open');
+            }}
+          >
+            {t.rateAgain}
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
