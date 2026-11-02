@@ -1,15 +1,15 @@
 # @wokuapp/woku-widget
 
-Ambivalent web widget for capturing **Woku ratings (1-5 stars)** and **NPS scores (0-10)**.
+Ambivalent web widget for capturing **Woku ratings (1-5 stars)**, **NPS scores (0-10)** and
+**CES and CSAT scores (1-5)**.
 
 Distributed as a micro-app hosted on `cdn.woku.app` (S3 + CloudFront) and embedded in any
 website via a lightweight loader `<script>` (~2.5 KB gzipped) that injects an `<iframe>`.
 
-## Proposed capture provenance (unreleased)
+## Capture provenance
 
-The next package and CDN release adds `collectionKind` and `flowId` to loader
-configuration. New Woku and NPS captures default to `standalone`. An external
-Flow host must pass `collectionKind: 'flow'` and the actual `flowId`; the API
+The loader configuration accepts `collectionKind` and `flowId`. New captures
+default to `standalone`. An external Flow host must pass `collectionKind: 'flow'` and the actual `flowId`; the API
 validates company and instrument membership. The loader sends this context by
 postMessage and the app preserves it through config merging, text/audio bodies,
 and initial NPS score plus comment attachments. Changing provenance resets the
@@ -18,8 +18,7 @@ prepared evaluation so a comment cannot attach to an earlier response.
 Flow responses may create normal tickets but do not start follow-up, including
 one-step and incomplete Flows. Individual instruments inside a customer journey
 remain standalone unless the response actually comes from a Flow. This capture
-widget does not expose support conversations. Use the new options after the
-matching API, npm package and CDN assets are released.
+widget does not expose support conversations.
 
 ## Quick start
 
@@ -75,7 +74,7 @@ interface WokuWidgetConfig {
   email?: string; // preidentified customer
   phone?: string; // alternative to email
   dispatchToken?: string; // prepared journey response token
-  collectionKind?: 'standalone' | 'flow'; // proposed, unreleased
+  collectionKind?: 'standalone' | 'flow'; // default: 'standalone'
   flowId?: string; // required with collectionKind: 'flow'
   npsToolId?: string; // optional for NPS — omit for company-level
   apiBaseUrl?: string; // default: https://clientapi.woku.app
@@ -172,17 +171,17 @@ Build outputs:
 | `dist/app/index.html`   | Micro-app entry — loaded inside the iframe           |
 | `dist/app/assets/*`     | Hashed JS/CSS bundles for the micro-app              |
 
-## CDN paths for the proposed release (S3 + CloudFront)
+## CDN paths (S3 + CloudFront)
 
 ```
 cdn.woku.app/sdks/woku-widget/v1/loader.js          ← major-alias (cache 5 min)
 cdn.woku.app/sdks/woku-widget/v1/index.html         ← major-alias (cache 5 min)
-cdn.woku.app/sdks/woku-widget/v0.3.0/loader.js      ← semver-pinned (cache immutable)
-cdn.woku.app/sdks/woku-widget/v0.3.0/index.html
-cdn.woku.app/sdks/woku-widget/v0.3.0/assets/*
+cdn.woku.app/sdks/woku-widget/v<version>/loader.js  ← semver-pinned (cache immutable)
+cdn.woku.app/sdks/woku-widget/v<version>/index.html
+cdn.woku.app/sdks/woku-widget/v<version>/assets/*
 ```
 
-Deploy `dist/app/` and `dist/loader/loader.js` to both CDN prefixes after the compatible API release. Upload hashed assets before `index.html`; keep pinned versions immutable and invalidate only the `v1` alias. CDN deployment is separate from npm publication.
+Deploy `dist/app/` and `dist/loader/loader.js` to both CDN prefixes after the compatible API release. Upload hashed assets before `index.html`; keep pinned versions immutable and invalidate only the `v1` alias. CDN deployment is separate from npm publication: from the published commit, run `SEMVER=<version> ALIAS=v1 ./scripts/release-widget.sh` (while the package is 0.x the live alias is still `v1`, the loader's default).
 
 ## Architecture
 
@@ -213,7 +212,7 @@ deadline. Optional branding failures do not block public capture. Once NPS is
 confirmed, its id is reused when retrying an optional attachment. Uncertain REST
 score submissions have no automatic transport retry.
 
-Widget supports Woku/NPS; React Native supports all four instruments. Use only pk\_
+Widget and React Native support all four instruments. Use only pk\_
 keys; management keys are rejected. The API key used to prepare a journey stays
 on your backend and is never passed to the loader.
 

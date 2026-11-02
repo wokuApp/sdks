@@ -175,8 +175,8 @@ See [the example](./examples/journey-hybrid.ts) for a typed four-moment journey 
 webhook content and waits. It remains disabled and sends no evaluations.
 
 React Native supports identified Woku/NPS/CSAT/CES journey responses with a
-persistent scoped queue. Widget keeps Woku/NPS and accepts response context through
-postMessage. Package READMEs describe retry, identity and storage constraints.
+persistent scoped queue. Widget captures Woku/NPS/CSAT/CES and accepts response context
+through postMessage. Package READMEs describe retry, identity and storage constraints.
 
 Management and Native packages ship checked ESM/CJS exports with matching
 type declarations. Management types regenerate from a vendored API v1 spec;
