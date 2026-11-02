@@ -60,7 +60,8 @@ export const Qualifier = ({ messages }: QualifierProps) => {
         <p className="text-sm text-center font-medium text-neutral-800">
           {scaleTool?.question ?? ''}
         </p>
-        <div className="relative">
+        {/* pb-10: room for the hint, which the iframe would clip outside. */}
+        <div className="relative pb-10">
           <ScaleRating
             value={undefined}
             onChange={handleScaleChange}
@@ -69,7 +70,7 @@ export const Qualifier = ({ messages }: QualifierProps) => {
             ariaLabel={messages.aria.scaleRating}
           />
           {showTooltip && (
-            <div className="absolute inset-x-0 -bottom-10 mx-auto text-center">
+            <div className="absolute inset-x-0 bottom-0 mx-auto text-center">
               <TooltipBubble text={q.scaleTooltip} />
             </div>
           )}
@@ -87,7 +88,8 @@ export const Qualifier = ({ messages }: QualifierProps) => {
     return (
       <div className="flex flex-col gap-4 py-2 relative">
         <p className="text-sm text-center text-neutral-700">{question}</p>
-        <div className="relative">
+        {/* pb-10: room for the hint, which the iframe would clip outside. */}
+        <div className="relative pb-10">
           <NpsRating
             value={undefined}
             onChange={handleNpsChange}
@@ -96,7 +98,7 @@ export const Qualifier = ({ messages }: QualifierProps) => {
             ariaLabel={messages.aria.npsRating}
           />
           {showTooltip && (
-            <div className="absolute inset-x-0 -bottom-10 mx-auto text-center">
+            <div className="absolute inset-x-0 bottom-0 mx-auto text-center">
               <TooltipBubble text={q.npsTooltip} />
             </div>
           )}
@@ -119,7 +121,8 @@ export const Qualifier = ({ messages }: QualifierProps) => {
         {q.rateUs}{' '}
         <span className="font-semibold">{wokuData?.description ?? ''}</span>
       </p>
-      <div className="relative">
+      {/* pb-10: room for the hint, which the iframe would clip outside. */}
+      <div className="relative pb-10">
         <StarRating
           value={0}
           onChange={handleStarChange}
@@ -129,7 +132,7 @@ export const Qualifier = ({ messages }: QualifierProps) => {
           ariaLabel={messages.aria.starRating}
         />
         {showTooltip && (
-          <div className="absolute inset-x-0 -bottom-10 mx-auto text-center">
+          <div className="absolute inset-x-0 bottom-0 mx-auto text-center">
             <TooltipBubble text={q.tooltip} />
           </div>
         )}

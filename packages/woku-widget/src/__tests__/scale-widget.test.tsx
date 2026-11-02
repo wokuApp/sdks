@@ -269,3 +269,33 @@ it('closes with Escape, keeping the close button inside the panel', async () => 
     ),
   ).toBe(true);
 });
+
+it('keeps the rating hint inside the panel for every capture type', async () => {
+  // The iframe clips what is drawn outside the panel, and the panel is as
+  // tall as its content: the hint's room must be part of that content.
+  vi.useFakeTimers({ shouldAdvanceTime: true });
+  try {
+    for (const [config, hint] of [
+      [{ captureType: 'ces', cesToolId: 'c1' }, 'Selecciona del 1 al 5'],
+      [
+        { captureType: 'nps', npsToolId: 'n1' },
+        'Selecciona un puntaje del 0 al 10',
+      ],
+    ] as const) {
+      cleanup();
+      configure(config);
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(600);
+      });
+      const bubble = (await screen.findByText(hint)).closest(
+        '.absolute.inset-x-0',
+      ) as HTMLElement;
+      expect(bubble.className).not.toMatch(/-bottom-/);
+      expect((bubble.parentElement as HTMLElement).className).toContain(
+        'pb-10',
+      );
+    }
+  } finally {
+    vi.useRealTimers();
+  }
+});

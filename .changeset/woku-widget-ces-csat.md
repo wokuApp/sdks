@@ -16,7 +16,9 @@ once); the `open` event also fires when the panel opens by itself (modal, fullsc
 Also fixes the styling of the widget itself: the build never ran Tailwind, so the CSS shipped
 to the CDN (0.3.1) had no utility classes and the widget rendered unstyled; a side-tab opened
 by click or `startOpen` stayed squeezed into its 60 px collapsed width; and the close button,
-drawn outside the panel, was clipped by the iframe. Escape now closes an open panel.
+drawn outside the panel, was clipped by the iframe. The panel now follows the height of
+its content, with room for the rating hint ("Select from 1 to 5") so the iframe no longer
+cuts it. Escape now closes an open panel.
 
 The woku mode now reads the API's reviewer payload (`{ woku, users, company }`): the woku
 name and image were missing because the widget expected a flat object. The name uses the
