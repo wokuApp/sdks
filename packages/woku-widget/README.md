@@ -117,6 +117,11 @@ WokuWidget.on('skip', () => {
 });
 ```
 
+Lifecycle notes: `open` fires whenever the panel opens, by a click or by itself (`modal`,
+`fullscreen` or `startOpen`); after `submit` the thank-you step stays on screen for 2.5 s
+before the widget folds away. A person invited by `email` or `dispatchToken` is not offered
+to rate again.
+
 ## CSP requirements
 
 The host page must allow:

@@ -133,7 +133,10 @@ function AppShell({ messages }: { messages: ReturnType<typeof getMessages> }) {
     config.behavior === 'modal' || config.behavior === 'fullscreen';
 
   useEffect(() => {
-    if (isModal || config.startOpen) setOpen(true);
+    if (!isModal && !config.startOpen) return;
+    setOpen(true);
+    // The host hears "open" whether a person or the configuration opened it.
+    sendToHost('woku:open');
   }, [isModal, config.startOpen]);
 
   return (

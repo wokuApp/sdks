@@ -41,6 +41,9 @@ const _listeners: Map<WidgetEventName, EventCallback[]> = new Map();
 
 const DEFAULT_API_BASE = 'https://clientapi.woku.app';
 
+/** How long the thank-you step stays visible after a submit. */
+const THANK_YOU_VISIBLE_MS = 2500;
+
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
@@ -153,10 +156,15 @@ function handleAppMessage(msg: PostMessageFromApp): void {
       emit('close');
       break;
 
-    case 'woku:submit':
+    case 'woku:submit': {
       emit('submit', msg.payload);
-      _iframeManager.hide();
+      // Leave the thank-you step on screen before folding the widget away.
+      const manager = _iframeManager;
+      setTimeout(() => {
+        if (_iframeManager === manager) manager.hide();
+      }, THANK_YOU_VISIBLE_MS);
       break;
+    }
 
     case 'woku:skip':
       emit('skip');

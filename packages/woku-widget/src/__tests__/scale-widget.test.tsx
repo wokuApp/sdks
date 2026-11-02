@@ -223,3 +223,25 @@ it('keeps a side-tab collapsed until clicked when startOpen is not set', async (
     await screen.findByText('¿Qué tan fácil fue empezar a medir con woku?'),
   ).toBeTruthy();
 });
+
+it('tells the host it opened when startOpen opens the panel by itself', async () => {
+  configure({ captureType: 'ces', cesToolId: 'c1' });
+  await screen.findByText('¿Qué tan fácil fue empezar a medir con woku?');
+  expect(
+    posted.some(
+      (message) => (message as { type?: string })?.type === 'woku:open',
+    ),
+  ).toBe(true);
+});
+
+it('does not offer to rate again to a person invited by email', async () => {
+  configure({ captureType: 'ces', cesToolId: 'c1', email: 'ana@acme.com' });
+  fireEvent.click(await screen.findByRole('radio', { name: /^4/ }));
+  fireEvent.click(
+    await screen.findByRole('button', { name: 'Enviar sin comentario' }),
+  );
+  expect(await screen.findByText('¡Gracias por tu Opinión!')).toBeTruthy();
+  expect(
+    screen.queryByRole('button', { name: 'Volver a Calificar' }),
+  ).toBeNull();
+});

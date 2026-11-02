@@ -8,3 +8,7 @@ and audience when `npsToolId` is set. The score of NPS, CES and CSAT is kept whe
 sends without a comment (previously skipping the NPS comment discarded the score). New
 `startOpen` option opens a side-tab or banner as soon as its trigger fires. The iframe now
 delegates the microphone (`allow="microphone"`) so voice notes work on hosts that allow it.
+
+Fixes: the thank-you step stays visible for 2.5 s after a submit (it used to be hidden at
+once); the `open` event also fires when the panel opens by itself (modal, fullscreen or
+`startOpen`); a person invited by email or dispatch token is no longer offered "Rate again".
