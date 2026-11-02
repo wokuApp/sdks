@@ -1,7 +1,7 @@
 {
   "qualifier": {
     "rateBad": "Malo",
-    "rateGood": "Muy Bueno",
+    "rateGood": "Muy bueno",
     "tooltip": "Califica del 1 al 5",
     "rateUs": "Califica y deja un comentario sobre:",
     "npsQuestion": "¿Con qué probabilidad recomendarías nuestros servicios a un amigo o colega?",
