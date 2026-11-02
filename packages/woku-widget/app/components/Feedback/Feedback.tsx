@@ -381,8 +381,8 @@ export const Feedback = ({ messages }: FeedbackProps) => {
             </div>
             {showEmailTooltip && (
               <div className="absolute left-1 -top-10 z-50">
-                <div className="relative bg-indigo-600 rounded-lg text-white py-2 px-3 text-xs shadow-md">
-                  <div className="absolute left-4 -bottom-1.5 w-3 h-3 bg-indigo-600 rotate-45 rounded-[2px]" />
+                <div className="relative bg-neutral-900 rounded-md text-white py-2 px-3 text-xs shadow-md">
+                  <div className="absolute left-4 -bottom-1.5 w-3 h-3 bg-neutral-900 rotate-45 rounded-[2px]" />
                   {f.emailRequired}
                 </div>
               </div>
@@ -435,15 +435,25 @@ export const Feedback = ({ messages }: FeedbackProps) => {
         )}
       </div>
 
-      {/* Actions row */}
-      <div className="flex items-end gap-2 justify-end">
+      {/* Actions: send on top; skip (or keep the score) with the voice note
+          button below, as on the review.woku.app feedback step. */}
+      <Button
+        fullWidth
+        disabled={isSending || !hasContent}
+        loading={isSending}
+        onClick={() => void handleSubmit()}
+      >
+        {hasContent ? f.send : f.pending}
+      </Button>
+
+      <div className="flex items-center gap-2">
         <Button
+          variant="secondary"
           fullWidth
-          disabled={isSending || !hasContent}
-          loading={isSending}
-          onClick={() => void handleSubmit()}
+          disabled={isSending}
+          onClick={() => void handleSkip()}
         >
-          {hasContent ? f.send : f.pending}
+          {isScoreTool ? f.sendWithoutComment : f.skip}
         </Button>
 
         {!textnote && (
@@ -452,17 +462,15 @@ export const Feedback = ({ messages }: FeedbackProps) => {
               type="button"
               disabled={recording}
               onClick={handleAudioButtonClick}
-              className="text-neutral-600 disabled:opacity-50 hover:text-indigo-700 transition-colors"
+              className="h-10 w-10 rounded-full bg-indigo-700 text-white hover:bg-indigo-500 flex items-center justify-center transition-colors cursor-pointer disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
               aria-label={f.recordAudio}
             >
-              <Mic
-                className={`h-7 w-7 ${recording ? 'text-indigo-700' : ''}`}
-              />
+              <Mic className="h-4 w-4" />
             </button>
             {showMicTooltip && (
-              <div className="absolute -right-1 bottom-10 w-28 text-center text-xs">
-                <div className="relative bg-indigo-600 rounded-lg text-white py-2 px-3 shadow-md">
-                  <div className="absolute right-5 -bottom-1.5 w-3 h-3 bg-indigo-600 rotate-45 rounded-[2px]" />
+              <div className="absolute -right-1 bottom-12 w-28 text-center text-xs">
+                <div className="relative bg-neutral-900 rounded-md text-white py-2 px-3 shadow-md">
+                  <div className="absolute right-5 -bottom-1.5 w-3 h-3 bg-neutral-900 rotate-45 rounded-[2px]" />
                   <span className="font-semibold">{f.recordAudio}</span>
                 </div>
               </div>
@@ -470,20 +478,6 @@ export const Feedback = ({ messages }: FeedbackProps) => {
           </div>
         )}
       </div>
-
-      {/* Skip */}
-      <button
-        type="button"
-        disabled={isSending}
-        onClick={() => void handleSkip()}
-        className={
-          isScoreTool
-            ? 'text-sm text-indigo-700 hover:text-indigo-900 font-medium text-center mt-1 cursor-pointer disabled:opacity-50'
-            : 'text-xs text-neutral-400 hover:text-neutral-600 text-center mt-1 cursor-pointer'
-        }
-      >
-        {isScoreTool ? f.sendWithoutComment : f.skip}
-      </button>
     </div>
   );
 };

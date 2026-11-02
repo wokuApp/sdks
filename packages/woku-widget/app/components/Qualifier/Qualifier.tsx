@@ -143,8 +143,8 @@ export const Qualifier = ({ messages }: QualifierProps) => {
 
 function TooltipBubble({ text }: { text: string }) {
   return (
-    <div className="relative inline-block bg-indigo-600 rounded-lg text-white py-2 px-3 text-xs shadow-md">
-      <div className="absolute left-1/2 -translate-x-1/2 -top-1.5 w-3 h-3 bg-indigo-600 rotate-45 rounded-[2px]" />
+    <div className="relative inline-block bg-neutral-900 rounded-md text-white py-2 px-3 text-xs shadow-md">
+      <div className="absolute left-1/2 -translate-x-1/2 -top-1.5 w-3 h-3 bg-neutral-900 rotate-45 rounded-[2px]" />
       <span className="font-semibold">{text}</span>
     </div>
   );

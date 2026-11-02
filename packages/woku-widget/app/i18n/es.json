@@ -19,13 +19,13 @@
   "feedback": {
     "title": "Profundiza tu calificación dejando un texto o audio.",
     "placeholder": "Escribe aquí tu opinión...",
-    "send": "Enviar Feedback",
-    "pending": "Escribe o Graba tu Opinión",
+    "send": "Enviar",
+    "pending": "Escribe o graba tu opinión",
     "recordAudio": "Presiona para grabar audio",
     "stop": "Parar",
     "delete": "Borrar",
     "emailRequired": "Ingresa un email válido",
-    "skip": "Saltar",
+    "skip": "Omitir",
     "scoreTitle": "¿Quieres contarnos por qué? Es opcional.",
     "sendWithoutComment": "Enviar sin comentario"
   },

@@ -23,3 +23,9 @@ cuts it. Escape now closes an open panel.
 The woku mode now reads the API's reviewer payload (`{ woku, users, company }`): the woku
 name and image were missing because the widget expected a flat object. The name uses the
 widget language when the woku has that translation.
+
+The widget now looks like the woku review page its respondents already know: it applies
+Montserrat (it was loaded but never used), buttons have square corners instead of pills, the
+CES and CSAT scale uses bordered boxes, hints are dark tooltips, and the comment step puts
+"Send" first with the secondary action and a round voice-note button below. Copy: "Send
+Feedback" is now "Send", and the Spanish "Saltar" is now "Omitir".

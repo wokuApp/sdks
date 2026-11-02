@@ -159,7 +159,7 @@ it('sends a CSAT score with its comment', async () => {
   fireEvent.change(await screen.findByRole('textbox'), {
     target: { value: 'Muy clara' },
   });
-  fireEvent.click(screen.getByRole('button', { name: 'Enviar Feedback' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Enviar' }));
   await waitFor(() =>
     expect(
       calls.find((c) => c.url.endsWith('/v1/csat/r-csat/textnotes'))?.body,
@@ -298,4 +298,66 @@ it('keeps the rating hint inside the panel for every capture type', async () => 
   } finally {
     vi.useRealTimers();
   }
+});
+
+it('looks like the woku review page: boxed scale, square buttons, dark hint', async () => {
+  // Same visual language as review.woku.app, the page respondents already
+  // know: no pill buttons, no grey circles, no bright indigo bubbles.
+  vi.useFakeTimers({ shouldAdvanceTime: true });
+  try {
+    configure({ captureType: 'ces', cesToolId: 'c1', email: 'ana@acme.com' });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(600);
+    });
+    const option = await screen.findByRole('radio', { name: /^4/ });
+    expect(option.className).toMatch(/\brounded-lg\b/);
+    expect(option.className).toMatch(/\bborder\b/);
+    expect(option.className).not.toMatch(/rounded-full/);
+    const hint = (await screen.findByText('Selecciona del 1 al 5'))
+      .parentElement as HTMLElement;
+    expect(hint.className).toContain('bg-neutral-900');
+    expect(hint.className).not.toContain('bg-indigo-600');
+
+    fireEvent.click(option);
+    fireEvent.change(await screen.findByRole('textbox'), {
+      target: { value: 'Fácil' },
+    });
+    const send = screen.getByRole('button', { name: 'Enviar' });
+    expect(send.className).toMatch(/\brounded-md\b/);
+    expect(send.className).not.toMatch(/rounded-full/);
+    const skip = screen.getByRole('button', { name: 'Enviar sin comentario' });
+    expect(skip.className).toMatch(/\brounded-md\b/);
+    expect(skip.className).toMatch(/\bborder\b/);
+  } finally {
+    vi.useRealTimers();
+  }
+});
+
+it('offers voice notes with a round icon button next to the secondary action', async () => {
+  const base = fetch;
+  vi.stubGlobal('fetch', (input: RequestInfo | URL, init?: RequestInit) =>
+    String(input).includes('/v1/wokus/w1/review')
+      ? Promise.resolve(
+          respond({
+            woku: { _id: 'w1', description: 'Tus primeras opiniones en woku' },
+            users: [],
+            company: {},
+          }),
+        )
+      : base(input, init),
+  );
+  configure({ captureType: 'woku', wokuId: 'w1', email: 'ana@acme.com' });
+  await screen.findByText('Tus primeras opiniones en woku');
+  fireEvent.click(screen.getByRole('radio', { name: /^4/ }));
+  const mic = await screen.findByRole('button', {
+    name: 'Presiona para grabar audio',
+  });
+  expect(mic.className).toMatch(/\brounded-full\b/);
+  expect(mic.className).toContain('bg-indigo-700');
+  const skip = screen.getByRole('button', { name: 'Omitir' });
+  expect(skip.className).toMatch(/\brounded-md\b/);
+  expect(skip.parentElement).toBe(mic.parentElement?.parentElement ?? null);
+  expect(
+    screen.getByRole('button', { name: 'Escribe o graba tu opinión' }),
+  ).toBeTruthy();
 });

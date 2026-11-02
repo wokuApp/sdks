@@ -19,8 +19,8 @@
   "feedback": {
     "title": "Deepen your rating by leaving a text or audio note.",
     "placeholder": "Write your opinion here...",
-    "send": "Send Feedback",
-    "pending": "Write or Record your Opinion",
+    "send": "Send",
+    "pending": "Write or record your opinion",
     "recordAudio": "Press to record audio",
     "stop": "Stop",
     "delete": "Delete",

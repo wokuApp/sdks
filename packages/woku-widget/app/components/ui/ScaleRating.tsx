@@ -1,7 +1,7 @@
 /**
  * ScaleRating — 1-5 score picker for CES (effort) and CSAT (satisfaction).
- * Same visual language as NpsRating: round numbered buttons, the selected one
- * in indigo, the two ends labelled underneath.
+ * Same boxes as the CES and CSAT pages of review.woku.app: bordered squares,
+ * the selected one outlined in indigo, the two ends labelled underneath.
  */
 import * as React from 'react';
 import { cn } from './cn';
@@ -25,7 +25,7 @@ export const ScaleRating = ({
 }: ScaleRatingProps): React.ReactElement => (
   <div className={cn('flex flex-col gap-3', className)}>
     <div
-      className="flex justify-center gap-2"
+      className="grid grid-cols-5 gap-2"
       role="radiogroup"
       aria-label={ariaLabel}
     >
@@ -45,10 +45,10 @@ export const ScaleRating = ({
                   : String(score)
             }
             className={cn(
-              'h-11 w-11 rounded-full text-sm font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 cursor-pointer',
+              'h-11 rounded-lg border text-lg font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 cursor-pointer',
               selected
-                ? 'bg-indigo-700 text-white scale-110 shadow-md'
-                : 'bg-neutral-100 text-neutral-700 hover:bg-indigo-100 hover:text-indigo-700',
+                ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
+                : 'border-neutral-200 text-neutral-900 hover:bg-neutral-50',
             )}
             onClick={() => onChange(score)}
           >
