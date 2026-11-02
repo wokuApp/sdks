@@ -41,6 +41,12 @@ export function createIframeManager(
     ...(config.captureType === 'nps' && config.npsToolId
       ? { npsToolId: config.npsToolId }
       : {}),
+    ...(config.captureType === 'ces' && config.cesToolId
+      ? { cesToolId: config.cesToolId }
+      : {}),
+    ...(config.captureType === 'csat' && config.csatToolId
+      ? { csatToolId: config.csatToolId }
+      : {}),
     branding: String(config.branding !== false),
   });
 
@@ -58,6 +64,9 @@ export function createIframeManager(
   // allow-same-origin is needed so the micro-app can do fetch() calls
   // (cross-origin fetch from the CDN document to clientapi.woku.app).
   iframe.setAttribute('sandbox', 'allow-scripts allow-forms allow-same-origin');
+  // Voice notes: a cross-origin iframe may only use the microphone when the
+  // host delegates it. The host page's own Permissions-Policy still applies.
+  iframe.setAttribute('allow', 'microphone');
   iframe.setAttribute('title', 'Woku feedback widget');
   iframe.setAttribute('loading', 'lazy');
   Object.assign(iframe.style, iframeStyles(behavior));

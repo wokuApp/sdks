@@ -14,9 +14,12 @@ export interface WidgetAppConfig {
   dispatchToken?: string;
   collectionKind?: 'standalone' | 'flow';
   flowId?: string;
-  captureType: 'woku' | 'nps';
+  captureType: 'woku' | 'nps' | 'ces' | 'csat';
   wokuId?: string;
   npsToolId?: string;
+  cesToolId?: string;
+  csatToolId?: string;
+  startOpen?: boolean;
   apiBaseUrl: string;
   lang?: string;
   branding: boolean;
@@ -37,9 +40,12 @@ export function parseUrlConfig(): Partial<WidgetAppConfig> {
   return {
     companyId: params.get('companyId') ?? undefined,
     captureType:
-      (params.get('captureType') as 'woku' | 'nps' | null) ?? undefined,
+      (params.get('captureType') as WidgetAppConfig['captureType'] | null) ??
+      undefined,
     wokuId: params.get('wokuId') ?? undefined,
     npsToolId: params.get('npsToolId') ?? undefined,
+    cesToolId: params.get('cesToolId') ?? undefined,
+    csatToolId: params.get('csatToolId') ?? undefined,
     lang: params.get('lang') ?? undefined,
     branding: params.get('branding') !== 'false',
     apiBaseUrl: params.get('apiBaseUrl') ?? DEFAULT_API_BASE,
@@ -65,6 +71,9 @@ export function mergeConfig(
     captureType: merged.captureType ?? 'woku',
     wokuId: merged.wokuId,
     npsToolId: merged.npsToolId,
+    cesToolId: merged.cesToolId,
+    csatToolId: merged.csatToolId,
+    startOpen: merged.startOpen === true,
     apiBaseUrl: merged.apiBaseUrl ?? DEFAULT_API_BASE,
     lang: merged.lang,
     branding: merged.branding !== false,

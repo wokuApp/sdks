@@ -31,11 +31,20 @@ export interface WokuWidgetConfig {
   dispatchToken?: string;
   collectionKind?: 'standalone' | 'flow';
   flowId?: string;
-  captureType: 'woku' | 'nps';
+  captureType: 'woku' | 'nps' | 'ces' | 'csat';
   /** Required when captureType === 'woku' */
   wokuId?: string;
   /** Optional for captureType === 'nps'; if omitted, NPS is company-level */
   npsToolId?: string;
+  /** Required when captureType === 'ces' (1-5 effort, the tool's question) */
+  cesToolId?: string;
+  /** Required when captureType === 'csat' (1-5 satisfaction, the tool's question) */
+  csatToolId?: string;
+  /**
+   * Open the panel as soon as the trigger fires, also for `side-tab` and
+   * `banner` (which otherwise start as a collapsed tab). Default: false.
+   */
+  startOpen?: boolean;
   /** Default: https://clientapi.woku.app */
   apiBaseUrl?: string;
   /** Default: https://cdn.woku.app/sdks/woku-widget/v1 */

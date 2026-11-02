@@ -1,7 +1,8 @@
 /**
  * Feedback — Stage 2.
- * Text or audio input. Calls the correct endpoint (woku or nps).
- * Icons via lucide-react.
+ * Text or audio input. Calls the correct endpoint (woku, nps, ces or csat).
+ * For score tools (nps, ces, csat) the comment is optional: sending without
+ * it still records the score. Icons via lucide-react.
  */
 import { ChangeEvent, useState, useEffect, useRef } from 'react';
 import { Mic, Trash2, Square, Mail } from 'lucide-react';
@@ -15,6 +16,9 @@ import {
   createNps,
   createNpsTextnote,
   createNpsVoicemail,
+  createScaleResponse,
+  createScaleTextnote,
+  createScaleVoicemail,
 } from '../../services/capture';
 import type { Messages } from '../../i18n';
 
@@ -39,8 +43,13 @@ export const Feedback = ({ messages }: FeedbackProps) => {
     wokuData,
     npsId: existingNpsId,
     setNpsId,
+    scaleScore,
+    scaleTool,
+    scaleResponseId,
+    setScaleResponseId,
     setStep,
   } = useWidgetContext();
+  const isScoreTool = config.captureType !== 'woku';
 
   const [showAudioRecorder, setShowAudioRecorder] = useState(false);
   const [showMicTooltip, setShowMicTooltip] = useState(false);
@@ -121,18 +130,14 @@ export const Feedback = ({ messages }: FeedbackProps) => {
     try {
       if (config.captureType === 'woku') {
         await submitWoku();
+      } else if (config.captureType === 'nps') {
+        await submitNps(true);
       } else {
-        await submitNps();
+        await submitScale(true);
       }
 
       setStep('thank');
-
-      // Notify host of submission
-      sendToHost('woku:submit', {
-        captureType: config.captureType,
-        qualification,
-        npsScore,
-      });
+      notifySubmitted(true);
     } catch (err) {
       console.error('[WokuWidget] Submit error:', err);
     } finally {
@@ -185,7 +190,60 @@ export const Feedback = ({ messages }: FeedbackProps) => {
     }
   };
 
-  const submitNps = async () => {
+  const identity = () =>
+    anonymous || (!email && !config.phone)
+      ? { anonymous: true }
+      : {
+          ...(email ? { clientEmail: email } : {}),
+          ...(config.phone ? { clientPhone: config.phone } : {}),
+        };
+
+  const notifySubmitted = (comment: boolean) =>
+    sendToHost('woku:submit', {
+      captureType: config.captureType,
+      qualification,
+      npsScore,
+      score: scaleScore,
+      comment,
+    });
+
+  const submitScale = async (withComment: boolean) => {
+    const kind = config.captureType === 'ces' ? 'ces' : 'csat';
+    const toolId =
+      (kind === 'ces' ? config.cesToolId : config.csatToolId) ??
+      scaleTool?._id ??
+      '';
+    const responseId =
+      scaleResponseId ??
+      (await createScaleResponse({
+        kind,
+        apiBaseUrl: config.apiBaseUrl,
+        publishableKey: config.publishableKey,
+        collectionKind: config.collectionKind,
+        flowId: config.flowId,
+        toolId,
+        score: scaleScore ?? 1,
+        ...identity(),
+        dispatchToken: config.dispatchToken,
+      }));
+    setScaleResponseId(responseId);
+    if (!withComment) return;
+
+    const common = {
+      kind,
+      apiBaseUrl: config.apiBaseUrl,
+      publishableKey: config.publishableKey,
+      responseId,
+    } as const;
+    if (textnote && textnote.length > 0)
+      await createScaleTextnote({ ...common, description: textnote });
+    if (feedbackAudio) {
+      stopRecording();
+      await createScaleVoicemail({ ...common, file: feedbackAudio });
+    }
+  };
+
+  const submitNps = async (withComment: boolean) => {
     const score = npsScore ?? 0;
 
     // POST /v1/nps first to get the npsId
@@ -210,6 +268,7 @@ export const Feedback = ({ messages }: FeedbackProps) => {
       ).npsId;
 
     setNpsId(npsId);
+    if (!withComment) return;
 
     if (textnote && textnote.length > 0) {
       await createNpsTextnote({
@@ -235,9 +294,27 @@ export const Feedback = ({ messages }: FeedbackProps) => {
     }
   };
 
-  const handleSkip = () => {
-    setStep('thank');
-    sendToHost('woku:skip');
+  const handleSkip = async () => {
+    if (!isScoreTool) {
+      setStep('thank');
+      sendToHost('woku:skip');
+      return;
+    }
+    // A score tool's comment is optional: keep the score that was chosen.
+    if (isSendingRef.current) return;
+    isSendingRef.current = true;
+    setIsSending(true);
+    try {
+      if (config.captureType === 'nps') await submitNps(false);
+      else await submitScale(false);
+      setStep('thank');
+      notifySubmitted(false);
+    } catch (err) {
+      console.error('[WokuWidget] Submit error:', err);
+    } finally {
+      isSendingRef.current = false;
+      setIsSending(false);
+    }
   };
 
   const hasContent = Boolean(textnote) || Boolean(feedbackAudio);
@@ -248,7 +325,9 @@ export const Feedback = ({ messages }: FeedbackProps) => {
         visible ? 'opacity-100' : 'opacity-0'
       }`}
     >
-      <p className="text-center text-sm text-neutral-700">{f.title}</p>
+      <p className="text-center text-sm text-neutral-700">
+        {isScoreTool ? f.scoreTitle : f.title}
+      </p>
 
       <div className="h-full w-full flex flex-col gap-1">
         {/* Email / identity row */}
@@ -395,10 +474,15 @@ export const Feedback = ({ messages }: FeedbackProps) => {
       {/* Skip */}
       <button
         type="button"
-        onClick={handleSkip}
-        className="text-xs text-neutral-400 hover:text-neutral-600 text-center mt-1 cursor-pointer"
+        disabled={isSending}
+        onClick={() => void handleSkip()}
+        className={
+          isScoreTool
+            ? 'text-sm text-indigo-700 hover:text-indigo-900 font-medium text-center mt-1 cursor-pointer disabled:opacity-50'
+            : 'text-xs text-neutral-400 hover:text-neutral-600 text-center mt-1 cursor-pointer'
+        }
       >
-        {f.skip}
+        {isScoreTool ? f.sendWithoutComment : f.skip}
       </button>
     </div>
   );

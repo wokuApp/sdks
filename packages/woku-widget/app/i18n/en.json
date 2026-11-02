@@ -7,7 +7,14 @@
     "npsQuestion": "How likely are you to recommend our services to a friend or colleague?",
     "npsDetractor": "Not at all likely",
     "npsPromoter": "Extremely likely",
-    "npsTooltip": "Select a score from 0 to 10"
+    "npsTooltip": "Select a score from 0 to 10",
+    "npsToolQuestion": "On a scale of 0 to 10, how likely are you to recommend {target} to {audience}?",
+    "npsDefaultAudience": "a friend or colleague",
+    "cesLow": "Very difficult",
+    "cesHigh": "Very easy",
+    "csatLow": "Very dissatisfied",
+    "csatHigh": "Very satisfied",
+    "scaleTooltip": "Select from 1 to 5"
   },
   "feedback": {
     "title": "Deepen your rating by leaving a text or audio note.",
@@ -18,7 +25,9 @@
     "stop": "Stop",
     "delete": "Delete",
     "emailRequired": "Please enter a valid email",
-    "skip": "Skip"
+    "skip": "Skip",
+    "scoreTitle": "Want to tell us why? It is optional.",
+    "sendWithoutComment": "Send without comment"
   },
   "identity": {
     "emailPlaceholder": "Email...",
@@ -36,6 +45,7 @@
     "closeWidget": "Close widget",
     "openFeedback": "Open feedback",
     "starRating": "Star rating",
-    "npsRating": "NPS score from 0 to 10"
+    "npsRating": "NPS score from 0 to 10",
+    "scaleRating": "Score from 1 to 5"
   }
 }

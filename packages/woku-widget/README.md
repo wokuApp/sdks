@@ -32,9 +32,11 @@ matching API, npm package and CDN assets are released.
   WokuWidget.init({
     companyId: 'YOUR_COMPANY_ID',
     publishableKey: 'pk_live_...',
-    captureType: 'nps', // 'nps' | 'woku'
+    captureType: 'nps', // 'nps' | 'woku' | 'ces' | 'csat'
     // wokuId: 'WOKU_ID',        // required when captureType === 'woku'
     // npsToolId: 'NPS_TOOL_ID', // optional for NPS (omit for company-level NPS)
+    // cesToolId: 'CES_TOOL_ID', // required when captureType === 'ces'
+    // csatToolId: 'CSAT_TOOL_ID', // required when captureType === 'csat'
     // lang: 'es',               // 'es' | 'en'; auto-detected from browser if omitted
     triggers: [{ type: 'time', value: 5, behavior: 'modal' }],
   });
@@ -46,10 +48,18 @@ page — all styles live inside the iframe (zero risk of clashing with host styl
 
 ## captureType
 
-| Value    | Rating UI           | API endpoint                                                      |
-| -------- | ------------------- | ----------------------------------------------------------------- |
-| `'woku'` | 5-star rating (1-5) | `POST /v1/wokus/:wokuId/textnotes` \| `/voicemails`               |
-| `'nps'`  | NPS scale (0-10)    | `POST /v1/nps` → `POST /v1/nps/:npsId/textnotes` \| `/voicemails` |
+| Value    | Rating UI           | API endpoint                                                         |
+| -------- | ------------------- | -------------------------------------------------------------------- |
+| `'woku'` | 5-star rating (1-5) | `POST /v1/wokus/:wokuId/textnotes` \| `/voicemails`                  |
+| `'nps'`  | NPS scale (0-10)    | `POST /v1/nps` → `POST /v1/nps/:npsId/textnotes` \| `/voicemails`    |
+| `'ces'`  | Effort scale (1-5)  | `POST /v1/ces` → `POST /v1/ces/:cesId/textnotes` \| `/voicemails`    |
+| `'csat'` | Satisfaction (1-5)  | `POST /v1/csat` → `POST /v1/csat/:csatId/textnotes` \| `/voicemails` |
+
+CES and CSAT show the tool's own question (read with `GET /v1/ces-tool/:id?lang=` or
+`/v1/csat-tool/:id?lang=`, in the widget language when the tool has that copy). NPS uses
+the tool's subject and audience when `npsToolId` is set. For `nps`, `ces` and `csat` the
+comment is optional: **Send without comment** records the score; in a woku the comment is
+the review itself, so **Skip** sends nothing.
 
 ## WokuWidgetConfig
 
@@ -57,9 +67,11 @@ page — all styles live inside the iframe (zero risk of clashing with host styl
 interface WokuWidgetConfig {
   companyId: string;
   publishableKey: string; // pk_... safe to embed in the page
-  captureType: 'woku' | 'nps';
+  captureType: 'woku' | 'nps' | 'ces' | 'csat';
 
   wokuId?: string; // required when captureType === 'woku'
+  cesToolId?: string; // required when captureType === 'ces'
+  csatToolId?: string; // required when captureType === 'csat'
   email?: string; // preidentified customer
   phone?: string; // alternative to email
   dispatchToken?: string; // prepared journey response token
@@ -70,6 +82,7 @@ interface WokuWidgetConfig {
   widgetBaseUrl?: string; // default: https://cdn.woku.app/sdks/woku-widget/v1
   lang?: string; // 'es' | 'en'; auto-detect if omitted
   branding?: boolean; // show "Powered by Woku"; default: true
+  startOpen?: boolean; // open side-tab/banner as soon as a trigger fires; default: false
 
   triggers: TriggerConfig[];
   theme?: ThemeConfig;
@@ -115,6 +128,11 @@ Content-Security-Policy:
 ```
 
 The loader does not use `eval` or inline scripts.
+
+Voice notes: the iframe is created with `allow="microphone"`. If the host page sends a
+`Permissions-Policy` header, it must also delegate the microphone to the widget origin, for
+example `microphone=(self "https://cdn.woku.app")`; otherwise text still works and audio is
+unavailable.
 
 ## i18n
 

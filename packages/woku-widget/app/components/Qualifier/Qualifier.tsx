@@ -1,11 +1,12 @@
 /**
  * Qualifier — Stage 1.
- * Renders StarRating (woku mode) or NpsRating (nps mode).
- * On selection, advances to the Feedback stage.
+ * Renders StarRating (woku), NpsRating (nps) or ScaleRating (ces/csat, with
+ * the tool's own question). On selection, advances to the Feedback stage.
  */
 import { useState, useEffect } from 'react';
 import { StarRating } from '../ui/StarRating';
 import { NpsRating } from '../ui/NpsRating';
+import { ScaleRating } from '../ui/ScaleRating';
 import { useWidgetContext } from '../../contexts/WidgetContext';
 import type { Messages } from '../../i18n';
 
@@ -14,7 +15,16 @@ interface QualifierProps {
 }
 
 export const Qualifier = ({ messages }: QualifierProps) => {
-  const { config, wokuData, setQualification, setNpsScore, setStep } = useWidgetContext();
+  const {
+    config,
+    wokuData,
+    npsTool,
+    scaleTool,
+    setQualification,
+    setNpsScore,
+    setScaleScore,
+    setStep,
+  } = useWidgetContext();
   const [showTooltip, setShowTooltip] = useState(false);
 
   useEffect(() => {
@@ -36,12 +46,47 @@ export const Qualifier = ({ messages }: QualifierProps) => {
     setTimeout(() => setStep('feedback'), 250);
   };
 
+  const handleScaleChange = (score: number) => {
+    setScaleScore(score);
+    setTimeout(() => setStep('feedback'), 250);
+  };
+
   const q = messages.qualifier;
 
-  if (config.captureType === 'nps') {
+  if (config.captureType === 'ces' || config.captureType === 'csat') {
+    const isCes = config.captureType === 'ces';
     return (
       <div className="flex flex-col gap-4 py-2 relative">
-        <p className="text-sm text-center text-neutral-700">{q.npsQuestion}</p>
+        <p className="text-sm text-center font-medium text-neutral-800">
+          {scaleTool?.question ?? ''}
+        </p>
+        <div className="relative">
+          <ScaleRating
+            value={undefined}
+            onChange={handleScaleChange}
+            lowLabel={isCes ? q.cesLow : q.csatLow}
+            highLabel={isCes ? q.cesHigh : q.csatHigh}
+            ariaLabel={messages.aria.scaleRating}
+          />
+          {showTooltip && (
+            <div className="absolute inset-x-0 -bottom-10 mx-auto text-center">
+              <TooltipBubble text={q.scaleTooltip} />
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (config.captureType === 'nps') {
+    const question = npsTool?.npsMessage
+      ? q.npsToolQuestion
+          .replace('{target}', npsTool.npsMessage)
+          .replace('{audience}', npsTool.audienceType || q.npsDefaultAudience)
+      : q.npsQuestion;
+    return (
+      <div className="flex flex-col gap-4 py-2 relative">
+        <p className="text-sm text-center text-neutral-700">{question}</p>
         <div className="relative">
           <NpsRating
             value={undefined}

@@ -78,6 +78,8 @@ export default function Root() {
         config.captureType,
         config.wokuId,
         config.npsToolId,
+        config.cesToolId,
+        config.csatToolId,
         config.dispatchToken,
         config.collectionKind,
         config.flowId,
@@ -131,8 +133,8 @@ function AppShell({ messages }: { messages: ReturnType<typeof getMessages> }) {
     config.behavior === 'modal' || config.behavior === 'fullscreen';
 
   useEffect(() => {
-    if (isModal) setOpen(true);
-  }, [isModal]);
+    if (isModal || config.startOpen) setOpen(true);
+  }, [isModal, config.startOpen]);
 
   return (
     <div ref={containerRef} className="font-sans text-neutral-900">
