@@ -63,7 +63,13 @@ export function createIframeManager(
   iframe.src = src;
   // allow-same-origin is needed so the micro-app can do fetch() calls
   // (cross-origin fetch from the CDN document to clientapi.woku.app).
-  iframe.setAttribute('sandbox', 'allow-scripts allow-forms allow-same-origin');
+  // allow-popups lets "Powered by woku" open woku.app in a new tab (without
+  // it the click does nothing); the new tab escapes the sandbox so woku.app
+  // works. The host page itself can never be navigated (no top navigation).
+  iframe.setAttribute(
+    'sandbox',
+    'allow-scripts allow-forms allow-same-origin allow-popups allow-popups-to-escape-sandbox',
+  );
   // Voice notes: a cross-origin iframe may only use the microphone when the
   // host delegates it. The host page's own Permissions-Policy still applies.
   iframe.setAttribute('allow', 'microphone');

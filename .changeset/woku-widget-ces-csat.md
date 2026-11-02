@@ -33,4 +33,6 @@ Feedback" is now "Send", and the Spanish "Saltar" is now "Omitir".
 The woku image keeps its proportions in the short frame, as on review.woku.app: a blurred
 cover fills the frame and the whole image sits on top, without the black border. "Powered by
 woku" now shows the woku logo on every step, thank-you included, and opens woku.app (with UTM
-tags) in a new tab so the person never leaves the page they answer on.
+tags) in a new tab so the person never leaves the page they answer on. The iframe sandbox now allows
+popups (escaping the sandbox): without it the browser silently dropped every click on that
+link, the old text link included.
