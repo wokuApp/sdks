@@ -8,6 +8,7 @@ import { X, MessageSquare } from 'lucide-react';
 import { Qualifier } from './components/Qualifier/Qualifier';
 import { Feedback } from './components/Feedback/Feedback';
 import { Thank } from './components/Thank/Thank';
+import { PoweredByWoku } from './components/ui/PoweredByWoku';
 import { WidgetProvider, useWidgetContext } from './contexts/WidgetContext';
 import { sendToHost, onHostMessage, notifyResize } from './bridge';
 import { parseUrlConfig, mergeConfig, type WidgetAppConfig } from './config';
@@ -175,17 +176,11 @@ function AppShell({ messages }: { messages: ReturnType<typeof getMessages> }) {
 
           {/* Branding */}
           {config.branding && (
-            <div className="text-xs text-neutral-400 flex items-center gap-1 justify-center mt-auto">
-              <span>{messages.branding.poweredBy}</span>
-              <a
-                href="https://woku.app"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline font-medium"
-              >
-                woku
-              </a>
-            </div>
+            <PoweredByWoku
+              label={messages.branding.poweredBy}
+              campaign={config.captureType}
+              className="mt-auto"
+            />
           )}
         </div>
       ) : (

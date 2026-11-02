@@ -240,9 +240,9 @@ it('does not offer to rate again to a person invited by email', async () => {
   fireEvent.click(
     await screen.findByRole('button', { name: 'Enviar sin comentario' }),
   );
-  expect(await screen.findByText('¡Gracias por tu Opinión!')).toBeTruthy();
+  expect(await screen.findByText('¡Gracias por tu opinión!')).toBeTruthy();
   expect(
-    screen.queryByRole('button', { name: 'Volver a Calificar' }),
+    screen.queryByRole('button', { name: 'Volver a calificar' }),
   ).toBeNull();
 });
 
@@ -360,4 +360,70 @@ it('offers voice notes with a round icon button next to the secondary action', a
   expect(
     screen.getByRole('button', { name: 'Escribe o graba tu opinión' }),
   ).toBeTruthy();
+});
+
+const withWokuReview = () => {
+  const base = fetch;
+  vi.stubGlobal('fetch', (input: RequestInfo | URL, init?: RequestInit) =>
+    String(input).includes('/v1/wokus/w1/review')
+      ? Promise.resolve(
+          respond({
+            woku: {
+              _id: 'w1',
+              description: 'Tus primeras opiniones en woku',
+              imageUrl: 'https://cdn.test/woku.png',
+            },
+            users: [],
+            company: {},
+          }),
+        )
+      : base(input, init),
+  );
+};
+
+it('fits the woku image like review: blurred cover behind, whole image on top, no border', async () => {
+  withWokuReview();
+  configure({ captureType: 'woku', wokuId: 'w1', email: 'ana@acme.com' });
+  const image = await screen.findByRole('img', {
+    name: 'Tus primeras opiniones en woku',
+  });
+  expect(image.className).toContain('object-contain');
+  const frame = image.parentElement as HTMLElement;
+  expect(frame.className).toContain('h-20');
+  expect(frame.className).not.toMatch(/\bborder\b/);
+  const backdrop = frame.querySelector('img[aria-hidden="true"]');
+  expect(backdrop?.getAttribute('src')).toBe('https://cdn.test/woku.png');
+  expect(backdrop?.className).toContain('object-cover');
+  expect(backdrop?.className).toContain('blur');
+});
+
+const poweredBy = () =>
+  screen.getByRole('link', { name: /powered by/i }) as HTMLAnchorElement;
+
+it('signs every step with the woku logo, opening woku.app in a new tab', async () => {
+  configure({ captureType: 'ces', cesToolId: 'c1', email: 'ana@acme.com' });
+  await screen.findByRole('radio', { name: /^4/ });
+  const link = poweredBy();
+  expect(link.querySelector('svg')).toBeTruthy();
+  expect(link.target).toBe('_blank');
+  expect(link.rel).toContain('noopener');
+  const url = new URL(link.href);
+  expect(url.origin).toBe('https://woku.app');
+  expect(url.searchParams.get('utm_source')).toBe('widget');
+  expect(url.searchParams.get('utm_medium')).toBe('powered_by');
+  expect(url.searchParams.get('utm_campaign')).toBe('ces');
+
+  // The thank-you step keeps it.
+  fireEvent.click(screen.getByRole('radio', { name: /^4/ }));
+  fireEvent.click(
+    await screen.findByRole('button', { name: 'Enviar sin comentario' }),
+  );
+  await screen.findByText(/gracias/i);
+  expect(poweredBy().querySelector('svg')).toBeTruthy();
+});
+
+it('leaves the woku mark out when the host turns branding off', async () => {
+  configure({ captureType: 'ces', cesToolId: 'c1', branding: false });
+  await screen.findByRole('radio', { name: /^4/ });
+  expect(screen.queryByRole('link', { name: /powered by/i })).toBeNull();
 });

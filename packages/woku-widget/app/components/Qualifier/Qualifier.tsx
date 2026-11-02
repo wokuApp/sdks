@@ -111,11 +111,22 @@ export const Qualifier = ({ messages }: QualifierProps) => {
   return (
     <div className="flex flex-col gap-4 py-2 relative">
       {wokuData?.imageUrl && (
-        <img
-          src={wokuData.imageUrl}
-          alt="Woku"
-          className="object-cover h-20 w-full rounded-lg border shadow"
-        />
+        // As on review.woku.app: a blurred cover fills the frame and the whole
+        // image sits on top, so any aspect ratio fits the short frame.
+        <div className="relative h-20 w-full overflow-hidden rounded-lg bg-neutral-100">
+          <img
+            src={wokuData.imageUrl}
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 h-full w-full object-cover scale-110 blur-[5px]"
+          />
+          <div className="absolute inset-0 bg-white/20" aria-hidden="true" />
+          <img
+            src={wokuData.imageUrl}
+            alt={wokuData.description ?? 'woku'}
+            className="absolute inset-0 h-full w-full object-contain"
+          />
+        </div>
       )}
       <p className="text-xs text-center text-neutral-700">
         {q.rateUs}{' '}
