@@ -9,7 +9,7 @@ sends without a comment (previously skipping the NPS comment discarded the score
 `startOpen` option opens a side-tab or banner as soon as its trigger fires. The iframe now
 delegates the microphone (`allow="microphone"`) so voice notes work on hosts that allow it.
 
-Fixes: the thank-you step stays visible for 2.5 s after a submit (it used to be hidden at
+Fixes: the thank-you step stays visible for 10 s after a submit (it used to be hidden at
 once); the `open` event also fires when the panel opens by itself (modal, fullscreen or
 `startOpen`); a person invited by email or dispatch token is no longer offered "Rate again".
 
@@ -36,3 +36,6 @@ woku" now shows the woku logo on every step, thank-you included, and opens woku.
 tags) in a new tab so the person never leaves the page they answer on. The iframe sandbox now allows
 popups (escaping the sandbox): without it the browser silently dropped every click on that
 link, the old text link included.
+
+The comment step shows the chosen rating (stars or score) and lets the person go back to
+change it until the response is sent.

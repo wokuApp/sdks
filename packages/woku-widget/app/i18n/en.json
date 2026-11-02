@@ -27,7 +27,9 @@
     "emailRequired": "Please enter a valid email",
     "skip": "Skip",
     "scoreTitle": "Want to tell us why? It is optional.",
-    "sendWithoutComment": "Send without comment"
+    "sendWithoutComment": "Send without comment",
+    "change": "Change",
+    "changeRating": "Change your rating"
   },
   "identity": {
     "emailPlaceholder": "Email...",

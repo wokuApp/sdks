@@ -48,14 +48,16 @@ const openWidget = async () => {
   fromIframe('woku:ready');
 };
 
-it('keeps the thank-you step on screen briefly after a submit, then hides', async () => {
+it('keeps the thank-you step on screen for 10 s after a submit, then hides', async () => {
+  // Long enough to read it and to follow "Powered by woku".
   const submitted = vi.fn();
   window.WokuWidget.on('submit', submitted);
   await openWidget();
   fromIframe('woku:submit', { score: 4 });
   expect(submitted).toHaveBeenCalledWith({ score: 4 });
+  await vi.advanceTimersByTimeAsync(9000);
   expect(overlay().style.display).not.toBe('none');
-  await vi.advanceTimersByTimeAsync(3000);
+  await vi.advanceTimersByTimeAsync(1500);
   expect(overlay().style.display).toBe('none');
 });
 

@@ -27,7 +27,9 @@
     "emailRequired": "Ingresa un email válido",
     "skip": "Omitir",
     "scoreTitle": "¿Quieres contarnos por qué? Es opcional.",
-    "sendWithoutComment": "Enviar sin comentario"
+    "sendWithoutComment": "Enviar sin comentario",
+    "change": "Cambiar",
+    "changeRating": "Cambiar tu calificación"
   },
   "identity": {
     "emailPlaceholder": "Email...",

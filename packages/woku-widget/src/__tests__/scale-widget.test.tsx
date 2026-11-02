@@ -427,3 +427,35 @@ it('leaves the woku mark out when the host turns branding off', async () => {
   await screen.findByRole('radio', { name: /^4/ });
   expect(screen.queryByRole('link', { name: /powered by/i })).toBeNull();
 });
+
+it('shows the chosen score above the comment and lets the person change it', async () => {
+  configure({ captureType: 'ces', cesToolId: 'c1', email: 'ana@acme.com' });
+  fireEvent.click(await screen.findByRole('radio', { name: /^4/ }));
+  fireEvent.click(
+    await screen.findByRole('button', { name: 'Cambiar tu calificación: 4' }),
+  );
+  // Back on the scale, with the previous choice still marked.
+  const previous = await screen.findByRole('radio', { name: /^4/ });
+  expect(previous.getAttribute('aria-checked')).toBe('true');
+  fireEvent.click(screen.getByRole('radio', { name: /^2/ }));
+  await screen.findByRole('button', { name: 'Cambiar tu calificación: 2' });
+  fireEvent.click(
+    screen.getByRole('button', { name: 'Enviar sin comentario' }),
+  );
+  await waitFor(() =>
+    expect(
+      calls.find((c) => c.method === 'POST' && c.url.endsWith('/v1/ces'))?.body,
+    ).toEqual(expect.objectContaining({ score: 2 })),
+  );
+});
+
+it('shows the chosen stars above the woku comment', async () => {
+  withWokuReview();
+  configure({ captureType: 'woku', wokuId: 'w1', email: 'ana@acme.com' });
+  await screen.findByText('Tus primeras opiniones en woku');
+  fireEvent.click(screen.getByRole('radio', { name: /^4/ }));
+  const change = await screen.findByRole('button', {
+    name: 'Cambiar tu calificación: 4',
+  });
+  expect(change.querySelectorAll('svg.fill-yellow-500')).toHaveLength(4);
+});

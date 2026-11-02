@@ -42,7 +42,8 @@ const _listeners: Map<WidgetEventName, EventCallback[]> = new Map();
 const DEFAULT_API_BASE = 'https://clientapi.woku.app';
 
 /** How long the thank-you step stays visible after a submit. */
-const THANK_YOU_VISIBLE_MS = 2500;
+// Long enough to read it and to follow "Powered by woku".
+const THANK_YOU_VISIBLE_MS = 10_000;
 
 // ---------------------------------------------------------------------------
 // Public API

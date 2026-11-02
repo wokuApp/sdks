@@ -20,8 +20,11 @@ export const Qualifier = ({ messages }: QualifierProps) => {
     wokuData,
     npsTool,
     scaleTool,
+    qualification,
     setQualification,
+    npsScore,
     setNpsScore,
+    scaleScore,
     setScaleScore,
     setStep,
   } = useWidgetContext();
@@ -63,7 +66,7 @@ export const Qualifier = ({ messages }: QualifierProps) => {
         {/* pb-10: room for the hint, which the iframe would clip outside. */}
         <div className="relative pb-10">
           <ScaleRating
-            value={undefined}
+            value={scaleScore}
             onChange={handleScaleChange}
             lowLabel={isCes ? q.cesLow : q.csatLow}
             highLabel={isCes ? q.cesHigh : q.csatHigh}
@@ -91,7 +94,7 @@ export const Qualifier = ({ messages }: QualifierProps) => {
         {/* pb-10: room for the hint, which the iframe would clip outside. */}
         <div className="relative pb-10">
           <NpsRating
-            value={undefined}
+            value={npsScore}
             onChange={handleNpsChange}
             detractorLabel={q.npsDetractor}
             promoterLabel={q.npsPromoter}
@@ -135,7 +138,7 @@ export const Qualifier = ({ messages }: QualifierProps) => {
       {/* pb-10: room for the hint, which the iframe would clip outside. */}
       <div className="relative pb-10">
         <StarRating
-          value={0}
+          value={qualification ?? 0}
           onChange={handleStarChange}
           size="md"
           badLabel={q.rateBad}

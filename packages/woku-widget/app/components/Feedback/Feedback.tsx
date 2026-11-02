@@ -5,7 +5,7 @@
  * it still records the score. Icons via lucide-react.
  */
 import { ChangeEvent, useState, useEffect, useRef } from 'react';
-import { Mic, Trash2, Square, Mail } from 'lucide-react';
+import { Mic, Trash2, Square, Mail, Star } from 'lucide-react';
 import AudioRecorder from '../common/AudioRecorder';
 import { Button } from '../ui/Button';
 import { useWidgetContext } from '../../contexts/WidgetContext';
@@ -50,6 +50,14 @@ export const Feedback = ({ messages }: FeedbackProps) => {
     setStep,
   } = useWidgetContext();
   const isScoreTool = config.captureType !== 'woku';
+  const chosen =
+    config.captureType === 'woku'
+      ? qualification
+      : config.captureType === 'nps'
+        ? npsScore
+        : scaleScore;
+  // A retry after a failed attachment reuses the recorded response.
+  const scoreRecorded = Boolean(existingNpsId || scaleResponseId);
 
   const [showAudioRecorder, setShowAudioRecorder] = useState(false);
   const [showMicTooltip, setShowMicTooltip] = useState(false);
@@ -325,6 +333,45 @@ export const Feedback = ({ messages }: FeedbackProps) => {
         visible ? 'opacity-100' : 'opacity-0'
       }`}
     >
+      {/* The chosen rating stays in sight, as on review.woku.app, and can be
+          changed until it is sent (once recorded, it is final). */}
+      {chosen !== undefined && (
+        <button
+          type="button"
+          onClick={() => setStep('qualifier')}
+          disabled={isSending || recording || scoreRecorded}
+          aria-label={`${f.changeRating}: ${chosen}`}
+          className="self-center flex items-center gap-2 rounded-md px-2 py-1 text-xs cursor-pointer hover:bg-neutral-100 disabled:cursor-default disabled:hover:bg-transparent"
+        >
+          {config.captureType === 'woku' ? (
+            <span className="flex gap-0.5" aria-hidden="true">
+              {[1, 2, 3, 4, 5].map((v) => (
+                <Star
+                  key={v}
+                  className={
+                    v <= chosen
+                      ? 'h-4 w-4 fill-yellow-500 stroke-yellow-500'
+                      : 'h-4 w-4 fill-transparent stroke-neutral-300'
+                  }
+                />
+              ))}
+            </span>
+          ) : (
+            <span
+              aria-hidden="true"
+              className="rounded-md border border-indigo-600 bg-indigo-50 px-2 py-0.5 text-sm font-bold text-indigo-700"
+            >
+              {chosen}
+            </span>
+          )}
+          {!scoreRecorded && (
+            <span className="font-medium text-indigo-700 underline">
+              {f.change}
+            </span>
+          )}
+        </button>
+      )}
+
       <p className="text-center text-sm text-neutral-700">
         {isScoreTool ? f.scoreTitle : f.title}
       </p>
