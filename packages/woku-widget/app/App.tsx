@@ -156,7 +156,7 @@ function AppShell({ messages }: { messages: ReturnType<typeof getMessages> }) {
     <div ref={containerRef} className="font-sans text-neutral-900 w-max">
       {open ? (
         // Widget panel
-        <div className="relative bg-white border border-neutral-200 rounded-xl shadow-xl w-72 min-h-64 flex flex-col gap-3 px-4 pb-4 pt-9">
+        <div className="relative bg-white border border-neutral-200 rounded-xl shadow-xl w-72 flex flex-col gap-3 px-4 pb-4 pt-9">
           {/* Close button */}
           <button
             type="button"
