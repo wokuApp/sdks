@@ -67,7 +67,10 @@ export class Wokus {
     );
   }
 
-  /** Apply the boolean settings idempotently (closed/reviewsDisabled/...). */
+  /**
+   * Apply the woku settings idempotently: the booleans (closed, reviewsDisabled,
+   * ...) and the declared usage (`usageContext`, `null` clears it).
+   */
   updateSettings(
     id: string,
     body: UpdateWokuSettingsParams,
