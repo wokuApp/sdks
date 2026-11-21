@@ -504,6 +504,16 @@ copy stays frozen:
 await woku.npsTools.update('nps_tool_id', { onlyOneResponsePerClient: true });
 ```
 
+A woku can declare where it will be used: `usageContext` is `'event'` (one-off event or session), `'fixed'`
+(fixed place with a permanent QR or link), `'list'` (sent to a list by email or
+WhatsApp) or `null` (not declared). It comes back on every woku and is set or
+cleared with `updateSettings`, also once the woku has reviews:
+
+```ts
+await woku.wokus.updateSettings('woku_id', { usageContext: 'event' });
+await woku.wokus.updateSettings('woku_id', { usageContext: null }); // clear
+```
+
 ### Scheduled reports
 
 Email the PDF report of a folder (every tool of its subtree, optionally with

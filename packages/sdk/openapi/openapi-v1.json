@@ -10115,6 +10115,16 @@
           "onlyOneReviewPerClient": {
             "type": "boolean",
             "description": "Whether each client may leave only one review."
+          },
+          "usageContext": {
+            "type": "string",
+            "description": "Declared usage of the woku: event (one-off event or session), fixed (fixed place with a permanent QR or link) or list (sent to a list by email or WhatsApp). null clears it; absent leaves it as is.",
+            "enum": [
+              "event",
+              "fixed",
+              "list"
+            ],
+            "nullable": true
           }
         }
       },

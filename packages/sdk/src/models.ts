@@ -324,6 +324,12 @@ export interface WokuResource {
   reviewsDisabled?: boolean;
   anonymousDisabled?: boolean;
   onlyOneReviewPerClient?: boolean;
+  /**
+   * Declared usage of the woku: a one-off `event` or session, a `fixed` place
+   * with a permanent QR or link, or a `list` send by email or WhatsApp. `null`
+   * when not declared.
+   */
+  usageContext?: 'event' | 'fixed' | 'list' | null;
   availableLocales?: string[];
   defaultLocale?: string;
   createdAt?: string;

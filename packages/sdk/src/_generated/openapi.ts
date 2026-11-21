@@ -2957,6 +2957,11 @@ export interface components {
             anonymousDisabled?: boolean;
             /** @description Whether each client may leave only one review. */
             onlyOneReviewPerClient?: boolean;
+            /**
+             * @description Declared usage of the woku: event (one-off event or session), fixed (fixed place with a permanent QR or link) or list (sent to a list by email or WhatsApp). null clears it; absent leaves it as is.
+             * @enum {string|null}
+             */
+            usageContext?: "event" | "fixed" | "list" | null;
         };
         MoveWokuBodyDTO: {
             /**

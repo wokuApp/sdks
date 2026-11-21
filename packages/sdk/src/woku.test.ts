@@ -217,6 +217,32 @@ describe('Woku facade — request shaping', () => {
     expect(ids).toEqual(['a', 'b']);
   });
 
+  it('wokus.updateSettings sets or clears the declared usage (usageContext)', async () => {
+    const bodies: unknown[] = [];
+    server.use(
+      http.patch(`${BASE}/v1/wokus/w1/settings`, async ({ request }) => {
+        const body = (await request.json()) as { usageContext: unknown };
+        bodies.push(body);
+        return HttpResponse.json({
+          _id: 'w1',
+          description: 'Feria',
+          usageContext: body.usageContext,
+        });
+      }),
+    );
+
+    const set = await woku().wokus.updateSettings('w1', {
+      usageContext: 'event',
+    });
+    const cleared = await woku().wokus.updateSettings('w1', {
+      usageContext: null,
+    });
+
+    expect(bodies).toEqual([{ usageContext: 'event' }, { usageContext: null }]);
+    expect(set.usageContext).toBe('event');
+    expect(cleared.usageContext).toBeNull();
+  });
+
   it('dispatches.stats reads /v1/dispatches/stats', async () => {
     server.use(
       http.get(`${BASE}/v1/dispatches/stats`, () =>
