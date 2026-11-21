@@ -1,5 +1,11 @@
 # @wokuapp/sdk
 
+## 0.13.0
+
+### Minor Changes
+
+- b92ae53: Wokus expose their declared usage, `usageContext` (`'event' | 'fixed' | 'list' | null`), on every woku and accept it in `wokus.updateSettings` to set or clear it.
+
 ## 0.12.0
 
 ### Minor Changes
